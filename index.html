@@ -1,0 +1,1018 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Interactive Poem – Revision Space</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <style>
+    :root {
+      --bg: #0b1020;
+      --bg-alt: #12172a;
+      --accent: #ffb347;
+      --accent-soft: rgba(255, 179, 71, 0.18);
+      --accent-strong: #ff914d;
+      --text: #f5f5f7;
+      --muted: #a9b0c7;
+      --border: #252b3f;
+      --shadow-soft: 0 18px 40px rgba(0, 0, 0, 0.45);
+      --shadow-small: 0 8px 20px rgba(0, 0, 0, 0.35);
+      --radius-lg: 18px;
+      --radius-md: 12px;
+      --radius-sm: 8px;
+      --transition-fast: 0.18s ease-out;
+      --transition-med: 0.25s ease-out;
+      --font-main: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+        sans-serif;
+      --font-mono: "SF Mono", Menlo, Monaco, Consolas, "Liberation Mono",
+        "Courier New", monospace;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: var(--font-main);
+      background: radial-gradient(circle at top, #1b2340 0, #050814 55%, #000 100%);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      align-items: stretch;
+      justify-content: center;
+      padding: 32px 16px;
+    }
+
+    .page {
+      width: 100%;
+      max-width: 1200px;
+      display: grid;
+      grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
+      gap: 24px;
+      background: linear-gradient(145deg, #0c1224, #050814);
+      border-radius: 24px;
+      border: 1px solid rgba(255, 255, 255, 0.04);
+      box-shadow: var(--shadow-soft);
+      overflow: hidden;
+    }
+
+    @media (max-width: 900px) {
+      .page {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .left-panel,
+    .right-panel {
+      padding: 24px 26px 26px;
+      position: relative;
+    }
+
+    .left-panel {
+      border-right: 1px solid var(--border);
+    }
+
+    @media (max-width: 900px) {
+      .left-panel {
+        border-right: none;
+        border-bottom: 1px solid var(--border);
+      }
+    }
+
+    .header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 18px;
+    }
+
+    .header-title {
+      font-size: 1.2rem;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+
+    .header-badge {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      padding: 6px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      background: radial-gradient(circle at top left, #ffb34733, transparent 60%);
+      color: var(--accent);
+    }
+
+    .section-title {
+      font-size: 1.05rem;
+      font-weight: 600;
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .section-title span.icon {
+      width: 18px;
+      height: 18px;
+      border-radius: 999px;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.7rem;
+      color: var(--accent);
+    }
+
+    .section-subtitle {
+      font-size: 0.9rem;
+      color: var(--muted);
+      margin-bottom: 14px;
+    }
+
+    .card {
+      background: radial-gradient(circle at top left, #1b2340 0, #050814 55%);
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--border);
+      padding: 16px 14px 14px;
+      margin-bottom: 16px;
+      box-shadow: var(--shadow-small);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .card::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at top right, rgba(255, 179, 71, 0.08), transparent 60%);
+      opacity: 0.9;
+      pointer-events: none;
+    }
+
+    .card-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 10px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .card-header-title {
+      font-size: 0.95rem;
+      font-weight: 600;
+    }
+
+    .card-header-tag {
+      font-size: 0.75rem;
+      padding: 4px 8px;
+      border-radius: 999px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      color: var(--muted);
+    }
+
+    .prompt-list {
+      list-style: none;
+      margin-top: 6px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .prompt-item {
+      margin-bottom: 8px;
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+      font-size: 0.9rem;
+      color: var(--muted);
+    }
+
+    .prompt-item-bullet {
+      width: 16px;
+      height: 16px;
+      border-radius: 999px;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.7rem;
+      color: var(--accent);
+      flex-shrink: 0;
+    }
+
+    .prompt-item strong {
+      color: var(--accent);
+      font-weight: 500;
+    }
+
+    .poem-original,
+    .poem-revised {
+      font-size: 0.95rem;
+      line-height: 1.6;
+      white-space: pre-wrap;
+      position: relative;
+      z-index: 1;
+    }
+
+    .poem-original span.line,
+    .poem-revised span.line {
+      display: block;
+      padding: 2px 0;
+    }
+
+    .poem-original span.line:hover,
+    .poem-revised span.line:hover {
+      background: rgba(255, 255, 255, 0.03);
+    }
+
+    .poem-original span.line-keyword {
+      color: var(--accent);
+      font-weight: 500;
+    }
+
+    .poem-original span.line-soft {
+      color: var(--muted);
+    }
+
+    .poem-revised span.line-highlight {
+      background: rgba(255, 179, 71, 0.12);
+      border-radius: 6px;
+      padding: 2px 4px;
+    }
+
+    .poem-revised span.line-break {
+      color: var(--muted);
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.18em;
+    }
+
+    .controls-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 12px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .btn {
+      border-radius: 999px;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      padding: 7px 14px;
+      font-size: 0.85rem;
+      background: rgba(255, 255, 255, 0.02);
+      color: var(--text);
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: background var(--transition-fast), transform var(--transition-fast),
+        box-shadow var(--transition-fast), border-color var(--transition-fast);
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--accent), var(--accent-strong));
+      color: #1b1020;
+      border-color: rgba(0, 0, 0, 0.4);
+      box-shadow: 0 10px 22px rgba(0, 0, 0, 0.45);
+      font-weight: 600;
+    }
+
+    .btn-outline {
+      background: rgba(255, 255, 255, 0.02);
+    }
+
+    .btn-ghost {
+      background: transparent;
+      border-style: dashed;
+      border-color: rgba(255, 255, 255, 0.12);
+      color: var(--muted);
+    }
+
+    .btn:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 10px 24px rgba(0, 0, 0, 0.45);
+      background: rgba(255, 255, 255, 0.04);
+    }
+
+    .btn-primary:hover {
+      background: linear-gradient(135deg, var(--accent-strong), var(--accent));
+    }
+
+    .btn:active {
+      transform: translateY(0);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+    }
+
+    .btn-icon {
+      font-size: 0.9rem;
+    }
+
+    .toggle-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 10px;
+      font-size: 0.8rem;
+      color: var(--muted);
+      position: relative;
+      z-index: 1;
+    }
+
+    .toggle-row input[type="checkbox"] {
+      accent-color: var(--accent);
+      width: 16px;
+      height: 16px;
+    }
+
+    .editor {
+      margin-top: 10px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .editor-label-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 6px;
+      font-size: 0.8rem;
+      color: var(--muted);
+    }
+
+    .editor-label-row span.label-main {
+      text-transform: uppercase;
+      letter-spacing: 0.16em;
+    }
+
+    .editor-label-row span.label-sub {
+      font-style: italic;
+    }
+
+    .editor textarea {
+      width: 100%;
+      min-height: 160px;
+      max-height: 260px;
+      resize: vertical;
+      border-radius: var(--radius-md);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      background: rgba(5, 8, 20, 0.9);
+      color: var(--text);
+      padding: 10px 11px;
+      font-size: 0.9rem;
+      line-height: 1.5;
+      font-family: var(--font-mono);
+      outline: none;
+      box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.4);
+      transition: border-color var(--transition-med), box-shadow var(--transition-med),
+        background var(--transition-med);
+    }
+
+    .editor textarea:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 1px rgba(255, 179, 71, 0.4);
+      background: rgba(5, 8, 20, 0.98);
+    }
+
+    .editor-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-top: 6px;
+      font-size: 0.8rem;
+      color: var(--muted);
+    }
+
+    .editor-footer span.counter {
+      font-family: var(--font-mono);
+    }
+
+    .editor-footer span.status {
+      text-transform: uppercase;
+      letter-spacing: 0.16em;
+    }
+
+    .editor-footer span.status.ready {
+      color: var(--accent);
+    }
+
+    .editor-footer span.status.draft {
+      color: var(--muted);
+    }
+
+    .right-panel-header {
+      margin-bottom: 14px;
+    }
+
+    .right-panel-header-title {
+      font-size: 1rem;
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+
+    .right-panel-header-subtitle {
+      font-size: 0.85rem;
+      color: var(--muted);
+    }
+
+    .timeline {
+      margin-top: 10px;
+      margin-bottom: 16px;
+      position: relative;
+    }
+
+    .timeline::before {
+      content: "";
+      position: absolute;
+      left: 10px;
+      top: 0;
+      bottom: 0;
+      width: 2px;
+      background: linear-gradient(to bottom, var(--accent), transparent);
+      opacity: 0.4;
+    }
+
+    .timeline-step {
+      position: relative;
+      padding-left: 28px;
+      margin-bottom: 12px;
+    }
+
+    .timeline-step:last-child {
+      margin-bottom: 0;
+    }
+
+    .timeline-step-dot {
+      position: absolute;
+      left: 4px;
+      top: 2px;
+      width: 12px;
+      height: 12px;
+      border-radius: 999px;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      background: radial-gradient(circle, var(--accent), #050814);
+      box-shadow: 0 0 0 4px rgba(255, 179, 71, 0.12);
+    }
+
+    .timeline-step-title {
+      font-size: 0.9rem;
+      font-weight: 500;
+      margin-bottom: 2px;
+    }
+
+    .timeline-step-body {
+      font-size: 0.85rem;
+      color: var(--muted);
+    }
+
+    .insight-card {
+      background: radial-gradient(circle at top left, #1b2340 0, #050814 55%);
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--border);
+      padding: 14px 13px 13px;
+      margin-bottom: 14px;
+      box-shadow: var(--shadow-small);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .insight-card::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at bottom right, rgba(255, 179, 71, 0.12), transparent 60%);
+      opacity: 0.9;
+      pointer-events: none;
+    }
+
+    .insight-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 8px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .insight-header-title {
+      font-size: 0.9rem;
+      font-weight: 500;
+    }
+
+    .insight-header-tag {
+      font-size: 0.75rem;
+      padding: 3px 8px;
+      border-radius: 999px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      color: var(--muted);
+    }
+
+    .insight-body {
+      font-size: 0.85rem;
+      color: var(--muted);
+      position: relative;
+      z-index: 1;
+    }
+
+    .insight-body strong {
+      color: var(--accent);
+      font-weight: 500;
+    }
+
+    .submission-card {
+      background: radial-gradient(circle at top left, #1b2340 0, #050814 55%);
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--border);
+      padding: 14px 13px 13px;
+      box-shadow: var(--shadow-small);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .submission-card::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at top right, rgba(255, 179, 71, 0.16), transparent 60%);
+      opacity: 0.9;
+      pointer-events: none;
+    }
+
+    .submission-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 8px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .submission-header-title {
+      font-size: 0.9rem;
+      font-weight: 600;
+    }
+
+    .submission-header-status {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.16em;
+      color: var(--muted);
+    }
+
+    .submission-body {
+      font-size: 0.85rem;
+      color: var(--muted);
+      margin-bottom: 10px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .submission-body strong {
+      color: var(--accent);
+      font-weight: 500;
+    }
+
+    .submission-preview {
+      background: rgba(5, 8, 20, 0.9);
+      border-radius: var(--radius-md);
+      border: 1px dashed rgba(255, 255, 255, 0.16);
+      padding: 10px 11px;
+      font-size: 0.9rem;
+      line-height: 1.6;
+      white-space: pre-wrap;
+      color: var(--text);
+      font-family: var(--font-mono);
+      max-height: 220px;
+      overflow-y: auto;
+      position: relative;
+      z-index: 1;
+    }
+
+    .submission-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-top: 8px;
+      position: relative;
+      z-index: 1;
+      font-size: 0.8rem;
+      color: var(--muted);
+    }
+
+    .submission-footer span.label {
+      text-transform: uppercase;
+      letter-spacing: 0.16em;
+    }
+
+    .submission-footer span.value {
+      font-family: var(--font-mono);
+    }
+
+    .submission-footer span.value.ready {
+      color: var(--accent);
+    }
+
+    .submission-footer span.value.pending {
+      color: var(--muted);
+    }
+
+    .footer-note {
+      margin-top: 10px;
+      font-size: 0.8rem;
+      color: var(--muted);
+      font-style: italic;
+    }
+
+    .footer-note strong {
+      color: var(--accent);
+      font-weight: 500;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 9px;
+      border-radius: 999px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      font-size: 0.75rem;
+      color: var(--muted);
+      background: rgba(255, 255, 255, 0.02);
+    }
+
+    .pill-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 999px;
+      background: var(--accent);
+    }
+
+    .pill-dot-soft {
+      background: rgba(255, 255, 255, 0.3);
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <!-- LEFT PANEL: PROMPTS + ORIGINAL + REVISION EDITOR -->
+    <section class="left-panel">
+      <header class="header">
+        <div class="header-title">Chapter 6 · Revision & Submission</div>
+        <div class="header-badge">Interactive Poem Workspace</div>
+      </header>
+
+      <!-- PROMPTS CARD -->
+      <article class="card">
+        <div class="card-header">
+          <div class="card-header-title">Revision Prompts</div>
+          <div class="card-header-tag">Chapter 6 Guide</div>
+        </div>
+        <ul class="prompt-list">
+          <li class="prompt-item">
+            <span class="prompt-item-bullet">1</span>
+            <span>
+              <strong>Clarify the emotional center.</strong>  
+              What feeling sits at the core of your poem? Tighten images and line breaks so they orbit that center.
+            </span>
+          </li>
+          <li class="prompt-item">
+            <span class="prompt-item-bullet">2</span>
+            <span>
+              <strong>Sharpen sensory detail.</strong>  
+              Replace abstract words with textures, temperatures, sounds, and colors that a reader can inhabit.
+            </span>
+          </li>
+          <li class="prompt-item">
+            <span class="prompt-item-bullet">3</span>
+            <span>
+              <strong>Experiment with form.</strong>  
+              Try at least one structural change—staggered lines, a repeated refrain, or a visual pattern on the page.
+            </span>
+          </li>
+          <li class="prompt-item">
+            <span class="prompt-item-bullet">4</span>
+            <span>
+              <strong>Interrogate each line.</strong>  
+              Ask: “Does this line earn its place?” Cut or condense anything that only repeats what another line already does.
+            </span>
+          </li>
+          <li class="prompt-item">
+            <span class="prompt-item-bullet">5</span>
+            <span>
+              <strong>Invite surprise.</strong>  
+              Add one image, turn, or phrase that slightly unsettles the poem—something that opens a new angle on the theme.
+            </span>
+          </li>
+        </ul>
+      </article>
+
+      <!-- ORIGINAL POEM CARD -->
+      <article class="card">
+        <div class="card-header">
+          <div class="card-header-title">Original Draft</div>
+          <div class="card-header-tag pill">
+            <span class="pill-dot pill-dot-soft"></span>
+            <span>Read-only reference</span>
+          </div>
+        </div>
+        <div class="poem-original" id="originalPoem">
+          <span class="line line-soft">I wake inside a screen-lit dawn,</span>
+          <span class="line">tabs blooming like <span class="line-keyword">glass petals</span> across the dark.</span>
+          <span class="line line-soft">The world arrives in scrolls and pings,</span>
+          <span class="line">a river of headlines I never asked to drink.</span>
+          <span class="line line-soft">Outside, the sky is doing its quiet work,</span>
+          <span class="line">clouds rearranging themselves without a single notification.</span>
+          <span class="line line-soft">My coffee cools beside the keyboard,</span>
+          <span class="line">steam writing brief poems I do not read.</span>
+          <span class="line line-soft">Somewhere, a bird rehearses the same note</span>
+          <span class="line">until it becomes a kind of <span class="line-keyword">faith</span>.</span>
+          <span class="line line-soft">I answer emails like small prayers,</span>
+          <span class="line">hoping one will open a door instead of another tab.</span>
+          <span class="line line-soft">By noon, my eyes forget the shape of distance,</span>
+          <span class="line">everything flattened into pixels and urgency.</span>
+          <span class="line line-soft">I promise myself an evening walk,</span>
+          <span class="line">a slow corridor of trees and uncurated shadows.</span>
+          <span class="line line-soft">But the day keeps refreshing,</span>
+          <span class="line">and I keep agreeing to stay.</span>
+        </div>
+        <div class="controls-row">
+          <button class="btn btn-outline" id="copyOriginalBtn">
+            <span class="btn-icon">⤵</span>
+            <span>Copy to revision editor</span>
+          </button>
+          <button class="btn btn-ghost" id="clearEditorBtn">
+            <span class="btn-icon">✕</span>
+            <span>Clear revision</span>
+          </button>
+        </div>
+      </article>
+
+      <!-- REVISION EDITOR CARD -->
+      <article class="card">
+        <div class="card-header">
+          <div class="card-header-title">Revision Draft</div>
+          <div class="card-header-tag pill">
+            <span class="pill-dot"></span>
+            <span>Live editing</span>
+          </div>
+        </div>
+
+        <div class="toggle-row">
+          <input type="checkbox" id="showHintsToggle" checked />
+          <label for="showHintsToggle">Show inline hints from Chapter 6 while revising</label>
+        </div>
+
+        <div class="editor">
+          <div class="editor-label-row">
+            <span class="label-main">Revision space</span>
+            <span class="label-sub">Use the prompts above as you reshape the poem.</span>
+          </div>
+          <textarea id="revisionText" placeholder="Paste or write your revised poem here. You can start by copying the original draft, then cut, rearrange, and rewrite lines according to the prompts."></textarea>
+          <div class="editor-footer">
+            <span class="counter" id="charCounter">0 characters</span>
+            <span class="status draft" id="draftStatus">draft in progress</span>
+          </div>
+        </div>
+
+        <div class="controls-row">
+          <button class="btn btn-primary" id="updatePreviewBtn">
+            <span class="btn-icon">▶</span>
+            <span>Update submission preview</span>
+          </button>
+          <button class="btn btn-outline" id="autoHintBtn">
+            <span class="btn-icon">✨</span>
+            <span>Highlight possible revision spots</span>
+          </button>
+        </div>
+      </article>
+    </section>
+
+    <!-- RIGHT PANEL: PROCESS + INSIGHTS + SUBMISSION PREVIEW -->
+    <section class="right-panel">
+      <header class="right-panel-header">
+        <div class="right-panel-header-title">Revision Process & Submission</div>
+        <div class="right-panel-header-subtitle">
+          Track how your poem changes as you respond to Chapter 6 prompts.
+        </div>
+      </header>
+
+      <!-- TIMELINE -->
+      <div class="timeline">
+        <div class="timeline-step">
+          <div class="timeline-step-dot"></div>
+          <div class="timeline-step-title">Step 1 · Read & Notice</div>
+          <div class="timeline-step-body">
+            Read the original poem slowly. Notice where the energy rises, where it falls, and where the language feels vague or overfamiliar.
+          </div>
+        </div>
+        <div class="timeline-step">
+          <div class="timeline-step-dot"></div>
+          <div class="timeline-step-title">Step 2 · Mark the Core</div>
+          <div class="timeline-step-body">
+            Decide what the poem is truly about—its emotional center. Keep that in mind as you cut, rearrange, and rewrite.
+          </div>
+        </div>
+        <div class="timeline-step">
+          <div class="timeline-step-dot"></div>
+          <div class="timeline-step-title">Step 3 · Rewrite Boldly</div>
+          <div class="timeline-step-body">
+            Use the editor to experiment. Remove entire lines, compress images, or add new stanzas that deepen the central feeling.
+          </div>
+        </div>
+        <div class="timeline-step">
+          <div class="timeline-step-dot"></div>
+          <div class="timeline-step-title">Step 4 · Prepare Submission</div>
+          <div class="timeline-step-body">
+            When the revision feels coherent and alive, update the submission preview and check that the poem reads cleanly from start to finish.
+          </div>
+        </div>
+      </div>
+
+      <!-- INSIGHT CARD -->
+      <article class="insight-card">
+        <div class="insight-header">
+          <div class="insight-header-title">Chapter 6 Insight</div>
+          <div class="insight-header-tag">Craft note</div>
+        </div>
+        <div class="insight-body">
+          Revision is not just fixing mistakes; it is <strong>re-choosing the poem</strong>.  
+          Each change you make is a decision about what the poem wants to hold and what it can let go of.  
+          Use this space to listen to the poem as it changes—notice which version feels most honest, most precise, and most alive.
+        </div>
+      </article>
+
+      <!-- SUBMISSION PREVIEW CARD -->
+      <article class="submission-card">
+        <div class="submission-header">
+          <div class="submission-header-title">Submission Preview</div>
+          <div class="submission-header-status" id="submissionStatusLabel">status · pending</div>
+        </div>
+        <div class="submission-body">
+          This area shows the poem exactly as it will appear when you submit it for Chapter 6.  
+          When you are satisfied with your revision, you can treat this preview as your <strong>final version</strong>.
+        </div>
+        <div class="submission-preview" id="submissionPreview">
+          (Your revised poem will appear here after you click “Update submission preview.”)
+        </div>
+        <div class="submission-footer">
+          <span class="label">Revision state</span>
+          <span class="value pending" id="submissionStateValue">not yet submitted</span>
+        </div>
+        <div class="controls-row" style="margin-top: 10px;">
+          <button class="btn btn-primary" id="markSubmittedBtn">
+            <span class="btn-icon">📨</span>
+            <span>Mark as ready to submit</span>
+          </button>
+          <button class="btn btn-outline" id="exportBtn">
+            <span class="btn-icon">⧉</span>
+            <span>Copy preview to clipboard</span>
+          </button>
+        </div>
+        <div class="footer-note">
+          <strong>Note:</strong> This page does not actually send your poem anywhere—it is a practice space.  
+          Use the “Copy preview” button to paste your final version into your course submission system.
+        </div>
+      </article>
+    </section>
+  </div>
+
+  <script>
+    const revisionText = document.getElementById("revisionText");
+    const charCounter = document.getElementById("charCounter");
+    const draftStatus = document.getElementById("draftStatus");
+    const copyOriginalBtn = document.getElementById("copyOriginalBtn");
+    const clearEditorBtn = document.getElementById("clearEditorBtn");
+    const originalPoem = document.getElementById("originalPoem");
+    const updatePreviewBtn = document.getElementById("updatePreviewBtn");
+    const submissionPreview = document.getElementById("submissionPreview");
+    const submissionStatusLabel = document.getElementById("submissionStatusLabel");
+    const submissionStateValue = document.getElementById("submissionStateValue");
+    const markSubmittedBtn = document.getElementById("markSubmittedBtn");
+    const exportBtn = document.getElementById("exportBtn");
+    const showHintsToggle = document.getElementById("showHintsToggle");
+    const autoHintBtn = document.getElementById("autoHintBtn");
+
+    function updateCharCounter() {
+      const text = revisionText.value;
+      charCounter.textContent = text.length + " characters";
+      if (text.trim().length === 0) {
+        draftStatus.textContent = "draft in progress";
+        draftStatus.classList.remove("ready");
+        draftStatus.classList.add("draft");
+      } else {
+        draftStatus.textContent = "draft active";
+        draftStatus.classList.remove("draft");
+        draftStatus.classList.add("ready");
+      }
+    }
+
+    revisionText.addEventListener("input", updateCharCounter);
+
+    copyOriginalBtn.addEventListener("click", () => {
+      const lines = Array.from(originalPoem.querySelectorAll(".line"))
+        .map((line) => line.textContent)
+        .join("\n");
+      revisionText.value = lines;
+      updateCharCounter();
+      revisionText.focus();
+    });
+
+    clearEditorBtn.addEventListener("click", () => {
+      revisionText.value = "";
+      updateCharCounter();
+      submissionPreview.textContent =
+        "(Your revised poem will appear here after you click “Update submission preview.”)";
+      submissionStatusLabel.textContent = "status · pending";
+      submissionStateValue.textContent = "not yet submitted";
+      submissionStateValue.classList.remove("ready");
+      submissionStateValue.classList.add("pending");
+    });
+
+    updatePreviewBtn.addEventListener("click", () => {
+      const text = revisionText.value.trim();
+      if (text.length === 0) {
+        submissionPreview.textContent =
+          "(Your revised poem will appear here after you click “Update submission preview.”)";
+        submissionStatusLabel.textContent = "status · pending";
+        submissionStateValue.textContent = "not yet submitted";
+        submissionStateValue.classList.remove("ready");
+        submissionStateValue.classList.add("pending");
+        return;
+      }
+      submissionPreview.textContent = text;
+      submissionStatusLabel.textContent = "status · draft updated";
+      submissionStateValue.textContent = "ready for review";
+      submissionStateValue.classList.remove("pending");
+      submissionStateValue.classList.add("ready");
+    });
+
+    markSubmittedBtn.addEventListener("click", () => {
+      const text = revisionText.value.trim();
+      if (text.length === 0) {
+        alert("Write or paste your revised poem before marking it as ready to submit.");
+        return;
+      }
+      submissionStatusLabel.textContent = "status · ready";
+      submissionStateValue.textContent = "final version prepared";
+      submissionStateValue.classList.remove("pending");
+      submissionStateValue.classList.add("ready");
+    });
+
+    exportBtn.addEventListener("click", async () => {
+      const text = submissionPreview.textContent.trim();
+      if (!text || text.startsWith("(Your revised poem")) {
+        alert("Update the submission preview before copying.");
+        return;
+      }
+      try {
+        await navigator.clipboard.writeText(text);
+        alert("Submission preview copied to clipboard. You can paste it into your course submission.");
+      } catch (e) {
+        alert("Clipboard copy failed. You can manually select and copy the text from the preview box.");
+      }
+    });
+
+    autoHintBtn.addEventListener("click", () => {
+      const text = revisionText.value;
+      if (!text.trim()) {
+        alert("Paste or write your poem in the revision editor first.");
+        return;
+      }
+
+      const hint =
+        "\n\n[Hint from Chapter 6]\n" +
+        "- Identify one stanza where the energy drops and try compressing it.\n" +
+        "- Replace at least one abstract noun with a concrete image.\n" +
+        "- Consider adding a small formal surprise: a repeated line, a visual indentation, or a sudden short line.";
+
+      if (!text.includes("[Hint from Chapter 6]")) {
+        revisionText.value = text + hint;
+        updateCharCounter();
+      } else {
+        alert("Hints are already present in your revision draft.");
+      }
+    });
+
+    showHintsToggle.addEventListener("change", () => {
+      const checked = showHintsToggle.checked;
+      const promptCard = document.querySelector(".card:first-of-type");
+      if (checked) {
+        promptCard.classList.remove("hidden");
+      } else {
+        promptCard.classList.add("hidden");
+      }
+    });
+
+    updateCharCounter();
+  </script>
+</body>
+</html>
