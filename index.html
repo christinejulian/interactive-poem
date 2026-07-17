@@ -2,21 +2,23 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Interactive Poem – Revision Space</title>
+  <title>Interactive Gaming Poem – Chapter 6 Revision Space</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
   <style>
     :root {
-      --bg: #0b1020;
-      --bg-alt: #12172a;
-      --accent: #ffb347;
-      --accent-soft: rgba(255, 179, 71, 0.18);
-      --accent-strong: #ff914d;
+      --bg: #050814;
+      --bg-alt: #0c1224;
+      --accent: #4df3ff;
+      --accent-soft: rgba(77, 243, 255, 0.18);
+      --accent-strong: #00ffc3;
+      --accent-warm: #ffb347;
       --text: #f5f5f7;
       --muted: #a9b0c7;
       --border: #252b3f;
-      --shadow-soft: 0 18px 40px rgba(0, 0, 0, 0.45);
-      --shadow-small: 0 8px 20px rgba(0, 0, 0, 0.35);
+      --shadow-soft: 0 18px 40px rgba(0, 0, 0, 0.55);
+      --shadow-small: 0 8px 20px rgba(0, 0, 0, 0.4);
+      --radius-xl: 24px;
       --radius-lg: 18px;
       --radius-md: 12px;
       --radius-sm: 8px;
@@ -26,6 +28,7 @@
         sans-serif;
       --font-mono: "SF Mono", Menlo, Monaco, Consolas, "Liberation Mono",
         "Courier New", monospace;
+      --grid-gap: 24px;
     }
 
     * {
@@ -36,7 +39,8 @@
 
     body {
       font-family: var(--font-main);
-      background: radial-gradient(circle at top, #1b2340 0, #050814 55%, #000 100%);
+      background:
+        radial-gradient(circle at top, #1b2340 0, #050814 55%, #000 100%);
       color: var(--text);
       min-height: 100vh;
       display: flex;
@@ -47,18 +51,30 @@
 
     .page {
       width: 100%;
-      max-width: 1200px;
+      max-width: 1300px;
       display: grid;
-      grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
-      gap: 24px;
+      grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr);
+      gap: var(--grid-gap);
       background: linear-gradient(145deg, #0c1224, #050814);
-      border-radius: 24px;
+      border-radius: var(--radius-xl);
       border: 1px solid rgba(255, 255, 255, 0.04);
       box-shadow: var(--shadow-soft);
       overflow: hidden;
+      position: relative;
     }
 
-    @media (max-width: 900px) {
+    .page::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(circle at top left, rgba(77, 243, 255, 0.12), transparent 60%),
+        radial-gradient(circle at bottom right, rgba(255, 179, 71, 0.12), transparent 60%);
+      opacity: 0.9;
+      pointer-events: none;
+    }
+
+    @media (max-width: 980px) {
       .page {
         grid-template-columns: 1fr;
       }
@@ -68,18 +84,21 @@
     .right-panel {
       padding: 24px 26px 26px;
       position: relative;
+      z-index: 1;
     }
 
     .left-panel {
       border-right: 1px solid var(--border);
     }
 
-    @media (max-width: 900px) {
+    @media (max-width: 980px) {
       .left-panel {
         border-right: none;
         border-bottom: 1px solid var(--border);
       }
     }
+
+    /* HEADER */
 
     .header {
       display: flex;
@@ -102,39 +121,27 @@
       padding: 6px 10px;
       border-radius: 999px;
       border: 1px solid rgba(255, 255, 255, 0.08);
-      background: radial-gradient(circle at top left, #ffb34733, transparent 60%);
+      background:
+        radial-gradient(circle at top left, rgba(77, 243, 255, 0.25), transparent 60%);
       color: var(--accent);
-    }
-
-    .section-title {
-      font-size: 1.05rem;
-      font-weight: 600;
-      margin-bottom: 10px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .section-title span.icon {
-      width: 18px;
-      height: 18px;
-      border-radius: 999px;
-      border: 1px solid rgba(255, 255, 255, 0.12);
       display: inline-flex;
       align-items: center;
-      justify-content: center;
-      font-size: 0.7rem;
-      color: var(--accent);
+      gap: 6px;
     }
 
-    .section-subtitle {
-      font-size: 0.9rem;
-      color: var(--muted);
-      margin-bottom: 14px;
+    .header-badge-icon {
+      width: 10px;
+      height: 10px;
+      border-radius: 999px;
+      background: var(--accent-strong);
+      box-shadow: 0 0 0 4px var(--accent-soft);
     }
+
+    /* GENERIC CARD */
 
     .card {
-      background: radial-gradient(circle at top left, #1b2340 0, #050814 55%);
+      background:
+        radial-gradient(circle at top left, #1b2340 0, #050814 55%);
       border-radius: var(--radius-lg);
       border: 1px solid var(--border);
       padding: 16px 14px 14px;
@@ -148,7 +155,8 @@
       content: "";
       position: absolute;
       inset: 0;
-      background: radial-gradient(circle at top right, rgba(255, 179, 71, 0.08), transparent 60%);
+      background:
+        radial-gradient(circle at top right, rgba(77, 243, 255, 0.08), transparent 60%);
       opacity: 0.9;
       pointer-events: none;
     }
@@ -165,6 +173,21 @@
     .card-header-title {
       font-size: 0.95rem;
       font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .card-header-title-icon {
+      width: 18px;
+      height: 18px;
+      border-radius: 999px;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.7rem;
+      color: var(--accent);
     }
 
     .card-header-tag {
@@ -173,7 +196,24 @@
       border-radius: 999px;
       border: 1px solid rgba(255, 255, 255, 0.08);
       color: var(--muted);
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(255, 255, 255, 0.02);
     }
+
+    .card-header-tag-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 999px;
+      background: var(--accent);
+    }
+
+    .card-header-tag-dot-soft {
+      background: rgba(255, 255, 255, 0.4);
+    }
+
+    /* PROMPTS LIST */
 
     .prompt-list {
       list-style: none;
@@ -192,8 +232,8 @@
     }
 
     .prompt-item-bullet {
-      width: 16px;
-      height: 16px;
+      width: 18px;
+      height: 18px;
       border-radius: 999px;
       border: 1px solid rgba(255, 255, 255, 0.12);
       display: inline-flex;
@@ -202,12 +242,15 @@
       font-size: 0.7rem;
       color: var(--accent);
       flex-shrink: 0;
+      background: rgba(255, 255, 255, 0.02);
     }
 
     .prompt-item strong {
-      color: var(--accent);
+      color: var(--accent-strong);
       font-weight: 500;
     }
+
+    /* POEM DISPLAY */
 
     .poem-original,
     .poem-revised {
@@ -216,12 +259,14 @@
       white-space: pre-wrap;
       position: relative;
       z-index: 1;
+      font-family: var(--font-main);
     }
 
     .poem-original span.line,
     .poem-revised span.line {
       display: block;
       padding: 2px 0;
+      transition: background var(--transition-fast), color var(--transition-fast);
     }
 
     .poem-original span.line:hover,
@@ -229,17 +274,17 @@
       background: rgba(255, 255, 255, 0.03);
     }
 
-    .poem-original span.line-keyword {
-      color: var(--accent);
-      font-weight: 500;
-    }
-
     .poem-original span.line-soft {
       color: var(--muted);
     }
 
+    .poem-original span.line-keyword {
+      color: var(--accent-warm);
+      font-weight: 500;
+    }
+
     .poem-revised span.line-highlight {
-      background: rgba(255, 179, 71, 0.12);
+      background: rgba(77, 243, 255, 0.12);
       border-radius: 6px;
       padding: 2px 4px;
     }
@@ -250,6 +295,8 @@
       text-transform: uppercase;
       letter-spacing: 0.18em;
     }
+
+    /* CONTROLS */
 
     .controls-row {
       display: flex;
@@ -271,13 +318,16 @@
       display: inline-flex;
       align-items: center;
       gap: 6px;
-      transition: background var(--transition-fast), transform var(--transition-fast),
-        box-shadow var(--transition-fast), border-color var(--transition-fast);
+      transition:
+        background var(--transition-fast),
+        transform var(--transition-fast),
+        box-shadow var(--transition-fast),
+        border-color var(--transition-fast);
     }
 
     .btn-primary {
       background: linear-gradient(135deg, var(--accent), var(--accent-strong));
-      color: #1b1020;
+      color: #050814;
       border-color: rgba(0, 0, 0, 0.4);
       box-shadow: 0 10px 22px rgba(0, 0, 0, 0.45);
       font-weight: 600;
@@ -313,6 +363,8 @@
       font-size: 0.9rem;
     }
 
+    /* TOGGLE ROW */
+
     .toggle-row {
       display: flex;
       align-items: center;
@@ -329,6 +381,8 @@
       width: 16px;
       height: 16px;
     }
+
+    /* EDITOR */
 
     .editor {
       margin-top: 10px;
@@ -356,8 +410,8 @@
 
     .editor textarea {
       width: 100%;
-      min-height: 160px;
-      max-height: 260px;
+      min-height: 180px;
+      max-height: 280px;
       resize: vertical;
       border-radius: var(--radius-md);
       border: 1px solid rgba(255, 255, 255, 0.12);
@@ -369,13 +423,15 @@
       font-family: var(--font-mono);
       outline: none;
       box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.4);
-      transition: border-color var(--transition-med), box-shadow var(--transition-med),
+      transition:
+        border-color var(--transition-med),
+        box-shadow var(--transition-med),
         background var(--transition-med);
     }
 
     .editor textarea:focus {
       border-color: var(--accent);
-      box-shadow: 0 0 0 1px rgba(255, 179, 71, 0.4);
+      box-shadow: 0 0 0 1px rgba(77, 243, 255, 0.4);
       background: rgba(5, 8, 20, 0.98);
     }
 
@@ -398,12 +454,14 @@
     }
 
     .editor-footer span.status.ready {
-      color: var(--accent);
+      color: var(--accent-strong);
     }
 
     .editor-footer span.status.draft {
       color: var(--muted);
     }
+
+    /* RIGHT PANEL HEADER */
 
     .right-panel-header {
       margin-bottom: 14px;
@@ -419,6 +477,8 @@
       font-size: 0.85rem;
       color: var(--muted);
     }
+
+    /* TIMELINE */
 
     .timeline {
       margin-top: 10px;
@@ -456,7 +516,7 @@
       border-radius: 999px;
       border: 1px solid rgba(255, 255, 255, 0.12);
       background: radial-gradient(circle, var(--accent), #050814);
-      box-shadow: 0 0 0 4px rgba(255, 179, 71, 0.12);
+      box-shadow: 0 0 0 4px var(--accent-soft);
     }
 
     .timeline-step-title {
@@ -470,8 +530,11 @@
       color: var(--muted);
     }
 
+    /* INSIGHT CARD */
+
     .insight-card {
-      background: radial-gradient(circle at top left, #1b2340 0, #050814 55%);
+      background:
+        radial-gradient(circle at top left, #1b2340 0, #050814 55%);
       border-radius: var(--radius-lg);
       border: 1px solid var(--border);
       padding: 14px 13px 13px;
@@ -485,7 +548,8 @@
       content: "";
       position: absolute;
       inset: 0;
-      background: radial-gradient(circle at bottom right, rgba(255, 179, 71, 0.12), transparent 60%);
+      background:
+        radial-gradient(circle at bottom right, rgba(255, 179, 71, 0.12), transparent 60%);
       opacity: 0.9;
       pointer-events: none;
     }
@@ -510,6 +574,7 @@
       border-radius: 999px;
       border: 1px solid rgba(255, 255, 255, 0.08);
       color: var(--muted);
+      background: rgba(255, 255, 255, 0.02);
     }
 
     .insight-body {
@@ -520,12 +585,15 @@
     }
 
     .insight-body strong {
-      color: var(--accent);
+      color: var(--accent-strong);
       font-weight: 500;
     }
 
+    /* SUBMISSION CARD */
+
     .submission-card {
-      background: radial-gradient(circle at top left, #1b2340 0, #050814 55%);
+      background:
+        radial-gradient(circle at top left, #1b2340 0, #050814 55%);
       border-radius: var(--radius-lg);
       border: 1px solid var(--border);
       padding: 14px 13px 13px;
@@ -538,7 +606,8 @@
       content: "";
       position: absolute;
       inset: 0;
-      background: radial-gradient(circle at top right, rgba(255, 179, 71, 0.16), transparent 60%);
+      background:
+        radial-gradient(circle at top right, rgba(77, 243, 255, 0.16), transparent 60%);
       opacity: 0.9;
       pointer-events: none;
     }
@@ -573,7 +642,7 @@
     }
 
     .submission-body strong {
-      color: var(--accent);
+      color: var(--accent-strong);
       font-weight: 500;
     }
 
@@ -587,7 +656,7 @@
       white-space: pre-wrap;
       color: var(--text);
       font-family: var(--font-mono);
-      max-height: 220px;
+      max-height: 240px;
       overflow-y: auto;
       position: relative;
       z-index: 1;
@@ -614,7 +683,7 @@
     }
 
     .submission-footer span.value.ready {
-      color: var(--accent);
+      color: var(--accent-strong);
     }
 
     .submission-footer span.value.pending {
@@ -629,7 +698,7 @@
     }
 
     .footer-note strong {
-      color: var(--accent);
+      color: var(--accent-warm);
       font-weight: 500;
     }
 
@@ -653,97 +722,241 @@
       width: 6px;
       height: 6px;
       border-radius: 999px;
-      background: var(--accent);
+      background: var(--accent-strong);
     }
 
     .pill-dot-soft {
       background: rgba(255, 255, 255, 0.3);
     }
+
+    /* GAMING MOOD BAR */
+
+    .mood-bar {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 8px;
+      font-size: 0.8rem;
+      color: var(--muted);
+    }
+
+    .mood-bar-label {
+      text-transform: uppercase;
+      letter-spacing: 0.16em;
+    }
+
+    .mood-bar-track {
+      flex: 1;
+      height: 6px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.06);
+      overflow: hidden;
+      position: relative;
+    }
+
+    .mood-bar-fill {
+      position: absolute;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: 40%;
+      background: linear-gradient(90deg, var(--accent), var(--accent-strong));
+      transition: width var(--transition-med);
+    }
+
+    .mood-bar-tag {
+      font-family: var(--font-mono);
+      padding: 2px 6px;
+      border-radius: 999px;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      background: rgba(255, 255, 255, 0.02);
+    }
+
+    /* GAMING PROMPT FILTERS */
+
+    .prompt-filters {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 8px;
+      font-size: 0.75rem;
+    }
+
+    .prompt-filter {
+      padding: 4px 8px;
+      border-radius: 999px;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      background: rgba(255, 255, 255, 0.02);
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      color: var(--muted);
+      transition:
+        background var(--transition-fast),
+        border-color var(--transition-fast),
+        color var(--transition-fast);
+    }
+
+    .prompt-filter-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.4);
+    }
+
+    .prompt-filter.active {
+      border-color: var(--accent-strong);
+      color: var(--accent-strong);
+      background: rgba(77, 243, 255, 0.08);
+    }
+
+    .prompt-filter.active .prompt-filter-dot {
+      background: var(--accent-strong);
+    }
   </style>
 </head>
 <body>
   <div class="page">
-    <!-- LEFT PANEL: PROMPTS + ORIGINAL + REVISION EDITOR -->
+    <!-- LEFT PANEL -->
     <section class="left-panel">
       <header class="header">
-        <div class="header-title">Chapter 6 · Revision & Submission</div>
-        <div class="header-badge">Interactive Poem Workspace</div>
+        <div class="header-title">Chapter 6 · Gaming Poem Revision</div>
+        <div class="header-badge">
+          <span class="header-badge-icon"></span>
+          <span>Interactive poem workspace</span>
+        </div>
       </header>
 
       <!-- PROMPTS CARD -->
-      <article class="card">
+      <article class="card" id="promptCard">
         <div class="card-header">
-          <div class="card-header-title">Revision Prompts</div>
-          <div class="card-header-tag">Chapter 6 Guide</div>
+          <div class="card-header-title">
+            <span class="card-header-title-icon">🎮</span>
+            <span>Revision Prompts (Gaming Edition)</span>
+          </div>
+          <div class="card-header-tag">
+            <span class="card-header-tag-dot"></span>
+            <span>Chapter 6 guide</span>
+          </div>
         </div>
+
         <ul class="prompt-list">
           <li class="prompt-item">
             <span class="prompt-item-bullet">1</span>
             <span>
-              <strong>Clarify the emotional center.</strong>  
-              What feeling sits at the core of your poem? Tighten images and line breaks so they orbit that center.
+              <strong>Clarify the emotional center.</strong>
+              Is your poem about escape, connection, competition, or comfort?  
+              Make sure every image and metaphor points toward that core feeling of why you love gaming.
             </span>
           </li>
           <li class="prompt-item">
             <span class="prompt-item-bullet">2</span>
             <span>
-              <strong>Sharpen sensory detail.</strong>  
-              Replace abstract words with textures, temperatures, sounds, and colors that a reader can inhabit.
+              <strong>Sharpen sensory detail.</strong>
+              Replace vague phrases with specific textures: controller plastic, headset pressure, pixel glow, loading-screen music, late-night snacks.
             </span>
           </li>
           <li class="prompt-item">
             <span class="prompt-item-bullet">3</span>
             <span>
-              <strong>Experiment with form.</strong>  
-              Try at least one structural change—staggered lines, a repeated refrain, or a visual pattern on the page.
+              <strong>Use game language with intention.</strong>
+              Terms like “XP,” “boss fight,” “co-op,” and “respawn” can be powerful metaphors—use them where they deepen meaning, not just as decoration.
             </span>
           </li>
           <li class="prompt-item">
             <span class="prompt-item-bullet">4</span>
             <span>
-              <strong>Interrogate each line.</strong>  
-              Ask: “Does this line earn its place?” Cut or condense anything that only repeats what another line already does.
+              <strong>Experiment with form.</strong>
+              Try structuring stanzas like levels, quests, or save points.  
+              Consider a repeated “Press Start” refrain or a sudden short line that feels like a quick-time event.
             </span>
           </li>
           <li class="prompt-item">
             <span class="prompt-item-bullet">5</span>
             <span>
-              <strong>Invite surprise.</strong>  
-              Add one image, turn, or phrase that slightly unsettles the poem—something that opens a new angle on the theme.
+              <strong>Interrogate each line.</strong>
+              Ask: “Does this line earn its place in the game?”  
+              Cut filler dialogue; keep only the lines that move the emotional story forward.
+            </span>
+          </li>
+          <li class="prompt-item">
+            <span class="prompt-item-bullet">6</span>
+            <span>
+              <strong>Invite surprise.</strong>
+              Add one image or turn that complicates your love of gaming—fatigue, friendship, grief, or joy that only exists in a lobby at 2 a.m.
             </span>
           </li>
         </ul>
+
+        <div class="prompt-filters">
+          <button class="prompt-filter active" data-filter="emotion">
+            <span class="prompt-filter-dot"></span>
+            <span>Emotion</span>
+          </button>
+          <button class="prompt-filter" data-filter="sensory">
+            <span class="prompt-filter-dot"></span>
+            <span>Sensory</span>
+          </button>
+          <button class="prompt-filter" data-filter="form">
+            <span class="prompt-filter-dot"></span>
+            <span>Form</span>
+          </button>
+          <button class="prompt-filter" data-filter="surprise">
+            <span class="prompt-filter-dot"></span>
+            <span>Surprise</span>
+          </button>
+        </div>
+
+        <div class="mood-bar">
+          <span class="mood-bar-label">Poem energy</span>
+          <div class="mood-bar-track">
+            <div class="mood-bar-fill" id="moodBarFill"></div>
+          </div>
+          <span class="mood-bar-tag" id="moodBarTag">Level 1 · tutorial</span>
+        </div>
       </article>
 
       <!-- ORIGINAL POEM CARD -->
       <article class="card">
         <div class="card-header">
-          <div class="card-header-title">Original Draft</div>
+          <div class="card-header-title">
+            <span class="card-header-title-icon">💾</span>
+            <span>Original Draft · “Save Point”</span>
+          </div>
           <div class="card-header-tag pill">
             <span class="pill-dot pill-dot-soft"></span>
             <span>Read-only reference</span>
           </div>
         </div>
+
         <div class="poem-original" id="originalPoem">
-          <span class="line line-soft">I wake inside a screen-lit dawn,</span>
-          <span class="line">tabs blooming like <span class="line-keyword">glass petals</span> across the dark.</span>
-          <span class="line line-soft">The world arrives in scrolls and pings,</span>
-          <span class="line">a river of headlines I never asked to drink.</span>
-          <span class="line line-soft">Outside, the sky is doing its quiet work,</span>
-          <span class="line">clouds rearranging themselves without a single notification.</span>
-          <span class="line line-soft">My coffee cools beside the keyboard,</span>
-          <span class="line">steam writing brief poems I do not read.</span>
-          <span class="line line-soft">Somewhere, a bird rehearses the same note</span>
-          <span class="line">until it becomes a kind of <span class="line-keyword">faith</span>.</span>
-          <span class="line line-soft">I answer emails like small prayers,</span>
-          <span class="line">hoping one will open a door instead of another tab.</span>
-          <span class="line line-soft">By noon, my eyes forget the shape of distance,</span>
-          <span class="line">everything flattened into pixels and urgency.</span>
-          <span class="line line-soft">I promise myself an evening walk,</span>
-          <span class="line">a slow corridor of trees and uncurated shadows.</span>
-          <span class="line line-soft">But the day keeps refreshing,</span>
-          <span class="line">and I keep agreeing to stay.</span>
+          <span class="line line-soft">Night loads like a familiar menu,</span>
+          <span class="line">the room dimmed to <span class="line-keyword">console glow</span> and quiet fan.</span>
+          <span class="line line-soft">Friends appear as usernames in the corner,</span>
+          <span class="line">small neon ghosts waving from another city.</span>
+          <span class="line line-soft">I press start and the day falls away,</span>
+          <span class="line">work emails minimized like defeated mini-bosses.</span>
+          <span class="line line-soft">The controller remembers my hands,</span>
+          <span class="line">thumbs resting on buttons like <span class="line-keyword">ritual</span>.</span>
+          <span class="line line-soft">We queue for a match,</span>
+          <span class="line">loading screen clouds drifting over digital mountains.</span>
+          <span class="line line-soft">Someone jokes about lag and life,</span>
+          <span class="line">how everything feels one second behind where it should be.</span>
+          <span class="line line-soft">The map opens like a second heartbeat,</span>
+          <span class="line">corridors of light and shadow waiting for our footsteps.</span>
+          <span class="line line-soft">I chase objectives and side quests,</span>
+          <span class="line">collecting tiny trophies no one outside the lobby will ever see.</span>
+          <span class="line line-soft">In the headset, laughter crackles,</span>
+          <span class="line">a party chat of voices stitched across distance.</span>
+          <span class="line line-soft">We lose, we win, we respawn,</span>
+          <span class="line">our avatars falling and rising like practice for something bigger.</span>
+          <span class="line line-soft">Outside, the night keeps scrolling,</span>
+          <span class="line">streetlights leveling up from yellow to dawn.</span>
+          <span class="line line-soft">I promise myself one more match,</span>
+          <span class="line">a final <span class="line-keyword">save point</span> before tomorrow loads.</span>
         </div>
+
         <div class="controls-row">
           <button class="btn btn-outline" id="copyOriginalBtn">
             <span class="btn-icon">⤵</span>
@@ -759,24 +972,30 @@
       <!-- REVISION EDITOR CARD -->
       <article class="card">
         <div class="card-header">
-          <div class="card-header-title">Revision Draft</div>
+          <div class="card-header-title">
+            <span class="card-header-title-icon">✏️</span>
+            <span>Revision Draft · Live Editing</span>
+          </div>
           <div class="card-header-tag pill">
             <span class="pill-dot"></span>
-            <span>Live editing</span>
+            <span>Player 1 · you</span>
           </div>
         </div>
 
         <div class="toggle-row">
           <input type="checkbox" id="showHintsToggle" checked />
-          <label for="showHintsToggle">Show inline hints from Chapter 6 while revising</label>
+          <label for="showHintsToggle">Show Chapter 6 hints while revising</label>
         </div>
 
         <div class="editor">
           <div class="editor-label-row">
             <span class="label-main">Revision space</span>
-            <span class="label-sub">Use the prompts above as you reshape the poem.</span>
+            <span class="label-sub">Treat each change like a new level in the poem.</span>
           </div>
-          <textarea id="revisionText" placeholder="Paste or write your revised poem here. You can start by copying the original draft, then cut, rearrange, and rewrite lines according to the prompts."></textarea>
+          <textarea
+            id="revisionText"
+            placeholder="Paste or write your revised gaming poem here. You can start by copying the original draft, then cut, rearrange, and rewrite lines according to the prompts. Try structuring stanzas like levels, quests, or save points."
+          ></textarea>
           <div class="editor-footer">
             <span class="counter" id="charCounter">0 characters</span>
             <span class="status draft" id="draftStatus">draft in progress</span>
@@ -790,18 +1009,18 @@
           </button>
           <button class="btn btn-outline" id="autoHintBtn">
             <span class="btn-icon">✨</span>
-            <span>Highlight possible revision spots</span>
+            <span>Add Chapter 6 revision hints</span>
           </button>
         </div>
       </article>
     </section>
 
-    <!-- RIGHT PANEL: PROCESS + INSIGHTS + SUBMISSION PREVIEW -->
+    <!-- RIGHT PANEL -->
     <section class="right-panel">
       <header class="right-panel-header">
         <div class="right-panel-header-title">Revision Process & Submission</div>
         <div class="right-panel-header-subtitle">
-          Track how your poem changes as you respond to Chapter 6 prompts.
+          Track how your gaming poem evolves as you respond to Chapter 6 prompts.
         </div>
       </header>
 
@@ -811,28 +1030,30 @@
           <div class="timeline-step-dot"></div>
           <div class="timeline-step-title">Step 1 · Read & Notice</div>
           <div class="timeline-step-body">
-            Read the original poem slowly. Notice where the energy rises, where it falls, and where the language feels vague or overfamiliar.
+            Read the original poem slowly, like replaying a favorite level.  
+            Notice where the emotional “boss fights” happen and where the language feels like filler dialogue.
           </div>
         </div>
         <div class="timeline-step">
           <div class="timeline-step-dot"></div>
           <div class="timeline-step-title">Step 2 · Mark the Core</div>
           <div class="timeline-step-body">
-            Decide what the poem is truly about—its emotional center. Keep that in mind as you cut, rearrange, and rewrite.
+            Decide what the poem is truly about—escape, friendship, adrenaline, or quiet comfort.  
+            Keep that emotional questline in mind as you cut, rearrange, and rewrite.
           </div>
         </div>
         <div class="timeline-step">
           <div class="timeline-step-dot"></div>
           <div class="timeline-step-title">Step 3 · Rewrite Boldly</div>
           <div class="timeline-step-body">
-            Use the editor to experiment. Remove entire lines, compress images, or add new stanzas that deepen the central feeling.
+            Use the editor to experiment. Remove entire stanzas, compress images, or add new “levels” that deepen your love of gaming.
           </div>
         </div>
         <div class="timeline-step">
           <div class="timeline-step-dot"></div>
           <div class="timeline-step-title">Step 4 · Prepare Submission</div>
           <div class="timeline-step-body">
-            When the revision feels coherent and alive, update the submission preview and check that the poem reads cleanly from start to finish.
+            When the revision feels coherent and alive, update the submission preview and check that the poem reads cleanly from start to finish—no glitchy lines.
           </div>
         </div>
       </div>
@@ -840,13 +1061,13 @@
       <!-- INSIGHT CARD -->
       <article class="insight-card">
         <div class="insight-header">
-          <div class="insight-header-title">Chapter 6 Insight</div>
+          <div class="insight-header-title">Chapter 6 Insight · Gaming Lens</div>
           <div class="insight-header-tag">Craft note</div>
         </div>
         <div class="insight-body">
-          Revision is not just fixing mistakes; it is <strong>re-choosing the poem</strong>.  
-          Each change you make is a decision about what the poem wants to hold and what it can let go of.  
-          Use this space to listen to the poem as it changes—notice which version feels most honest, most precise, and most alive.
+          Revision is not just fixing bugs; it is <strong>rebalancing the game</strong> of your poem.  
+          Each cut, each new image, each rearranged stanza is a patch note to how the poem plays in the reader’s mind.  
+          Ask yourself: does this version feel more honest about why gaming matters to me—how it holds my joy, my stress, my friendships, my late-night quiet?
         </div>
       </article>
 
@@ -858,10 +1079,10 @@
         </div>
         <div class="submission-body">
           This area shows the poem exactly as it will appear when you submit it for Chapter 6.  
-          When you are satisfied with your revision, you can treat this preview as your <strong>final version</strong>.
+          When you are satisfied with your revision, you can treat this preview as your <strong>final version</strong>—your “release build.”
         </div>
         <div class="submission-preview" id="submissionPreview">
-          (Your revised poem will appear here after you click “Update submission preview.”)
+          (Your revised gaming poem will appear here after you click “Update submission preview.”)
         </div>
         <div class="submission-footer">
           <span class="label">Revision state</span>
@@ -878,7 +1099,7 @@
           </button>
         </div>
         <div class="footer-note">
-          <strong>Note:</strong> This page does not actually send your poem anywhere—it is a practice space.  
+          <strong>Note:</strong> This page does not actually send your poem anywhere—it is a practice arena.  
           Use the “Copy preview” button to paste your final version into your course submission system.
         </div>
       </article>
@@ -900,18 +1121,39 @@
     const exportBtn = document.getElementById("exportBtn");
     const showHintsToggle = document.getElementById("showHintsToggle");
     const autoHintBtn = document.getElementById("autoHintBtn");
+    const moodBarFill = document.getElementById("moodBarFill");
+    const moodBarTag = document.getElementById("moodBarTag");
+    const promptFilters = document.querySelectorAll(".prompt-filter");
 
     function updateCharCounter() {
       const text = revisionText.value;
-      charCounter.textContent = text.length + " characters";
+      const length = text.length;
+      charCounter.textContent = length + " characters";
+
       if (text.trim().length === 0) {
         draftStatus.textContent = "draft in progress";
         draftStatus.classList.remove("ready");
         draftStatus.classList.add("draft");
-      } else {
+        moodBarFill.style.width = "30%";
+        moodBarTag.textContent = "Level 1 · tutorial";
+      } else if (length < 400) {
         draftStatus.textContent = "draft active";
         draftStatus.classList.remove("draft");
         draftStatus.classList.add("ready");
+        moodBarFill.style.width = "50%";
+        moodBarTag.textContent = "Level 2 · early game";
+      } else if (length < 900) {
+        draftStatus.textContent = "draft expanding";
+        draftStatus.classList.remove("draft");
+        draftStatus.classList.add("ready");
+        moodBarFill.style.width = "70%";
+        moodBarTag.textContent = "Level 3 · mid game";
+      } else {
+        draftStatus.textContent = "draft epic";
+        draftStatus.classList.remove("draft");
+        draftStatus.classList.add("ready");
+        moodBarFill.style.width = "90%";
+        moodBarTag.textContent = "Level 4 · boss fight";
       }
     }
 
@@ -930,7 +1172,7 @@
       revisionText.value = "";
       updateCharCounter();
       submissionPreview.textContent =
-        "(Your revised poem will appear here after you click “Update submission preview.”)";
+        "(Your revised gaming poem will appear here after you click “Update submission preview.”)";
       submissionStatusLabel.textContent = "status · pending";
       submissionStateValue.textContent = "not yet submitted";
       submissionStateValue.classList.remove("ready");
@@ -941,7 +1183,7 @@
       const text = revisionText.value.trim();
       if (text.length === 0) {
         submissionPreview.textContent =
-          "(Your revised poem will appear here after you click “Update submission preview.”)";
+          "(Your revised gaming poem will appear here after you click “Update submission preview.”)";
         submissionStatusLabel.textContent = "status · pending";
         submissionStateValue.textContent = "not yet submitted";
         submissionStateValue.classList.remove("ready");
@@ -958,7 +1200,7 @@
     markSubmittedBtn.addEventListener("click", () => {
       const text = revisionText.value.trim();
       if (text.length === 0) {
-        alert("Write or paste your revised poem before marking it as ready to submit.");
+        alert("Write or paste your revised gaming poem before marking it as ready to submit.");
         return;
       }
       submissionStatusLabel.textContent = "status · ready";
@@ -969,7 +1211,7 @@
 
     exportBtn.addEventListener("click", async () => {
       const text = submissionPreview.textContent.trim();
-      if (!text || text.startsWith("(Your revised poem")) {
+      if (!text || text.startsWith("(Your revised gaming poem")) {
         alert("Update the submission preview before copying.");
         return;
       }
@@ -984,32 +1226,40 @@
     autoHintBtn.addEventListener("click", () => {
       const text = revisionText.value;
       if (!text.trim()) {
-        alert("Paste or write your poem in the revision editor first.");
+        alert("Paste or write your gaming poem in the revision editor first.");
         return;
       }
 
       const hint =
-        "\n\n[Hint from Chapter 6]\n" +
-        "- Identify one stanza where the energy drops and try compressing it.\n" +
-        "- Replace at least one abstract noun with a concrete image.\n" +
-        "- Consider adding a small formal surprise: a repeated line, a visual indentation, or a sudden short line.";
+        "\n\n[Chapter 6 Gaming Hints]\n" +
+        "- Identify one stanza where the energy drops and compress it like a speedrun.\n" +
+        "- Replace at least one abstract feeling with a concrete gaming image (controller, lobby, loading screen, HUD).\n" +
+        "- Add a formal surprise: a repeated “Press Start” line, a sudden one-word stanza, or a level-style heading.\n" +
+        "- Let one moment of doubt or fatigue enter the poem to complicate your love of gaming.";
 
-      if (!text.includes("[Hint from Chapter 6]")) {
+      if (!text.includes("[Chapter 6 Gaming Hints]")) {
         revisionText.value = text + hint;
         updateCharCounter();
       } else {
-        alert("Hints are already present in your revision draft.");
+        alert("Chapter 6 hints are already present in your revision draft.");
       }
     });
 
     showHintsToggle.addEventListener("change", () => {
       const checked = showHintsToggle.checked;
-      const promptCard = document.querySelector(".card:first-of-type");
+      const promptCard = document.getElementById("promptCard");
       if (checked) {
         promptCard.classList.remove("hidden");
       } else {
         promptCard.classList.add("hidden");
       }
+    });
+
+    promptFilters.forEach((filter) => {
+      filter.addEventListener("click", () => {
+        promptFilters.forEach((f) => f.classList.remove("active"));
+        filter.classList.add("active");
+      });
     });
 
     updateCharCounter();
