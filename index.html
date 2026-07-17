@@ -2,1267 +2,268 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Interactive Gaming Poem – Chapter 6 Revision Space</title>
+  <title>Off the Grid Gaming Haiku</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
   <style>
-    :root {
-      --bg: #050814;
-      --bg-alt: #0c1224;
-      --accent: #4df3ff;
-      --accent-soft: rgba(77, 243, 255, 0.18);
-      --accent-strong: #00ffc3;
-      --accent-warm: #ffb347;
-      --text: #f5f5f7;
-      --muted: #a9b0c7;
-      --border: #252b3f;
-      --shadow-soft: 0 18px 40px rgba(0, 0, 0, 0.55);
-      --shadow-small: 0 8px 20px rgba(0, 0, 0, 0.4);
-      --radius-xl: 24px;
-      --radius-lg: 18px;
-      --radius-md: 12px;
-      --radius-sm: 8px;
-      --transition-fast: 0.18s ease-out;
-      --transition-med: 0.25s ease-out;
-      --font-main: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
-        sans-serif;
-      --font-mono: "SF Mono", Menlo, Monaco, Consolas, "Liberation Mono",
-        "Courier New", monospace;
-      --grid-gap: 24px;
-    }
-
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
+    html {
+      width: 100%;
+      height: 100%;
     }
 
     body {
-      font-family: var(--font-main);
-      background:
-        radial-gradient(circle at top, #1b2340 0, #050814 55%, #000 100%);
-      color: var(--text);
-      min-height: 100vh;
-      display: flex;
-      align-items: stretch;
-      justify-content: center;
-      padding: 32px 16px;
-    }
-
-    .page {
-      width: 100%;
-      max-width: 1300px;
-      display: grid;
-      grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr);
-      gap: var(--grid-gap);
-      background: linear-gradient(145deg, #0c1224, #050814);
-      border-radius: var(--radius-xl);
-      border: 1px solid rgba(255, 255, 255, 0.04);
-      box-shadow: var(--shadow-soft);
+      margin: 0;
+      background: #000 url("assets/img/gaming-bg.gif") no-repeat center/cover;
+      color: #f5f5f5;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      font-size: 4rem;
       overflow: hidden;
-      position: relative;
     }
 
-    .page::before {
-      content: "";
-      position: absolute;
+    /* Overlay to soften background and focus text */
+    .overlay {
+      position: fixed;
       inset: 0;
-      background:
-        radial-gradient(circle at top left, rgba(77, 243, 255, 0.12), transparent 60%),
-        radial-gradient(circle at bottom right, rgba(255, 179, 71, 0.12), transparent 60%);
-      opacity: 0.9;
+      background: radial-gradient(circle at 50% 20%, rgba(0, 255, 153, 0.35), transparent 55%),
+                  radial-gradient(circle at 10% 80%, rgba(255, 0, 153, 0.25), transparent 55%),
+                  radial-gradient(circle at 90% 60%, rgba(0, 153, 255, 0.25), transparent 55%);
       pointer-events: none;
+      mix-blend-mode: screen;
+      z-index: 0;
     }
 
-    @media (max-width: 980px) {
-      .page {
-        grid-template-columns: 1fr;
-      }
-    }
-
-    .left-panel,
-    .right-panel {
-      padding: 24px 26px 26px;
+    /* Container for poem words in a grid */
+    .grid-container {
       position: relative;
       z-index: 1;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 2rem;
+      margin: 10% 4rem 0 4rem;
     }
 
-    .left-panel {
-      border-right: 1px solid var(--border);
+    .grid-container div {
+      text-transform: lowercase;
+      letter-spacing: 0.08em;
+      text-shadow: 0 0 12px rgba(0, 0, 0, 0.9);
+      transition-property: transform, color, text-shadow;
+      transition-duration: 2.5s;
+      transition-timing-function: cubic-bezier(0.19, 1, 0.22, 1);
+      cursor: crosshair;
+      will-change: transform, color;
     }
 
-    @media (max-width: 980px) {
-      .left-panel {
-        border-right: none;
-        border-bottom: 1px solid var(--border);
-      }
+    /* Mark the 5-7-5 syllable “beats” */
+    .beat {
+      padding-bottom: 1.5rem;
+      border-bottom: 2px solid rgba(255, 255, 255, 0.4);
     }
 
-    /* HEADER */
-
-    .header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 18px;
+    /* Subtle hover effect before explosion */
+    .grid-container div:hover {
+      text-shadow: 0 0 18px rgba(0, 255, 153, 0.9);
+      color: #00ff99;
     }
 
-    .header-title {
-      font-size: 1.2rem;
-      letter-spacing: 0.04em;
-      text-transform: uppercase;
-      color: var(--muted);
+    /* HUD-style instructions */
+    .hud {
+      position: fixed;
+      left: 1.5rem;
+      bottom: 1.5rem;
+      z-index: 2;
+      font-size: 0.9rem;
+      font-family: "SF Mono", Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+      color: #9efcff;
+      background: rgba(0, 0, 0, 0.7);
+      border: 1px solid rgba(158, 252, 255, 0.6);
+      padding: 0.75rem 1rem;
+      border-radius: 0.5rem;
+      max-width: 22rem;
     }
 
-    .header-badge {
-      font-size: 0.75rem;
+    .hud-title {
+      font-weight: 600;
+      margin-bottom: 0.25rem;
       text-transform: uppercase;
       letter-spacing: 0.12em;
-      padding: 6px 10px;
+      color: #00ff99;
+    }
+
+    .hud-line {
+      margin: 0.1rem 0;
+    }
+
+    /* Small “press start” button */
+    .start-btn {
+      display: inline-block;
+      margin-top: 0.5rem;
+      padding: 0.35rem 0.8rem;
       border-radius: 999px;
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      background:
-        radial-gradient(circle at top left, rgba(77, 243, 255, 0.25), transparent 60%);
-      color: var(--accent);
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
+      border: 1px solid rgba(0, 255, 153, 0.7);
+      background: rgba(0, 0, 0, 0.8);
+      color: #00ff99;
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.16em;
+      cursor: pointer;
     }
 
-    .header-badge-icon {
-      width: 10px;
-      height: 10px;
-      border-radius: 999px;
-      background: var(--accent-strong);
-      box-shadow: 0 0 0 4px var(--accent-soft);
+    .start-btn:hover {
+      background: rgba(0, 255, 153, 0.15);
     }
 
-    /* GENERIC CARD */
-
-    .card {
-      background:
-        radial-gradient(circle at top left, #1b2340 0, #050814 55%);
-      border-radius: var(--radius-lg);
-      border: 1px solid var(--border);
-      padding: 16px 14px 14px;
-      margin-bottom: 16px;
-      box-shadow: var(--shadow-small);
-      position: relative;
-      overflow: hidden;
-    }
-
-    .card::before {
-      content: "";
-      position: absolute;
-      inset: 0;
-      background:
-        radial-gradient(circle at top right, rgba(77, 243, 255, 0.08), transparent 60%);
-      opacity: 0.9;
-      pointer-events: none;
-    }
-
-    .card-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 10px;
-      position: relative;
-      z-index: 1;
-    }
-
-    .card-header-title {
-      font-size: 0.95rem;
-      font-weight: 600;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .card-header-title-icon {
-      width: 18px;
-      height: 18px;
-      border-radius: 999px;
-      border: 1px solid rgba(255, 255, 255, 0.12);
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 0.7rem;
-      color: var(--accent);
-    }
-
-    .card-header-tag {
+    /* Tiny footer credit */
+    .footer {
+      position: fixed;
+      right: 1.5rem;
+      bottom: 1.5rem;
+      z-index: 2;
       font-size: 0.75rem;
-      padding: 4px 8px;
-      border-radius: 999px;
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      color: var(--muted);
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      background: rgba(255, 255, 255, 0.02);
+      font-family: "SF Mono", Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+      color: rgba(245, 245, 245, 0.7);
+      text-align: right;
+      max-width: 18rem;
     }
 
-    .card-header-tag-dot {
-      width: 7px;
-      height: 7px;
-      border-radius: 999px;
-      background: var(--accent);
-    }
-
-    .card-header-tag-dot-soft {
-      background: rgba(255, 255, 255, 0.4);
-    }
-
-    /* PROMPTS LIST */
-
-    .prompt-list {
-      list-style: none;
-      margin-top: 6px;
-      position: relative;
-      z-index: 1;
-    }
-
-    .prompt-item {
-      margin-bottom: 8px;
-      display: flex;
-      align-items: flex-start;
-      gap: 8px;
-      font-size: 0.9rem;
-      color: var(--muted);
-    }
-
-    .prompt-item-bullet {
-      width: 18px;
-      height: 18px;
-      border-radius: 999px;
-      border: 1px solid rgba(255, 255, 255, 0.12);
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 0.7rem;
-      color: var(--accent);
-      flex-shrink: 0;
-      background: rgba(255, 255, 255, 0.02);
-    }
-
-    .prompt-item strong {
-      color: var(--accent-strong);
-      font-weight: 500;
-    }
-
-    /* POEM DISPLAY */
-
-    .poem-original,
-    .poem-revised {
-      font-size: 0.95rem;
-      line-height: 1.6;
-      white-space: pre-wrap;
-      position: relative;
-      z-index: 1;
-      font-family: var(--font-main);
-    }
-
-    .poem-original span.line,
-    .poem-revised span.line {
+    .footer span {
       display: block;
-      padding: 2px 0;
-      transition: background var(--transition-fast), color var(--transition-fast);
     }
 
-    .poem-original span.line:hover,
-    .poem-revised span.line:hover {
-      background: rgba(255, 255, 255, 0.03);
-    }
-
-    .poem-original span.line-soft {
-      color: var(--muted);
-    }
-
-    .poem-original span.line-keyword {
-      color: var(--accent-warm);
-      font-weight: 500;
-    }
-
-    .poem-revised span.line-highlight {
-      background: rgba(77, 243, 255, 0.12);
-      border-radius: 6px;
-      padding: 2px 4px;
-    }
-
-    .poem-revised span.line-break {
-      color: var(--muted);
-      font-size: 0.8rem;
-      text-transform: uppercase;
-      letter-spacing: 0.18em;
-    }
-
-    /* CONTROLS */
-
-    .controls-row {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-      margin-top: 12px;
-      position: relative;
-      z-index: 1;
-    }
-
-    .btn {
-      border-radius: 999px;
-      border: 1px solid rgba(255, 255, 255, 0.12);
-      padding: 7px 14px;
-      font-size: 0.85rem;
-      background: rgba(255, 255, 255, 0.02);
-      color: var(--text);
-      cursor: pointer;
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      transition:
-        background var(--transition-fast),
-        transform var(--transition-fast),
-        box-shadow var(--transition-fast),
-        border-color var(--transition-fast);
-    }
-
-    .btn-primary {
-      background: linear-gradient(135deg, var(--accent), var(--accent-strong));
-      color: #050814;
-      border-color: rgba(0, 0, 0, 0.4);
-      box-shadow: 0 10px 22px rgba(0, 0, 0, 0.45);
-      font-weight: 600;
-    }
-
-    .btn-outline {
-      background: rgba(255, 255, 255, 0.02);
-    }
-
-    .btn-ghost {
-      background: transparent;
-      border-style: dashed;
-      border-color: rgba(255, 255, 255, 0.12);
-      color: var(--muted);
-    }
-
-    .btn:hover {
-      transform: translateY(-1px);
-      box-shadow: 0 10px 24px rgba(0, 0, 0, 0.45);
-      background: rgba(255, 255, 255, 0.04);
-    }
-
-    .btn-primary:hover {
-      background: linear-gradient(135deg, var(--accent-strong), var(--accent));
-    }
-
-    .btn:active {
-      transform: translateY(0);
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
-    }
-
-    .btn-icon {
-      font-size: 0.9rem;
-    }
-
-    /* TOGGLE ROW */
-
-    .toggle-row {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      margin-top: 10px;
-      font-size: 0.8rem;
-      color: var(--muted);
-      position: relative;
-      z-index: 1;
-    }
-
-    .toggle-row input[type="checkbox"] {
-      accent-color: var(--accent);
-      width: 16px;
-      height: 16px;
-    }
-
-    /* EDITOR */
-
-    .editor {
-      margin-top: 10px;
-      position: relative;
-      z-index: 1;
-    }
-
-    .editor-label-row {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 6px;
-      font-size: 0.8rem;
-      color: var(--muted);
-    }
-
-    .editor-label-row span.label-main {
-      text-transform: uppercase;
-      letter-spacing: 0.16em;
-    }
-
-    .editor-label-row span.label-sub {
-      font-style: italic;
-    }
-
-    .editor textarea {
-      width: 100%;
-      min-height: 180px;
-      max-height: 280px;
-      resize: vertical;
-      border-radius: var(--radius-md);
-      border: 1px solid rgba(255, 255, 255, 0.12);
-      background: rgba(5, 8, 20, 0.9);
-      color: var(--text);
-      padding: 10px 11px;
-      font-size: 0.9rem;
-      line-height: 1.5;
-      font-family: var(--font-mono);
-      outline: none;
-      box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.4);
-      transition:
-        border-color var(--transition-med),
-        box-shadow var(--transition-med),
-        background var(--transition-med);
-    }
-
-    .editor textarea:focus {
-      border-color: var(--accent);
-      box-shadow: 0 0 0 1px rgba(77, 243, 255, 0.4);
-      background: rgba(5, 8, 20, 0.98);
-    }
-
-    .editor-footer {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-top: 6px;
-      font-size: 0.8rem;
-      color: var(--muted);
-    }
-
-    .editor-footer span.counter {
-      font-family: var(--font-mono);
-    }
-
-    .editor-footer span.status {
-      text-transform: uppercase;
-      letter-spacing: 0.16em;
-    }
-
-    .editor-footer span.status.ready {
-      color: var(--accent-strong);
-    }
-
-    .editor-footer span.status.draft {
-      color: var(--muted);
-    }
-
-    /* RIGHT PANEL HEADER */
-
-    .right-panel-header {
-      margin-bottom: 14px;
-    }
-
-    .right-panel-header-title {
-      font-size: 1rem;
-      font-weight: 600;
-      margin-bottom: 4px;
-    }
-
-    .right-panel-header-subtitle {
-      font-size: 0.85rem;
-      color: var(--muted);
-    }
-
-    /* TIMELINE */
-
-    .timeline {
-      margin-top: 10px;
-      margin-bottom: 16px;
-      position: relative;
-    }
-
-    .timeline::before {
-      content: "";
-      position: absolute;
-      left: 10px;
-      top: 0;
-      bottom: 0;
-      width: 2px;
-      background: linear-gradient(to bottom, var(--accent), transparent);
-      opacity: 0.4;
-    }
-
-    .timeline-step {
-      position: relative;
-      padding-left: 28px;
-      margin-bottom: 12px;
-    }
-
-    .timeline-step:last-child {
-      margin-bottom: 0;
-    }
-
-    .timeline-step-dot {
-      position: absolute;
-      left: 4px;
-      top: 2px;
-      width: 12px;
-      height: 12px;
-      border-radius: 999px;
-      border: 1px solid rgba(255, 255, 255, 0.12);
-      background: radial-gradient(circle, var(--accent), #050814);
-      box-shadow: 0 0 0 4px var(--accent-soft);
-    }
-
-    .timeline-step-title {
-      font-size: 0.9rem;
-      font-weight: 500;
-      margin-bottom: 2px;
-    }
-
-    .timeline-step-body {
-      font-size: 0.85rem;
-      color: var(--muted);
-    }
-
-    /* INSIGHT CARD */
-
-    .insight-card {
-      background:
-        radial-gradient(circle at top left, #1b2340 0, #050814 55%);
-      border-radius: var(--radius-lg);
-      border: 1px solid var(--border);
-      padding: 14px 13px 13px;
-      margin-bottom: 14px;
-      box-shadow: var(--shadow-small);
-      position: relative;
-      overflow: hidden;
-    }
-
-    .insight-card::before {
-      content: "";
-      position: absolute;
-      inset: 0;
-      background:
-        radial-gradient(circle at bottom right, rgba(255, 179, 71, 0.12), transparent 60%);
-      opacity: 0.9;
-      pointer-events: none;
-    }
-
-    .insight-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 8px;
-      position: relative;
-      z-index: 1;
-    }
-
-    .insight-header-title {
-      font-size: 0.9rem;
-      font-weight: 500;
-    }
-
-    .insight-header-tag {
-      font-size: 0.75rem;
-      padding: 3px 8px;
-      border-radius: 999px;
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      color: var(--muted);
-      background: rgba(255, 255, 255, 0.02);
-    }
-
-    .insight-body {
-      font-size: 0.85rem;
-      color: var(--muted);
-      position: relative;
-      z-index: 1;
-    }
-
-    .insight-body strong {
-      color: var(--accent-strong);
-      font-weight: 500;
-    }
-
-    /* SUBMISSION CARD */
-
-    .submission-card {
-      background:
-        radial-gradient(circle at top left, #1b2340 0, #050814 55%);
-      border-radius: var(--radius-lg);
-      border: 1px solid var(--border);
-      padding: 14px 13px 13px;
-      box-shadow: var(--shadow-small);
-      position: relative;
-      overflow: hidden;
-    }
-
-    .submission-card::before {
-      content: "";
-      position: absolute;
-      inset: 0;
-      background:
-        radial-gradient(circle at top right, rgba(77, 243, 255, 0.16), transparent 60%);
-      opacity: 0.9;
-      pointer-events: none;
-    }
-
-    .submission-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 8px;
-      position: relative;
-      z-index: 1;
-    }
-
-    .submission-header-title {
-      font-size: 0.9rem;
-      font-weight: 600;
-    }
-
-    .submission-header-status {
-      font-size: 0.75rem;
-      text-transform: uppercase;
-      letter-spacing: 0.16em;
-      color: var(--muted);
-    }
-
-    .submission-body {
-      font-size: 0.85rem;
-      color: var(--muted);
-      margin-bottom: 10px;
-      position: relative;
-      z-index: 1;
-    }
-
-    .submission-body strong {
-      color: var(--accent-strong);
-      font-weight: 500;
-    }
-
-    .submission-preview {
-      background: rgba(5, 8, 20, 0.9);
-      border-radius: var(--radius-md);
-      border: 1px dashed rgba(255, 255, 255, 0.16);
-      padding: 10px 11px;
-      font-size: 0.9rem;
-      line-height: 1.6;
-      white-space: pre-wrap;
-      color: var(--text);
-      font-family: var(--font-mono);
-      max-height: 240px;
-      overflow-y: auto;
-      position: relative;
-      z-index: 1;
-    }
-
-    .submission-footer {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-top: 8px;
-      position: relative;
-      z-index: 1;
-      font-size: 0.8rem;
-      color: var(--muted);
-    }
-
-    .submission-footer span.label {
-      text-transform: uppercase;
-      letter-spacing: 0.16em;
-    }
-
-    .submission-footer span.value {
-      font-family: var(--font-mono);
-    }
-
-    .submission-footer span.value.ready {
-      color: var(--accent-strong);
-    }
-
-    .submission-footer span.value.pending {
-      color: var(--muted);
-    }
-
-    .footer-note {
-      margin-top: 10px;
-      font-size: 0.8rem;
-      color: var(--muted);
-      font-style: italic;
-    }
-
-    .footer-note strong {
-      color: var(--accent-warm);
-      font-weight: 500;
-    }
-
-    .hidden {
-      display: none !important;
-    }
-
-    .pill {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      padding: 4px 9px;
-      border-radius: 999px;
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      font-size: 0.75rem;
-      color: var(--muted);
-      background: rgba(255, 255, 255, 0.02);
-    }
-
-    .pill-dot {
-      width: 6px;
-      height: 6px;
-      border-radius: 999px;
-      background: var(--accent-strong);
-    }
-
-    .pill-dot-soft {
-      background: rgba(255, 255, 255, 0.3);
-    }
-
-    /* GAMING MOOD BAR */
-
-    .mood-bar {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      margin-top: 8px;
-      font-size: 0.8rem;
-      color: var(--muted);
-    }
-
-    .mood-bar-label {
-      text-transform: uppercase;
-      letter-spacing: 0.16em;
-    }
-
-    .mood-bar-track {
-      flex: 1;
-      height: 6px;
-      border-radius: 999px;
-      background: rgba(255, 255, 255, 0.06);
-      overflow: hidden;
-      position: relative;
-    }
-
-    .mood-bar-fill {
-      position: absolute;
-      left: 0;
-      top: 0;
-      bottom: 0;
-      width: 40%;
-      background: linear-gradient(90deg, var(--accent), var(--accent-strong));
-      transition: width var(--transition-med);
-    }
-
-    .mood-bar-tag {
-      font-family: var(--font-mono);
-      padding: 2px 6px;
-      border-radius: 999px;
-      border: 1px solid rgba(255, 255, 255, 0.12);
-      background: rgba(255, 255, 255, 0.02);
-    }
-
-    /* GAMING PROMPT FILTERS */
-
-    .prompt-filters {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 6px;
-      margin-top: 8px;
-      font-size: 0.75rem;
-    }
-
-    .prompt-filter {
-      padding: 4px 8px;
-      border-radius: 999px;
-      border: 1px solid rgba(255, 255, 255, 0.12);
-      background: rgba(255, 255, 255, 0.02);
-      cursor: pointer;
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      color: var(--muted);
-      transition:
-        background var(--transition-fast),
-        border-color var(--transition-fast),
-        color var(--transition-fast);
-    }
-
-    .prompt-filter-dot {
-      width: 6px;
-      height: 6px;
-      border-radius: 999px;
-      background: rgba(255, 255, 255, 0.4);
-    }
-
-    .prompt-filter.active {
-      border-color: var(--accent-strong);
-      color: var(--accent-strong);
-      background: rgba(77, 243, 255, 0.08);
-    }
-
-    .prompt-filter.active .prompt-filter-dot {
-      background: var(--accent-strong);
+    @media (max-width: 768px) {
+      body {
+        font-size: 2.6rem;
+      }
+      .hud {
+        max-width: 18rem;
+      }
     }
   </style>
 </head>
+
 <body>
-  <div class="page">
-    <!-- LEFT PANEL -->
-    <section class="left-panel">
-      <header class="header">
-        <div class="header-title">Chapter 6 · Gaming Poem Revision</div>
-        <div class="header-badge">
-          <span class="header-badge-icon"></span>
-          <span>Interactive poem workspace</span>
-        </div>
-      </header>
+  <!-- Soft color overlay -->
+  <div class="overlay"></div>
 
-      <!-- PROMPTS CARD -->
-      <article class="card" id="promptCard">
-        <div class="card-header">
-          <div class="card-header-title">
-            <span class="card-header-title-icon">🎮</span>
-            <span>Revision Prompts (Gaming Edition)</span>
-          </div>
-          <div class="card-header-tag">
-            <span class="card-header-tag-dot"></span>
-            <span>Chapter 6 guide</span>
-          </div>
-        </div>
+  <!-- Gaming haiku, word-by-word in a grid -->
+  <div class="grid-container" aria-label="Interactive gaming haiku">
+    <!-- Line 1: 5-ish syllables -->
+    <div class="beat">arcade</div>
+    <div>neon</div>
+    <div>hum</div>
+    <div>pixel</div>
+    <div>dreams</div>
 
-        <ul class="prompt-list">
-          <li class="prompt-item">
-            <span class="prompt-item-bullet">1</span>
-            <span>
-              <strong>Clarify the emotional center.</strong>
-              Is your poem about escape, connection, competition, or comfort?  
-              Make sure every image and metaphor points toward that core feeling of why you love gaming.
-            </span>
-          </li>
-          <li class="prompt-item">
-            <span class="prompt-item-bullet">2</span>
-            <span>
-              <strong>Sharpen sensory detail.</strong>
-              Replace vague phrases with specific textures: controller plastic, headset pressure, pixel glow, loading-screen music, late-night snacks.
-            </span>
-          </li>
-          <li class="prompt-item">
-            <span class="prompt-item-bullet">3</span>
-            <span>
-              <strong>Use game language with intention.</strong>
-              Terms like “XP,” “boss fight,” “co-op,” and “respawn” can be powerful metaphors—use them where they deepen meaning, not just as decoration.
-            </span>
-          </li>
-          <li class="prompt-item">
-            <span class="prompt-item-bullet">4</span>
-            <span>
-              <strong>Experiment with form.</strong>
-              Try structuring stanzas like levels, quests, or save points.  
-              Consider a repeated “Press Start” refrain or a sudden short line that feels like a quick-time event.
-            </span>
-          </li>
-          <li class="prompt-item">
-            <span class="prompt-item-bullet">5</span>
-            <span>
-              <strong>Interrogate each line.</strong>
-              Ask: “Does this line earn its place in the game?”  
-              Cut filler dialogue; keep only the lines that move the emotional story forward.
-            </span>
-          </li>
-          <li class="prompt-item">
-            <span class="prompt-item-bullet">6</span>
-            <span>
-              <strong>Invite surprise.</strong>
-              Add one image or turn that complicates your love of gaming—fatigue, friendship, grief, or joy that only exists in a lobby at 2 a.m.
-            </span>
-          </li>
-        </ul>
+    <!-- Line 2: 7-ish syllables -->
+    <div class="beat">boss</div>
+    <div>fights</div>
+    <div>pulse</div>
+    <div>through</div>
+    <div>midnight</div>
+    <div>party</div>
+    <div>queues</div>
 
-        <div class="prompt-filters">
-          <button class="prompt-filter active" data-filter="emotion">
-            <span class="prompt-filter-dot"></span>
-            <span>Emotion</span>
-          </button>
-          <button class="prompt-filter" data-filter="sensory">
-            <span class="prompt-filter-dot"></span>
-            <span>Sensory</span>
-          </button>
-          <button class="prompt-filter" data-filter="form">
-            <span class="prompt-filter-dot"></span>
-            <span>Form</span>
-          </button>
-          <button class="prompt-filter" data-filter="surprise">
-            <span class="prompt-filter-dot"></span>
-            <span>Surprise</span>
-          </button>
-        </div>
+    <!-- Line 3: 5-ish syllables -->
+    <div class="beat">hearts</div>
+    <div>level</div>
+    <div>up</div>
+    <div>in</div>
+    <div>co-op</div>
+  </div>
 
-        <div class="mood-bar">
-          <span class="mood-bar-label">Poem energy</span>
-          <div class="mood-bar-track">
-            <div class="mood-bar-fill" id="moodBarFill"></div>
-          </div>
-          <span class="mood-bar-tag" id="moodBarTag">Level 1 · tutorial</span>
-        </div>
-      </article>
+  <!-- HUD / instructions -->
+  <div class="hud">
+    <div class="hud-title">off the grid: gaming poem</div>
+    <p class="hud-line">• click anywhere to “explode” the layout.</p>
+    <p class="hud-line">• each word jumps, rotates, and scales like a glitchy sprite.</p>
+    <p class="hud-line">• click again to keep iterating new compositions.</p>
+    <button class="start-btn" id="startBtn">press start</button>
+  </div>
 
-      <!-- ORIGINAL POEM CARD -->
-      <article class="card">
-        <div class="card-header">
-          <div class="card-header-title">
-            <span class="card-header-title-icon">💾</span>
-            <span>Original Draft · “Save Point”</span>
-          </div>
-          <div class="card-header-tag pill">
-            <span class="pill-dot pill-dot-soft"></span>
-            <span>Read-only reference</span>
-          </div>
-        </div>
-
-        <div class="poem-original" id="originalPoem">
-          <span class="line line-soft">Night loads like a familiar menu,</span>
-          <span class="line">the room dimmed to <span class="line-keyword">console glow</span> and quiet fan.</span>
-          <span class="line line-soft">Friends appear as usernames in the corner,</span>
-          <span class="line">small neon ghosts waving from another city.</span>
-          <span class="line line-soft">I press start and the day falls away,</span>
-          <span class="line">work emails minimized like defeated mini-bosses.</span>
-          <span class="line line-soft">The controller remembers my hands,</span>
-          <span class="line">thumbs resting on buttons like <span class="line-keyword">ritual</span>.</span>
-          <span class="line line-soft">We queue for a match,</span>
-          <span class="line">loading screen clouds drifting over digital mountains.</span>
-          <span class="line line-soft">Someone jokes about lag and life,</span>
-          <span class="line">how everything feels one second behind where it should be.</span>
-          <span class="line line-soft">The map opens like a second heartbeat,</span>
-          <span class="line">corridors of light and shadow waiting for our footsteps.</span>
-          <span class="line line-soft">I chase objectives and side quests,</span>
-          <span class="line">collecting tiny trophies no one outside the lobby will ever see.</span>
-          <span class="line line-soft">In the headset, laughter crackles,</span>
-          <span class="line">a party chat of voices stitched across distance.</span>
-          <span class="line line-soft">We lose, we win, we respawn,</span>
-          <span class="line">our avatars falling and rising like practice for something bigger.</span>
-          <span class="line line-soft">Outside, the night keeps scrolling,</span>
-          <span class="line">streetlights leveling up from yellow to dawn.</span>
-          <span class="line line-soft">I promise myself one more match,</span>
-          <span class="line">a final <span class="line-keyword">save point</span> before tomorrow loads.</span>
-        </div>
-
-        <div class="controls-row">
-          <button class="btn btn-outline" id="copyOriginalBtn">
-            <span class="btn-icon">⤵</span>
-            <span>Copy to revision editor</span>
-          </button>
-          <button class="btn btn-ghost" id="clearEditorBtn">
-            <span class="btn-icon">✕</span>
-            <span>Clear revision</span>
-          </button>
-        </div>
-      </article>
-
-      <!-- REVISION EDITOR CARD -->
-      <article class="card">
-        <div class="card-header">
-          <div class="card-header-title">
-            <span class="card-header-title-icon">✏️</span>
-            <span>Revision Draft · Live Editing</span>
-          </div>
-          <div class="card-header-tag pill">
-            <span class="pill-dot"></span>
-            <span>Player 1 · you</span>
-          </div>
-        </div>
-
-        <div class="toggle-row">
-          <input type="checkbox" id="showHintsToggle" checked />
-          <label for="showHintsToggle">Show Chapter 6 hints while revising</label>
-        </div>
-
-        <div class="editor">
-          <div class="editor-label-row">
-            <span class="label-main">Revision space</span>
-            <span class="label-sub">Treat each change like a new level in the poem.</span>
-          </div>
-          <textarea
-            id="revisionText"
-            placeholder="Paste or write your revised gaming poem here. You can start by copying the original draft, then cut, rearrange, and rewrite lines according to the prompts. Try structuring stanzas like levels, quests, or save points."
-          ></textarea>
-          <div class="editor-footer">
-            <span class="counter" id="charCounter">0 characters</span>
-            <span class="status draft" id="draftStatus">draft in progress</span>
-          </div>
-        </div>
-
-        <div class="controls-row">
-          <button class="btn btn-primary" id="updatePreviewBtn">
-            <span class="btn-icon">▶</span>
-            <span>Update submission preview</span>
-          </button>
-          <button class="btn btn-outline" id="autoHintBtn">
-            <span class="btn-icon">✨</span>
-            <span>Add Chapter 6 revision hints</span>
-          </button>
-        </div>
-      </article>
-    </section>
-
-    <!-- RIGHT PANEL -->
-    <section class="right-panel">
-      <header class="right-panel-header">
-        <div class="right-panel-header-title">Revision Process & Submission</div>
-        <div class="right-panel-header-subtitle">
-          Track how your gaming poem evolves as you respond to Chapter 6 prompts.
-        </div>
-      </header>
-
-      <!-- TIMELINE -->
-      <div class="timeline">
-        <div class="timeline-step">
-          <div class="timeline-step-dot"></div>
-          <div class="timeline-step-title">Step 1 · Read & Notice</div>
-          <div class="timeline-step-body">
-            Read the original poem slowly, like replaying a favorite level.  
-            Notice where the emotional “boss fights” happen and where the language feels like filler dialogue.
-          </div>
-        </div>
-        <div class="timeline-step">
-          <div class="timeline-step-dot"></div>
-          <div class="timeline-step-title">Step 2 · Mark the Core</div>
-          <div class="timeline-step-body">
-            Decide what the poem is truly about—escape, friendship, adrenaline, or quiet comfort.  
-            Keep that emotional questline in mind as you cut, rearrange, and rewrite.
-          </div>
-        </div>
-        <div class="timeline-step">
-          <div class="timeline-step-dot"></div>
-          <div class="timeline-step-title">Step 3 · Rewrite Boldly</div>
-          <div class="timeline-step-body">
-            Use the editor to experiment. Remove entire stanzas, compress images, or add new “levels” that deepen your love of gaming.
-          </div>
-        </div>
-        <div class="timeline-step">
-          <div class="timeline-step-dot"></div>
-          <div class="timeline-step-title">Step 4 · Prepare Submission</div>
-          <div class="timeline-step-body">
-            When the revision feels coherent and alive, update the submission preview and check that the poem reads cleanly from start to finish—no glitchy lines.
-          </div>
-        </div>
-      </div>
-
-      <!-- INSIGHT CARD -->
-      <article class="insight-card">
-        <div class="insight-header">
-          <div class="insight-header-title">Chapter 6 Insight · Gaming Lens</div>
-          <div class="insight-header-tag">Craft note</div>
-        </div>
-        <div class="insight-body">
-          Revision is not just fixing bugs; it is <strong>rebalancing the game</strong> of your poem.  
-          Each cut, each new image, each rearranged stanza is a patch note to how the poem plays in the reader’s mind.  
-          Ask yourself: does this version feel more honest about why gaming matters to me—how it holds my joy, my stress, my friendships, my late-night quiet?
-        </div>
-      </article>
-
-      <!-- SUBMISSION PREVIEW CARD -->
-      <article class="submission-card">
-        <div class="submission-header">
-          <div class="submission-header-title">Submission Preview</div>
-          <div class="submission-header-status" id="submissionStatusLabel">status · pending</div>
-        </div>
-        <div class="submission-body">
-          This area shows the poem exactly as it will appear when you submit it for Chapter 6.  
-          When you are satisfied with your revision, you can treat this preview as your <strong>final version</strong>—your “release build.”
-        </div>
-        <div class="submission-preview" id="submissionPreview">
-          (Your revised gaming poem will appear here after you click “Update submission preview.”)
-        </div>
-        <div class="submission-footer">
-          <span class="label">Revision state</span>
-          <span class="value pending" id="submissionStateValue">not yet submitted</span>
-        </div>
-        <div class="controls-row" style="margin-top: 10px;">
-          <button class="btn btn-primary" id="markSubmittedBtn">
-            <span class="btn-icon">📨</span>
-            <span>Mark as ready to submit</span>
-          </button>
-          <button class="btn btn-outline" id="exportBtn">
-            <span class="btn-icon">⧉</span>
-            <span>Copy preview to clipboard</span>
-          </button>
-        </div>
-        <div class="footer-note">
-          <strong>Note:</strong> This page does not actually send your poem anywhere—it is a practice arena.  
-          Use the “Copy preview” button to paste your final version into your course submission system.
-        </div>
-      </article>
-    </section>
+  <!-- Footer credit / context -->
+  <div class="footer">
+    <span>interactive haiku based on love of gaming.</span>
+    <span>grid → chaos, inspired by critical web design chapter 6.</span>
   </div>
 
   <script>
-    const revisionText = document.getElementById("revisionText");
-    const charCounter = document.getElementById("charCounter");
-    const draftStatus = document.getElementById("draftStatus");
-    const copyOriginalBtn = document.getElementById("copyOriginalBtn");
-    const clearEditorBtn = document.getElementById("clearEditorBtn");
-    const originalPoem = document.getElementById("originalPoem");
-    const updatePreviewBtn = document.getElementById("updatePreviewBtn");
-    const submissionPreview = document.getElementById("submissionPreview");
-    const submissionStatusLabel = document.getElementById("submissionStatusLabel");
-    const submissionStateValue = document.getElementById("submissionStateValue");
-    const markSubmittedBtn = document.getElementById("markSubmittedBtn");
-    const exportBtn = document.getElementById("exportBtn");
-    const showHintsToggle = document.getElementById("showHintsToggle");
-    const autoHintBtn = document.getElementById("autoHintBtn");
-    const moodBarFill = document.getElementById("moodBarFill");
-    const moodBarTag = document.getElementById("moodBarTag");
-    const promptFilters = document.querySelectorAll(".prompt-filter");
-
-    function updateCharCounter() {
-      const text = revisionText.value;
-      const length = text.length;
-      charCounter.textContent = length + " characters";
-
-      if (text.trim().length === 0) {
-        draftStatus.textContent = "draft in progress";
-        draftStatus.classList.remove("ready");
-        draftStatus.classList.add("draft");
-        moodBarFill.style.width = "30%";
-        moodBarTag.textContent = "Level 1 · tutorial";
-      } else if (length < 400) {
-        draftStatus.textContent = "draft active";
-        draftStatus.classList.remove("draft");
-        draftStatus.classList.add("ready");
-        moodBarFill.style.width = "50%";
-        moodBarTag.textContent = "Level 2 · early game";
-      } else if (length < 900) {
-        draftStatus.textContent = "draft expanding";
-        draftStatus.classList.remove("draft");
-        draftStatus.classList.add("ready");
-        moodBarFill.style.width = "70%";
-        moodBarTag.textContent = "Level 3 · mid game";
-      } else {
-        draftStatus.textContent = "draft epic";
-        draftStatus.classList.remove("draft");
-        draftStatus.classList.add("ready");
-        moodBarFill.style.width = "90%";
-        moodBarTag.textContent = "Level 4 · boss fight";
-      }
+    // Utility: inclusive random integer
+    function randomInt(min, max) {
+      return Math.floor(Math.random() * (max - min + 1)) + min;
     }
 
-    revisionText.addEventListener("input", updateCharCounter);
+    // Utility: pick a random neon-ish color
+    function randomColor() {
+      const palette = [
+        "#00ff99", // neon green
+        "#ff00aa", // magenta
+        "#00aaff", // cyan
+        "#ffdd33", // warm yellow
+        "#ff6633"  // orange
+      ];
+      const idx = randomInt(0, palette.length - 1);
+      return palette[idx];
+    }
 
-    copyOriginalBtn.addEventListener("click", () => {
-      const lines = Array.from(originalPoem.querySelectorAll(".line"))
-        .map((line) => line.textContent)
-        .join("\n");
-      revisionText.value = lines;
-      updateCharCounter();
-      revisionText.focus();
-    });
+    // Get all poem words
+    const words = document.querySelectorAll(".grid-container div");
 
-    clearEditorBtn.addEventListener("click", () => {
-      revisionText.value = "";
-      updateCharCounter();
-      submissionPreview.textContent =
-        "(Your revised gaming poem will appear here after you click “Update submission preview.”)";
-      submissionStatusLabel.textContent = "status · pending";
-      submissionStateValue.textContent = "not yet submitted";
-      submissionStateValue.classList.remove("ready");
-      submissionStateValue.classList.add("pending");
-    });
+    // Explode function: random transform + color per word
+    function explodePoem() {
+      words.forEach((word) => {
+        const scale = randomInt(60, 130) / 100;          // 0.6–1.3
+        const translateX = randomInt(-60, 60);          // -60%–60%
+        const translateY = randomInt(-40, 40);          // -40%–40%
+        const rotate = randomInt(-180, 180);            // -180–180 degrees
 
-    updatePreviewBtn.addEventListener("click", () => {
-      const text = revisionText.value.trim();
-      if (text.length === 0) {
-        submissionPreview.textContent =
-          "(Your revised gaming poem will appear here after you click “Update submission preview.”)";
-        submissionStatusLabel.textContent = "status · pending";
-        submissionStateValue.textContent = "not yet submitted";
-        submissionStateValue.classList.remove("ready");
-        submissionStateValue.classList.add("pending");
-        return;
-      }
-      submissionPreview.textContent = text;
-      submissionStatusLabel.textContent = "status · draft updated";
-      submissionStateValue.textContent = "ready for review";
-      submissionStateValue.classList.remove("pending");
-      submissionStateValue.classList.add("ready");
-    });
+        const color = randomColor();
 
-    markSubmittedBtn.addEventListener("click", () => {
-      const text = revisionText.value.trim();
-      if (text.length === 0) {
-        alert("Write or paste your revised gaming poem before marking it as ready to submit.");
-        return;
-      }
-      submissionStatusLabel.textContent = "status · ready";
-      submissionStateValue.textContent = "final version prepared";
-      submissionStateValue.classList.remove("pending");
-      submissionStateValue.classList.add("ready");
-    });
-
-    exportBtn.addEventListener("click", async () => {
-      const text = submissionPreview.textContent.trim();
-      if (!text || text.startsWith("(Your revised gaming poem")) {
-        alert("Update the submission preview before copying.");
-        return;
-      }
-      try {
-        await navigator.clipboard.writeText(text);
-        alert("Submission preview copied to clipboard. You can paste it into your course submission.");
-      } catch (e) {
-        alert("Clipboard copy failed. You can manually select and copy the text from the preview box.");
-      }
-    });
-
-    autoHintBtn.addEventListener("click", () => {
-      const text = revisionText.value;
-      if (!text.trim()) {
-        alert("Paste or write your gaming poem in the revision editor first.");
-        return;
-      }
-
-      const hint =
-        "\n\n[Chapter 6 Gaming Hints]\n" +
-        "- Identify one stanza where the energy drops and compress it like a speedrun.\n" +
-        "- Replace at least one abstract feeling with a concrete gaming image (controller, lobby, loading screen, HUD).\n" +
-        "- Add a formal surprise: a repeated “Press Start” line, a sudden one-word stanza, or a level-style heading.\n" +
-        "- Let one moment of doubt or fatigue enter the poem to complicate your love of gaming.";
-
-      if (!text.includes("[Chapter 6 Gaming Hints]")) {
-        revisionText.value = text + hint;
-        updateCharCounter();
-      } else {
-        alert("Chapter 6 hints are already present in your revision draft.");
-      }
-    });
-
-    showHintsToggle.addEventListener("change", () => {
-      const checked = showHintsToggle.checked;
-      const promptCard = document.getElementById("promptCard");
-      if (checked) {
-        promptCard.classList.remove("hidden");
-      } else {
-        promptCard.classList.add("hidden");
-      }
-    });
-
-    promptFilters.forEach((filter) => {
-      filter.addEventListener("click", () => {
-        promptFilters.forEach((f) => f.classList.remove("active"));
-        filter.classList.add("active");
+        word.style.transform =
+          `scale(${scale}) translate(${translateX}%, ${translateY}%) rotate(${rotate}deg)`;
+        word.style.color = color;
+        word.style.textShadow = `0 0 18px ${color}`;
       });
+    }
+
+    // Reset function: bring poem back closer to grid
+    function resetPoem() {
+      words.forEach((word) => {
+        word.style.transform = "scale(1) translate(0, 0) rotate(0deg)";
+        word.style.color = "#f5f5f5";
+        word.style.textShadow = "0 0 12px rgba(0, 0, 0, 0.9)";
+      });
+    }
+
+    // Alternate between explode and subtle reset on clicks
+    let exploded = false;
+
+    document.addEventListener("click", () => {
+      exploded = !exploded;
+      if (exploded) {
+        explodePoem();
+      } else {
+        resetPoem();
+      }
     });
 
-    updateCharCounter();
+    // “Press start” button triggers an immediate explosion
+    const startBtn = document.getElementById("startBtn");
+    if (startBtn) {
+      startBtn.addEventListener("click", (event) => {
+        event.stopPropagation(); // don’t double-trigger body click
+        exploded = true;
+        explodePoem();
+      });
+    }
+
+    // Optional: initial gentle jitter so page feels alive
+    setTimeout(() => {
+      words.forEach((word) => {
+        const jitterX = randomInt(-5, 5);
+        const jitterY = randomInt(-5, 5);
+        word.style.transform =
+          `scale(1) translate(${jitterX}%, ${jitterY}%) rotate(0deg)`;
+      });
+    }, 800);
   </script>
 </body>
 </html>
