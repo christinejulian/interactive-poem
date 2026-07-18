@@ -1,159 +1,223 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>Off the Grid Gaming Haiku</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta charset="UTF-8" />
+<title>Retro Arcade Poem — Off the Grid</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-  <style>
-    html {
-      width: 100%;
-      height: 100%;
-    }
+<!-- Pixel Font -->
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
 
-    body {
-      margin: 0;
-      background: #000 url("assets/img/gaming-bg.gif") no-repeat center/cover;
-      color: #f5f5f5;
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      font-size: 4rem;
-      overflow: hidden;
-    }
+<style>
+/* -----------------------------------------------------------
+   GLOBAL ARCADE LOOK
+----------------------------------------------------------- */
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  background: #000;
+  font-family: "Press Start 2P", monospace;
+  overflow: hidden;
+}
 
-    /* Overlay to soften background and focus text */
-    .overlay {
-      position: fixed;
-      inset: 0;
-      background: radial-gradient(circle at 50% 20%, rgba(0, 255, 153, 0.35), transparent 55%),
-                  radial-gradient(circle at 10% 80%, rgba(255, 0, 153, 0.25), transparent 55%),
-                  radial-gradient(circle at 90% 60%, rgba(0, 153, 255, 0.25), transparent 55%);
-      pointer-events: none;
-      mix-blend-mode: screen;
-      z-index: 0;
-    }
+/* CRT Scanlines */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background: repeating-linear-gradient(
+    to bottom,
+    rgba(255,255,255,0.03) 0px,
+    rgba(255,255,255,0.03) 2px,
+    rgba(0,0,0,0.05) 3px
+  );
+  pointer-events: none;
+  z-index: 1000;
+}
 
-    /* Container for poem words in a grid */
-    .grid-container {
-      position: relative;
-      z-index: 1;
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-      gap: 2rem;
-      margin: 10% 4rem 0 4rem;
-    }
+/* Glow Overlay */
+.arcade-glow {
+  position: fixed;
+  inset: 0;
+  background:
+    radial-gradient(circle at 50% 20%, rgba(0,255,153,0.25), transparent 60%),
+    radial-gradient(circle at 10% 80%, rgba(255,0,153,0.25), transparent 60%),
+    radial-gradient(circle at 90% 60%, rgba(0,153,255,0.25), transparent 60%);
+  mix-blend-mode: screen;
+  pointer-events: none;
+  z-index: 900;
+}
 
-    .grid-container div {
-      text-transform: lowercase;
-      letter-spacing: 0.08em;
-      text-shadow: 0 0 12px rgba(0, 0, 0, 0.9);
-      transition-property: transform, color, text-shadow;
-      transition-duration: 2.5s;
-      transition-timing-function: cubic-bezier(0.19, 1, 0.22, 1);
-      cursor: crosshair;
-      will-change: transform, color;
-    }
+/* -----------------------------------------------------------
+   ARCADE CABINET FRAME
+----------------------------------------------------------- */
+.cabinet {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 88vw;
+  height: 88vh;
+  transform: translate(-50%, -50%);
+  background: #111;
+  border: 12px solid #0ff;
+  border-radius: 18px;
+  box-shadow:
+    0 0 40px #0ff,
+    0 0 80px #0ff inset,
+    0 0 120px rgba(0,255,255,0.4) inset;
+  overflow: hidden;
+}
 
-    /* Mark the 5-7-5 syllable “beats” */
-    .beat {
-      padding-bottom: 1.5rem;
-      border-bottom: 2px solid rgba(255, 255, 255, 0.4);
-    }
+/* -----------------------------------------------------------
+   RETRO MENU SCREEN
+----------------------------------------------------------- */
+.menu-screen {
+  width: 100%;
+  height: 100%;
+  padding-top: 4rem;
+  text-align: center;
+  color: #0ff;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  font-size: 1.2rem;
+}
 
-    /* Subtle hover effect before explosion */
-    .grid-container div:hover {
-      text-shadow: 0 0 18px rgba(0, 255, 153, 0.9);
-      color: #00ff99;
-    }
+.menu-title {
+  font-size: 2rem;
+  text-shadow: 0 0 12px #0ff, 0 0 24px #0ff;
+  letter-spacing: 0.15em;
+}
 
-    /* HUD-style instructions */
-    .hud {
-      position: fixed;
-      left: 1.5rem;
-      bottom: 1.5rem;
-      z-index: 2;
-      font-size: 0.9rem;
-      font-family: "SF Mono", Menlo, Monaco, Consolas, "Liberation Mono", monospace;
-      color: #9efcff;
-      background: rgba(0, 0, 0, 0.7);
-      border: 1px solid rgba(158, 252, 255, 0.6);
-      padding: 0.75rem 1rem;
-      border-radius: 0.5rem;
-      max-width: 22rem;
-    }
+.menu-option {
+  padding: 1rem;
+  margin: 0 auto;
+  width: 60%;
+  border: 3px solid #0ff;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: background 0.3s, color 0.3s;
+}
 
-    .hud-title {
-      font-weight: 600;
-      margin-bottom: 0.25rem;
-      text-transform: uppercase;
-      letter-spacing: 0.12em;
-      color: #00ff99;
-    }
+.menu-option:hover {
+  background: #0ff;
+  color: #000;
+}
 
-    .hud-line {
-      margin: 0.1rem 0;
-    }
+/* -----------------------------------------------------------
+   POEM GRID (GAMEPLAY)
+----------------------------------------------------------- */
+.poem-grid {
+  display: none;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 2rem;
+  padding: 3rem;
+  font-size: 1.2rem;
+  color: #fff;
+  text-align: center;
+  transition: all 1s ease;
+}
 
-    /* Small “press start” button */
-    .start-btn {
-      display: inline-block;
-      margin-top: 0.5rem;
-      padding: 0.35rem 0.8rem;
-      border-radius: 999px;
-      border: 1px solid rgba(0, 255, 153, 0.7);
-      background: rgba(0, 0, 0, 0.8);
-      color: #00ff99;
-      font-size: 0.8rem;
-      text-transform: uppercase;
-      letter-spacing: 0.16em;
-      cursor: pointer;
-    }
+.poem-grid div {
+  padding: 1rem;
+  border: 2px solid #0ff;
+  border-radius: 10px;
+  background: rgba(0,0,0,0.6);
+  box-shadow: 0 0 12px #0ff;
+  transition: transform 2s ease, color 1s ease, text-shadow 1s ease;
+  cursor: pointer;
+}
 
-    .start-btn:hover {
-      background: rgba(0, 255, 153, 0.15);
-    }
+.beat {
+  border-color: #ff0;
+  box-shadow: 0 0 12px #ff0;
+}
 
-    /* Tiny footer credit */
-    .footer {
-      position: fixed;
-      right: 1.5rem;
-      bottom: 1.5rem;
-      z-index: 2;
-      font-size: 0.75rem;
-      font-family: "SF Mono", Menlo, Monaco, Consolas, "Liberation Mono", monospace;
-      color: rgba(245, 245, 245, 0.7);
-      text-align: right;
-      max-width: 18rem;
-    }
+/* -----------------------------------------------------------
+   EXPLODED MODE
+----------------------------------------------------------- */
+.exploded div {
+  position: relative;
+  transform-origin: center;
+}
 
-    .footer span {
-      display: block;
-    }
+/* -----------------------------------------------------------
+   CONTROL PANEL
+----------------------------------------------------------- */
+.controls {
+  display: none;
+  position: absolute;
+  bottom: 1rem;
+  left: 50%;
+  transform: translateX(-50%);
+  text-align: center;
+  color: #0ff;
+  font-size: 1rem;
+}
 
-    @media (max-width: 768px) {
-      body {
-        font-size: 2.6rem;
-      }
-      .hud {
-        max-width: 18rem;
-      }
-    }
-  </style>
+button {
+  font-family: "Press Start 2P", monospace;
+  padding: 0.6rem 1.2rem;
+  margin-top: 1rem;
+  background: #000;
+  border: 3px solid #0ff;
+  color: #0ff;
+  cursor: pointer;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  box-shadow: 0 0 12px #0ff;
+}
+
+button:hover {
+  background: #0ff;
+  color: #000;
+}
+
+/* -----------------------------------------------------------
+   PARTICLES
+----------------------------------------------------------- */
+.particle {
+  position: fixed;
+  width: 6px;
+  height: 6px;
+  background: #0ff;
+  border-radius: 50%;
+  pointer-events: none;
+  opacity: 0.8;
+  animation: fly 1.2s linear forwards;
+}
+
+@keyframes fly {
+  from { transform: translate(0,0); opacity: 1; }
+  to { transform: translate(var(--dx), var(--dy)); opacity: 0; }
+}
+</style>
 </head>
 
 <body>
-  <!-- Soft color overlay -->
-  <div class="overlay"></div>
 
-  <!-- Gaming haiku, word-by-word in a grid -->
-  <div class="grid-container" aria-label="Interactive gaming haiku">
-    <!-- Line 1: 5-ish syllables -->
+<div class="arcade-glow"></div>
+
+<div class="cabinet">
+
+  <!-- RETRO MENU -->
+  <div class="menu-screen" id="menuScreen">
+    <div class="menu-title">ARCADE MENU</div>
+
+    <div class="menu-option" onclick="startGame()">▶ START GAME</div>
+    <div class="menu-option" onclick="showCredits()">★ CREDITS</div>
+    <div class="menu-option" onclick="showInstructions()">❖ HOW TO PLAY</div>
+  </div>
+
+  <!-- GAMEPLAY: POEM GRID -->
+  <div class="poem-grid" id="poemGrid">
     <div class="beat">arcade</div>
     <div>neon</div>
     <div>hum</div>
     <div>pixel</div>
     <div>dreams</div>
 
-    <!-- Line 2: 7-ish syllables -->
     <div class="beat">boss</div>
     <div>fights</div>
     <div>pulse</div>
@@ -162,7 +226,6 @@
     <div>party</div>
     <div>queues</div>
 
-    <!-- Line 3: 5-ish syllables -->
     <div class="beat">hearts</div>
     <div>level</div>
     <div>up</div>
@@ -170,100 +233,97 @@
     <div>co-op</div>
   </div>
 
-  <!-- HUD / instructions -->
-  <div class="hud">
-    <div class="hud-title">off the grid: gaming poem</div>
-    <p class="hud-line">• click anywhere to “explode” the layout.</p>
-    <p class="hud-line">• each word jumps, rotates, and scales like a glitchy sprite.</p>
-    <p class="hud-line">• click again to keep iterating new compositions.</p>
-    <button class="start-btn" id="startBtn">press start</button>
+  <!-- Controls -->
+  <div class="controls" id="controls">
+    click anywhere to explode the grid  
+    <br />
+    <button id="explodeBtn">press start</button>
   </div>
 
-  <!-- Footer credit / context -->
-  <div class="footer">
-    <span>interactive haiku based on love of gaming.</span>
-    <span>grid → chaos, inspired by critical web design chapter 6.</span>
-  </div>
+</div>
 
-  <script>
-    // Utility: inclusive random integer
-    function randomInt(min, max) {
-      return Math.floor(Math.random() * (max - min + 1)) + min;
-    }
+<script>
+/* -----------------------------------------------------------
+   MENU FUNCTIONS
+----------------------------------------------------------- */
+function startGame() {
+  document.getElementById("menuScreen").style.display = "none";
+  document.getElementById("poemGrid").style.display = "grid";
+  document.getElementById("controls").style.display = "block";
+}
 
-    // Utility: pick a random neon-ish color
-    function randomColor() {
-      const palette = [
-        "#00ff99", // neon green
-        "#ff00aa", // magenta
-        "#00aaff", // cyan
-        "#ffdd33", // warm yellow
-        "#ff6633"  // orange
-      ];
-      const idx = randomInt(0, palette.length - 1);
-      return palette[idx];
-    }
+function showCredits() {
+  alert("Created by Christine + Copilot\nRetro Arcade Poem — Off the Grid Edition");
+}
 
-    // Get all poem words
-    const words = document.querySelectorAll(".grid-container div");
+function showInstructions() {
+  alert("Use your mouse.\nClick anywhere to explode the poem.\nClick again to reset.\nPress Start to trigger chaos.");
+}
 
-    // Explode function: random transform + color per word
-    function explodePoem() {
-      words.forEach((word) => {
-        const scale = randomInt(60, 130) / 100;          // 0.6–1.3
-        const translateX = randomInt(-60, 60);          // -60%–60%
-        const translateY = randomInt(-40, 40);          // -40%–40%
-        const rotate = randomInt(-180, 180);            // -180–180 degrees
+/* -----------------------------------------------------------
+   EXPLODE THE GRID
+----------------------------------------------------------- */
+const grid = document.getElementById("poemGrid");
+const explodeBtn = document.getElementById("explodeBtn");
+let exploded = false;
 
-        const color = randomColor();
+function explode() {
+  exploded = !exploded;
+  grid.classList.toggle("exploded");
 
-        word.style.transform =
-          `scale(${scale}) translate(${translateX}%, ${translateY}%) rotate(${rotate}deg)`;
-        word.style.color = color;
-        word.style.textShadow = `0 0 18px ${color}`;
-      });
-    }
+  const words = grid.querySelectorAll("div");
 
-    // Reset function: bring poem back closer to grid
-    function resetPoem() {
-      words.forEach((word) => {
-        word.style.transform = "scale(1) translate(0, 0) rotate(0deg)";
-        word.style.color = "#f5f5f5";
-        word.style.textShadow = "0 0 12px rgba(0, 0, 0, 0.9)";
-      });
-    }
+  words.forEach(word => {
+    const dx = (Math.random() * 200 - 100) + "px";
+    const dy = (Math.random() * 200 - 100) + "px";
+    const rot = (Math.random() * 360 - 180) + "deg";
+    const scale = Math.random() * 1.5 + 0.5;
 
-    // Alternate between explode and subtle reset on clicks
-    let exploded = false;
+    word.style.transform = exploded
+      ? `translate(${dx}, ${dy}) rotate(${rot}) scale(${scale})`
+      : `translate(0,0) rotate(0deg) scale(1)`;
 
-    document.addEventListener("click", () => {
-      exploded = !exploded;
-      if (exploded) {
-        explodePoem();
-      } else {
-        resetPoem();
-      }
-    });
+    word.style.color = exploded ? randomColor() : "#fff";
+    word.style.textShadow = exploded ? `0 0 12px ${randomColor()}` : "0 0 12px #0ff";
+  });
 
-    // “Press start” button triggers an immediate explosion
-    const startBtn = document.getElementById("startBtn");
-    if (startBtn) {
-      startBtn.addEventListener("click", (event) => {
-        event.stopPropagation(); // don’t double-trigger body click
-        exploded = true;
-        explodePoem();
-      });
-    }
+  spawnParticles();
+}
 
-    // Optional: initial gentle jitter so page feels alive
-    setTimeout(() => {
-      words.forEach((word) => {
-        const jitterX = randomInt(-5, 5);
-        const jitterY = randomInt(-5, 5);
-        word.style.transform =
-          `scale(1) translate(${jitterX}%, ${jitterY}%) rotate(0deg)`;
-      });
-    }, 800);
-  </script>
+function randomColor() {
+  const colors = ["#0ff", "#ff0", "#f0f", "#0f0", "#f00", "#00f"];
+  return colors[Math.floor(Math.random() * colors.length)];
+}
+
+/* -----------------------------------------------------------
+   PARTICLE BURST
+----------------------------------------------------------- */
+function spawnParticles() {
+  for (let i = 0; i < 40; i++) {
+    const p = document.createElement("div");
+    p.classList.add("particle");
+
+    const dx = (Math.random() * 400 - 200) + "px";
+    const dy = (Math.random() * 400 - 200) + "px";
+
+    p.style.setProperty("--dx", dx);
+    p.style.setProperty("--dy", dy);
+
+    p.style.left = (window.innerWidth / 2) + "px";
+    p.style.top = (window.innerHeight / 2) + "px";
+
+    document.body.appendChild(p);
+
+    setTimeout(() => p.remove(), 1200);
+  }
+}
+
+/* -----------------------------------------------------------
+   EVENT LISTENERS
+----------------------------------------------------------- */
+explodeBtn.addEventListener("click", explode);
+document.addEventListener("click", explode);
+</script>
+
 </body>
 </html>
