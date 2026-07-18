@@ -156,24 +156,6 @@ body::before {
   font-size: 1rem;
 }
 
-button {
-  font-family: "Press Start 2P", monospace;
-  padding: 0.6rem 1.2rem;
-  margin-top: 1rem;
-  background: #000;
-  border: 3px solid #0ff;
-  color: #0ff;
-  cursor: pointer;
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
-  box-shadow: 0 0 12px #0ff;
-}
-
-button:hover {
-  background: #0ff;
-  color: #000;
-}
-
 /* -----------------------------------------------------------
    PARTICLES
 ----------------------------------------------------------- */
@@ -236,8 +218,6 @@ button:hover {
   <!-- Controls -->
   <div class="controls" id="controls">
     click anywhere to explode the grid  
-    <br />
-    <button id="explodeBtn">press start</button>
   </div>
 
 </div>
@@ -257,14 +237,13 @@ function showCredits() {
 }
 
 function showInstructions() {
-  alert("Use your mouse.\nClick anywhere to explode the poem.\nClick again to reset.\nPress Start to trigger chaos.");
+  alert("Use your mouse.\nClick anywhere to explode the poem.\nClick again to reset.\nNo Press Start needed — the menu IS the start screen.");
 }
 
 /* -----------------------------------------------------------
    EXPLODE THE GRID
 ----------------------------------------------------------- */
 const grid = document.getElementById("poemGrid");
-const explodeBtn = document.getElementById("explodeBtn");
 let exploded = false;
 
 function explode() {
@@ -321,7 +300,6 @@ function spawnParticles() {
 /* -----------------------------------------------------------
    EVENT LISTENERS
 ----------------------------------------------------------- */
-explodeBtn.addEventListener("click", explode);
 document.addEventListener("click", explode);
 </script>
 
