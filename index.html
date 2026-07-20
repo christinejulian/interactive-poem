@@ -1,645 +1,706 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8" />
-<title>Arcade Poem Dungeon — Off the Grid</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<!DOCTYPE html>  
+<html lang="en">  
+<head>  
+<meta charset="UTF-8" />  
+<title>Arcade Poem Dungeon — Off the Grid</title>  
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />  
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">  
+<style>  
+html, body {  
+  margin: 0;  
+  padding: 0;  
+  height: 100%;  
+  background: #000;  
+  font-family: "Press Start 2P", monospace;  
+  overflow: hidden;  
+}  
+  
+/* CRT scanlines */  
+body::before {  
+  content: "";  
+  position: fixed;  
+  inset: 0;  
+  background: repeating-linear-gradient(  
+    to bottom,  
+    rgba(255,255,255,0.03) 0px,  
+    rgba(255,255,255,0.03) 2px,  
+    rgba(0,0,0,0.05) 3px  
+  );  
+  pointer-events: none;  
+  z-index: 1000;  
+}  
+  
+/* VHS glitch */  
+@keyframes glitch {  
+  0% { transform: translate(0,0); }  
+  20% { transform: translate(-2px, 1px); }  
+  40% { transform: translate(2px, -1px); }  
+  60% { transform: translate(-1px, 2px); }  
+  80% { transform: translate(1px, -2px); }  
+  100% { transform: translate(0,0); }  
+}  
+.vhs {  
+  animation: glitch 0.25s infinite;  
+}  
+  
+/* Glow overlay */  
+.arcade-glow {  
+  position: fixed;  
+  inset: 0;  
+  background:  
+    radial-gradient(circle at 50% 20%, rgba(0,255,153,0.25), transparent 60%),  
+    radial-gradient(circle at 10% 80%, rgba(255,0,153,0.25), transparent 60%),  
+    radial-gradient(circle at 90% 60%, rgba(0,153,255,0.25), transparent 60%);  
+  mix-blend-mode: screen;  
+  pointer-events: none;  
+  z-index: 900;  
+}  
+  
+/* Cabinet */  
+.cabinet {  
+  position: absolute;  
+  top: 50%;  
+  left: 50%;  
+  width: 88vw;  
+  height: 88vh;  
+  transform: translate(-50%, -50%);  
+  background: #111;  
+  border: 12px solid #0ff;  
+  border-radius: 18px;  
+  box-shadow:  
+    0 0 40px #0ff,  
+    0 0 80px #0ff inset,  
+    0 0 120px rgba(0,255,255,0.4) inset;  
+  overflow: hidden;  
+}  
+  
+/* Pixel dungeon background */  
+.dungeon-bg {  
+  position: absolute;  
+  inset: 0;  
+  background-image:  
+    linear-gradient(#050505 1px, transparent 1px),  
+    linear-gradient(90deg, #050505 1px, transparent 1px);  
+  background-size: 32px 32px;  
+  opacity: 0.4;  
+  pointer-events: none;  
+}  
+  
+/* Menu screen */  
+.menu-screen {  
+  width: 100%;  
+  height: 100%;  
+  padding-top: 4rem;  
+  text-align: center;  
+  color: #0ff;  
+  display: flex;  
+  flex-direction: column;  
+  gap: 2rem;  
+  font-size: 1.2rem;  
+  position: relative;  
+  z-index: 2;  
+}  
+.menu-title {  
+  font-size: 2rem;  
+  text-shadow: 0 0 12px #0ff, 0 0 24px #0ff;  
+  letter-spacing: 0.15em;  
+}  
+.menu-option {  
+  padding: 1rem;  
+  margin: 0 auto;  
+  width: 60%;  
+  border: 3px solid #0ff;  
+  border-radius: 12px;  
+  cursor: pointer;  
+  transition: background 0.3s, color 0.3s;  
+}  
+.menu-option:hover {  
+  background: #0ff;  
+  color: #000;  
+}  
+  
+/* Character select */  
+.character-select {  
+  display: none;  
+  width: 100%;  
+  height: 100%;  
+  padding-top: 3rem;  
+  text-align: center;  
+  color: #0ff;  
+  position: relative;  
+  z-index: 2;  
+}  
+.character-grid {  
+  display: flex;  
+  justify-content: center;  
+  gap: 3rem;  
+  margin-top: 2rem;  
+}  
+.character {  
+  width: 140px;  
+  height: 140px;  
+  border: 3px solid #0ff;  
+  border-radius: 12px;  
+  display: flex;  
+  flex-direction: column;  
+  align-items: center;  
+  justify-content: center;  
+  cursor: pointer;  
+  transition: transform 0.3s, background 0.3s;  
+}  
+.character:hover {  
+  background: #0ff;  
+  color: #000;  
+  transform: scale(1.1);  
+}  
+.sprite {  
+  width: 64px;  
+  height: 64px;  
+  image-rendering: pixelated;  
+  background-size: cover;  
+  margin-bottom: 0.5rem;  
+}  
+  
+/* Save slots */  
+.save-screen {  
+  display: none;  
+  width: 100%;  
+  height: 100%;  
+  padding-top: 3rem;  
+  text-align: center;  
+  color: #0ff;  
+  position: relative;  
+  z-index: 2;  
+}  
+.save-slot {  
+  padding: 1rem;  
+  margin: 1rem auto;  
+  width: 60%;  
+  border: 3px solid #0ff;  
+  border-radius: 12px;  
+  cursor: pointer;  
+}  
+.save-slot:hover {  
+  background: #0ff;  
+  color: #000;  
+}  
+  
+/* In-Game Navigation UI Controls */
+.game-controls {  
+  position: absolute;  
+  top: 1rem;  
+  right: 1rem;  
+  display: flex;  
+  gap: 0.5rem;  
+  z-index: 10;  
+}  
+.ctrl-btn {  
+  background: #000;  
+  color: #0ff;  
+  border: 2px solid #0ff;  
+  padding: 0.5rem 0.8rem;  
+  font-family: inherit;  
+  font-size: 0.7rem;  
+  border-radius: 6px;  
+  cursor: pointer;  
+  box-shadow: 0 0 8px #0ff;  
+  transition: background 0.2s, color 0.2s, transform 0.1s;  
+}  
+.ctrl-btn:hover {  
+  background: #0ff;  
+  color: #000;  
+}  
+.ctrl-btn:active {  
+  transform: scale(0.95);  
+}  
 
-<link href="https://fonts.googleapis.com/css2?family=Press Start 2P&display=swap" rel="stylesheet">
+/* Health bar */  
+.health-bar {  
+  position: absolute;  
+  top: 1rem;  
+  left: 1rem;  
+  width: 200px;  
+  height: 24px;  
+  border: 3px solid #f00;  
+  border-radius: 8px;  
+  background: #300;  
+  overflow: hidden;  
+  z-index: 3;  
+}  
+.health-fill {  
+  height: 100%;  
+  width: 100%;  
+  background: linear-gradient(90deg, #0f0, #ff0, #f00);  
+}  
+  
+/* Player sprite */  
+.player {  
+  position: absolute;  
+  bottom: 10%;  
+  left: 50%;  
+  transform: translateX(-50%);  
+  width: 64px;  
+  height: 64px;  
+  background: #0ff;  
+  border-radius: 4px;  
+  box-shadow: 0 0 12px #0ff;  
+  image-rendering: pixelated;  
+  z-index: 3;  
+}  
+@keyframes idle {  
+  0% { transform: translateX(-50%) translateY(0); }  
+  50% { transform: translateX(-50%) translateY(-4px); }  
+  100% { transform: translateX(-50%) translateY(0); }  
+}  
+.player {  
+  animation: idle 1s infinite;  
+}  
+  
+/* Poem grid */  
+.poem-grid {  
+  display: none;  
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));  
+  gap: 2rem;  
+  padding: 4rem 3rem 3rem 3rem;  
+  font-size: 1.2rem;  
+  color: #fff;  
+  text-align: center;  
+  transition: all 1s ease;  
+  position: relative;  
+  z-index: 2;  
+}  
+.poem-grid div {  
+  padding: 1rem;  
+  border: 2px solid #0ff;  
+  border-radius: 10px;  
+  background: rgba(0,0,0,0.6);  
+  box-shadow: 0 0 12px #0ff;  
+  transition: transform 0.6s ease, color 0.4s ease, text-shadow 0.4s ease, opacity 0.4s ease;  
+  cursor: pointer;  
+}  
+.beat {  
+  border-color: #ff0;  
+  box-shadow: 0 0 12px #ff0;  
+}  
+  
+/* Boss */  
+.boss {  
+  position: absolute;  
+  top: 10%;  
+  left: 50%;  
+  transform: translateX(-50%);  
+  font-size: 2rem;  
+  color: #f00;  
+  text-shadow: 0 0 12px #f00;  
+  display: none;  
+  z-index: 3;  
+}  
+  
+/* Settings overlay */  
+.settings-overlay {  
+  position: fixed;  
+  inset: 0;  
+  background: rgba(0,0,0,0.8);  
+  color: #0ff;  
+  display: none;  
+  align-items: center;  
+  justify-content: center;  
+  z-index: 1100;  
+}  
+.settings-panel {  
+  border: 3px solid #0ff;  
+  padding: 2rem;  
+  border-radius: 12px;  
+  background: #111;  
+  width: 320px;  
+}  
+.settings-panel h2 {  
+  font-size: 1rem;  
+  margin-bottom: 1rem;  
+}  
+.settings-row {  
+  margin-bottom: 1rem;  
+  font-size: 0.8rem;  
+}  
+.settings-row label {  
+  display: block;  
+  margin-bottom: 0.3rem;  
+}  
+.settings-row input[type="range"] {  
+  width: 100%;  
+}  
+  
+/* Particles */  
+.particle {  
+  position: fixed;  
+  width: 6px;  
+  height: 6px;  
+  background: #0ff;  
+  border-radius: 50%;  
+  pointer-events: none;  
+  opacity: 0.8;  
+  animation: fly 1.2s linear forwards;  
+}  
+@keyframes fly {  
+  from { transform: translate(0,0); opacity: 1; }  
+  to { transform: translate(var(--dx), var(--dy)); opacity: 0; }  
+}  
+  
+/* Game over overlay with replay CTA */  
+.game-over {  
+  position: absolute;  
+  inset: 0;  
+  display: none;  
+  flex-direction: column;  
+  align-items: center;  
+  justify-content: center;  
+  gap: 2rem;  
+  background: rgba(0,0,0,0.85);  
+  color: #f00;  
+  font-size: 2rem;  
+  text-shadow: 0 0 12px #f00;  
+  z-index: 5;  
+}  
+  
+/* Scrolling retro credits */  
+.credits-overlay {  
+  position: fixed;  
+  inset: 0;  
+  background: #000;  
+  display: none;  
+  overflow: hidden;  
+  z-index: 2000;  
+}  
+.credits-content {  
+  position: absolute;  
+  bottom: -100%;  
+  width: 100%;  
+  text-align: center;  
+  color: #0ff;  
+  font-size: 1.2rem;  
+  text-shadow: 0 0 12px #0ff;  
+  animation: scrollCredits 18s linear forwards;  
+}  
+.credit-line {  
+  margin: 1.2rem 0;  
+  letter-spacing: 0.15em;  
+}  
+@keyframes scrollCredits {  
+  from { bottom: -100%; }  
+  to { bottom: 110%; }  
+}  
+</style>  
+</head>  
+<body>  
+<div class="arcade-glow"></div>  
+<div class="cabinet">  
+  <div class="dungeon-bg"></div>    
 
-<style>
-html, body {
-  margin: 0;
-  padding: 0;
-  height: 100%;
-  background: #000;
-  font-family: "Press Start 2P", monospace;
-  overflow: hidden;
-}
+  <!-- UI Navigation Controls -->
+  <div class="game-controls">  
+    <button class="ctrl-btn" onclick="replayGame()">🔄 REPLAY</button>  
+    <button class="ctrl-btn" onclick="returnToMenu()">🏠 MENU</button>  
+  </div>  
 
-/* CRT scanlines */
-body::before {
-  content: "";
-  position: fixed;
-  inset: 0;
-  background: repeating-linear-gradient(
-    to bottom,
-    rgba(255,255,255,0.03) 0px,
-    rgba(255,255,255,0.03) 2px,
-    rgba(0,0,0,0.05) 3px
-  );
-  pointer-events: none;
-  z-index: 1000;
-}
+  <!-- Health bar -->    
+  <div class="health-bar" id="healthBar">  
+    <div class="health-fill" id="healthFill"></div>  
+  </div>    
 
-/* VHS glitch */
-@keyframes glitch {
-  0% { transform: translate(0,0); }
-  20% { transform: translate(-2px, 1px); }
-  40% { transform: translate(2px, -1px); }
-  60% { transform: translate(-1px, 2px); }
-  80% { transform: translate(1px, -2px); }
-  100% { transform: translate(0,0); }
-}
-.vhs {
-  animation: glitch 0.25s infinite;
-}
+  <!-- Player sprite -->    
+  <div class="player" id="player"></div>    
 
-/* Glow overlay */
-.arcade-glow {
-  position: fixed;
-  inset: 0;
-  background:
-    radial-gradient(circle at 50% 20%, rgba(0,255,153,0.25), transparent 60%),
-    radial-gradient(circle at 10% 80%, rgba(255,0,153,0.25), transparent 60%),
-    radial-gradient(circle at 90% 60%, rgba(0,153,255,0.25), transparent 60%);
-  mix-blend-mode: screen;
-  pointer-events: none;
-  z-index: 900;
-}
+  <!-- Boss -->    
+  <div class="boss" id="boss">👾 BOSS: GLITCHED VERSE</div>    
 
-/* Cabinet */
-.cabinet {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  width: 88vw;
-  height: 88vh;
-  transform: translate(-50%, -50%);
-  background: #111;
-  border: 12px solid #0ff;
-  border-radius: 18px;
-  box-shadow:
-    0 0 40px #0ff,
-    0 0 80px #0ff inset,
-    0 0 120px rgba(0,255,255,0.4) inset;
-  overflow: hidden;
-}
+  <!-- Menu -->    
+  <div class="menu-screen" id="menuScreen">  
+    <div class="menu-title vhs">ARCADE POEM DUNGEON</div>  
+    <div class="menu-option" onclick="openCharacterSelect()">▶ START GAME</div>  
+    <div class="menu-option" onclick="openSaveSlots()">💾 SAVE SLOTS</div>  
+    <div class="menu-option" onclick="showCredits()">★ CREDITS</div>  
+    <div class="menu-option" onclick="showInstructions()">❖ HOW TO PLAY</div>  
+    <div class="menu-option" onclick="openSettings()">⚙ SETTINGS</div>  
+  </div>    
 
-/* Pixel dungeon background */
-.dungeon-bg {
-  position: absolute;
-  inset: 0;
-  background-image:
-    linear-gradient(#050505 1px, transparent 1px),
-    linear-gradient(90deg, #050505 1px, transparent 1px);
-  background-size: 32px 32px;
-  opacity: 0.4;
-  pointer-events: none;
-}
+  <!-- Character select -->    
+  <div class="character-select" id="characterSelect">  
+    <div class="menu-title">SELECT YOUR HERO</div>  
+    <div class="character-grid">  
+      <div class="character" onclick="chooseCharacter('Warrior')">  
+        <div class="sprite" style="background-image: linear-gradient(#f00,#800);"></div>  
+        <div>⚔️ Warrior</div>  
+      </div>  
+      <div class="character" onclick="chooseCharacter('Mage')">  
+        <div class="sprite" style="background-image: linear-gradient(#0ff,#008);"></div>  
+        <div>✨ Mage</div>  
+      </div>  
+      <div class="character" onclick="chooseCharacter('Rogue')">  
+        <div class="sprite" style="background-image: linear-gradient(#ff0,#880);"></div>  
+        <div>🗡️ Rogue</div>  
+      </div>  
+    </div>  
+  </div>    
 
-/* Menu screen */
-.menu-screen {
-  width: 100%;
-  height: 100%;
-  padding-top: 4rem;
-  text-align: center;
-  color: #0ff;
-  display: flex;
-  flex-direction: column;
-  gap: 2rem;
-  font-size: 1.2rem;
-  position: relative;
-  z-index: 2;
-}
-.menu-title {
-  font-size: 2rem;
-  text-shadow: 0 0 12px #0ff, 0 0 24px #0ff;
-  letter-spacing: 0.15em;
-}
-.menu-option {
-  padding: 1rem;
-  margin: 0 auto;
-  width: 60%;
-  border: 3px solid #0ff;
-  border-radius: 12px;
-  cursor: pointer;
-  transition: background 0.3s, color 0.3s;
-}
-.menu-option:hover {
-  background: #0ff;
-  color: #000;
-}
+  <!-- Save slots -->    
+  <div class="save-screen" id="saveScreen">  
+    <div class="menu-title">SAVE SLOTS</div>  
+    <div class="save-slot" onclick="loadSlot(1)">Slot 1</div>  
+    <div class="save-slot" onclick="loadSlot(2)">Slot 2</div>  
+    <div class="save-slot" onclick="loadSlot(3)">Slot 3</div>  
+  </div>    
 
-/* Character select */
-.character-select {
-  display: none;
-  width: 100%;
-  height: 100%;
-  padding-top: 3rem;
-  text-align: center;
-  color: #0ff;
-  position: relative;
-  z-index: 2;
-}
-.character-grid {
-  display: flex;
-  justify-content: center;
-  gap: 3rem;
-  margin-top: 2rem;
-}
-.character {
-  width: 140px;
-  height: 140px;
-  border: 3px solid #0ff;
-  border-radius: 12px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  transition: transform 0.3s, background 0.3s;
-}
-.character:hover {
-  background: #0ff;
-  color: #000;
-  transform: scale(1.1);
-}
-.sprite {
-  width: 64px;
-  height: 64px;
-  image-rendering: pixelated;
-  background-size: cover;
-  margin-bottom: 0.5rem;
-}
-
-/* Save slots */
-.save-screen {
-  display: none;
-  width: 100%;
-  height: 100%;
-  padding-top: 3rem;
-  text-align: center;
-  color: #0ff;
-  position: relative;
-  z-index: 2;
-}
-.save-slot {
-  padding: 1rem;
-  margin: 1rem auto;
-  width: 60%;
-  border: 3px solid #0ff;
-  border-radius: 12px;
-  cursor: pointer;
-}
-.save-slot:hover {
-  background: #0ff;
-  color: #000;
-}
-
-/* Health bar */
-.health-bar {
-  position: absolute;
-  top: 1rem;
-  left: 1rem;
-  width: 200px;
-  height: 24px;
-  border: 3px solid #f00;
-  border-radius: 8px;
-  background: #300;
-  overflow: hidden;
-  z-index: 3;
-}
-.health-fill {
-  height: 100%;
-  width: 100%;
-  background: linear-gradient(90deg, #0f0, #ff0, #f00);
-}
-
-/* Player sprite */
-.player {
-  position: absolute;
-  bottom: 10%;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 64px;
-  height: 64px;
-  background: #0ff;
-  border-radius: 4px;
-  box-shadow: 0 0 12px #0ff;
-  image-rendering: pixelated;
-  z-index: 3;
-}
-@keyframes idle {
-  0% { transform: translateX(-50%) translateY(0); }
-  50% { transform: translateX(-50%) translateY(-4px); }
-  100% { transform: translateX(-50%) translateY(0); }
-}
-.player {
-  animation: idle 1s infinite;
-}
-
-/* Poem grid */
-.poem-grid {
-  display: none;
-  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-  gap: 2rem;
-  padding: 3rem;
-  font-size: 1.2rem;
-  color: #fff;
-  text-align: center;
-  transition: all 1s ease;
-  position: relative;
-  z-index: 2;
-}
-.poem-grid div {
-  padding: 1rem;
-  border: 2px solid #0ff;
-  border-radius: 10px;
-  background: rgba(0,0,0,0.6);
-  box-shadow: 0 0 12px #0ff;
-  transition: transform 0.6s ease, color 0.4s ease, text-shadow 0.4s ease, opacity 0.4s ease;
-  cursor: pointer;
-}
-.beat {
-  border-color: #ff0;
-  box-shadow: 0 0 12px #ff0;
-}
-
-/* Boss */
-.boss {
-  position: absolute;
-  top: 10%;
-  left: 50%;
-  transform: translateX(-50%);
-  font-size: 2rem;
-  color: #f00;
-  text-shadow: 0 0 12px #f00;
-  display: none;
-  z-index: 3;
-}
-
-/* Settings overlay */
-.settings-overlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,0.8);
-  color: #0ff;
-  display: none;
-  align-items: center;
-  justify-content: center;
-  z-index: 1100;
-}
-.settings-panel {
-  border: 3px solid #0ff;
-  padding: 2rem;
-  border-radius: 12px;
-  background: #111;
-  width: 320px;
-}
-.settings-panel h2 {
-  font-size: 1rem;
-  margin-bottom: 1rem;
-}
-.settings-row {
-  margin-bottom: 1rem;
-  font-size: 0.8rem;
-}
-.settings-row label {
-  display: block;
-  margin-bottom: 0.3rem;
-}
-.settings-row input[type="range"] {
-  width: 100%;
-}
-
-/* Particles */
-.particle {
-  position: fixed;
-  width: 6px;
-  height: 6px;
-  background: #0ff;
-  border-radius: 50%;
-  pointer-events: none;
-  opacity: 0.8;
-  animation: fly 1.2s linear forwards;
-}
-@keyframes fly {
-  from { transform: translate(0,0); opacity: 1; }
-  to { transform: translate(var(--dx), var(--dy)); opacity: 0; }
-}
-
-/* Game over */
-.game-over {
-  position: absolute;
-  inset: 0;
-  display: none;
-  align-items: center;
-  justify-content: center;
-  color: #f00;
-  font-size: 2rem;
-  text-shadow: 0 0 12px #f00;
-  z-index: 4;
-}
-
-/* Scrolling retro credits */
-.credits-overlay {
-  position: fixed;
-  inset: 0;
-  background: #000;
-  display: none;
-  overflow: hidden;
-  z-index: 2000;
-}
-.credits-content {
-  position: absolute;
-  bottom: -100%;
-  width: 100%;
-  text-align: center;
-  color: #0ff;
-  font-size: 1.2rem;
-  text-shadow: 0 0 12px #0ff;
-  animation: scrollCredits 18s linear forwards;
-}
-.credit-line {
-  margin: 1.2rem 0;
-  letter-spacing: 0.15em;
-}
-@keyframes scrollCredits {
-  from { bottom: -100%; }
-  to { bottom: 110%; }
-}
-</style>
-</head>
-
-<body>
-
-<div class="arcade-glow"></div>
-
-<div class="cabinet">
-  <div class="dungeon-bg"></div>
-
-  <!-- Health bar -->
-  <div class="health-bar" id="healthBar">
-    <div class="health-fill" id="healthFill"></div>
-  </div>
-
-  <!-- Player sprite -->
-  <div class="player" id="player"></div>
-
-  <!-- Boss -->
-  <div class="boss" id="boss">👾 BOSS: GLITCHED VERSE</div>
-
-  <!-- Menu -->
-  <div class="menu-screen" id="menuScreen">
-    <div class="menu-title vhs">ARCADE POEM DUNGEON</div>
-    <div class="menu-option" onclick="openCharacterSelect()">▶ START GAME</div>
-    <div class="menu-option" onclick="openSaveSlots()">💾 SAVE SLOTS</div>
-    <div class="menu-option" onclick="showCredits()">★ CREDITS</div>
-    <div class="menu-option" onclick="showInstructions()">❖ HOW TO PLAY</div>
-    <div class="menu-option" onclick="openSettings()">⚙ SETTINGS</div>
-  </div>
-
-  <!-- Character select -->
-  <div class="character-select" id="characterSelect">
-    <div class="menu-title">SELECT YOUR HERO</div>
-    <div class="character-grid">
-      <div class="character" onclick="chooseCharacter('Warrior')">
-        <div class="sprite" style="background-image: linear-gradient(#f00,#800);"></div>
-        <div>⚔️ Warrior</div>
-      </div>
-      <div class="character" onclick="chooseCharacter('Mage')">
-        <div class="sprite" style="background-image: linear-gradient(#0ff,#008);"></div>
-        <div>✨ Mage</div>
-      </div>
-      <div class="character" onclick="chooseCharacter('Rogue')">
-        <div class="sprite" style="background-image: linear-gradient(#ff0,#880);"></div>
-        <div>🗡️ Rogue</div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Save slots -->
-  <div class="save-screen" id="saveScreen">
-    <div class="menu-title">SAVE SLOTS</div>
-    <div class="save-slot" onclick="loadSlot(1)">Slot 1</div>
-    <div class="save-slot" onclick="loadSlot(2)">Slot 2</div>
-    <div class="save-slot" onclick="loadSlot(3)">Slot 3</div>
-  </div>
-
-  <!-- Poem grid (enemies) -->
-  <div class="poem-grid" id="poemGrid">
-    <div class="beat enemy">arcade</div>
-    <div class="enemy">neon</div>
-    <div class="enemy">hum</div>
-    <div class="enemy">pixel</div>
-    <div class="enemy">dreams</div>
-
-    <div class="beat enemy">boss</div>
-    <div class="enemy">fights</div>
-    <div class="enemy">pulse</div>
-    <div class="enemy">through</div>
-    <div class="enemy">midnight</div>
-    <div class="enemy">party</div>
-    <div class="enemy">queues</div>
-
-    <div class="beat enemy">hearts</div>
-    <div class="enemy">level</div>
-    <div class="enemy">up</div>
-    <div class="enemy">in</div>
+  <!-- Poem grid (enemies) -->    
+  <div class="poem-grid" id="poemGrid">  
+    <div class="beat enemy">arcade</div>  
+    <div class="enemy">neon</div>  
+    <div class="enemy">hum</div>  
+    <div class="enemy">pixel</div>  
+    <div class="enemy">dreams</div>  
+    <div class="beat enemy">boss</div>  
+    <div class="enemy">fights</div>  
+    <div class="enemy">pulse</div>  
+    <div class="enemy">through</div>  
+    <div class="enemy">midnight</div>  
+    <div class="enemy">party</div>  
+    <div class="enemy">queues</div>  
+    <div class="beat enemy">hearts</div>  
+    <div class="enemy">level</div>  
+    <div class="enemy">up</div>  
+    <div class="enemy">in</div>  
     <div class="enemy">co-op</div>
-  </div>
+  </div>    
 
-  <!-- Game over -->
-  <div class="game-over" id="gameOver">
-    GAME OVER  
-  </div>
-</div>
+  <!-- Game over -->    
+  <div class="game-over" id="gameOver">  
+    <div>GAME OVER</div>  
+    <button class="ctrl-btn" style="font-size: 1rem; padding: 0.8rem 1.5rem;" onclick="replayGame()">🔄 TRY AGAIN</button>  
+  </div>  
+</div>  
 
-<!-- Settings overlay -->
-<div class="settings-overlay" id="settingsOverlay">
-  <div class="settings-panel">
-    <h2>Settings</h2>
-    <div class="settings-row">
-      <label for="crtRange">CRT Intensity</label>
-      <input type="range" id="crtRange" min="0" max="1" step="0.1" value="1">
-    </div>
-    <div class="settings-row">
-      <label for="glitchRange">Glitch Level</label>
-      <input type="range" id="glitchRange" min="0" max="1" step="0.1" value="1">
-    </div>
-    <div class="settings-row">
-      <label for="volumeRange">Soundtrack Volume</label>
-      <input type="range" id="volumeRange" min="0" max="1" step="0.1" value="0.6">
-    </div>
-    <button onclick="closeSettings()">Close</button>
-  </div>
-</div>
+<!-- Settings overlay -->  
+<div class="settings-overlay" id="settingsOverlay">  
+  <div class="settings-panel">  
+    <h2>Settings</h2>  
+    <div class="settings-row">  
+      <label for="crtRange">CRT Intensity</label>  
+      <input type="range" id="crtRange" min="0" max="1" step="0.1" value="1">  
+    </div>  
+    <div class="settings-row">  
+      <label for="glitchRange">Glitch Level</label>  
+      <input type="range" id="glitchRange" min="0" max="1" step="0.1" value="1">  
+    </div>  
+    <div class="settings-row">  
+      <label for="volumeRange">Soundtrack Volume</label>  
+      <input type="range" id="volumeRange" min="0" max="1" step="0.1" value="0.6">  
+    </div>  
+    <button class="ctrl-btn" onclick="closeSettings()">Close</button>  
+  </div>  
+</div>  
 
-<!-- Retro Scrolling Credits -->
-<div class="credits-overlay" id="creditsOverlay">
-  <div class="credits-content">
-    <div class="credit-line">ARCADE POEM DUNGEON</div>
-    <div class="credit-line">CREATED BY</div>
-    <div class="credit-line">CHRISTINE</div>
-    <div class="credit-line">PIXEL DUNGEON BACKGROUND</div>
-    <div class="credit-line">SYNTH NARRATOR VOICE</div>
-    <div class="credit-line">8-BIT SOUNDTRACK</div>
-    <div class="credit-line">GLITCH FX & CRT FILTER</div>
-    <div class="credit-line">POEM ENEMY COMBAT</div>
-    <div class="credit-line">BOSS: GLITCHED VERSE</div>
-    <div class="credit-line">THANK YOU FOR PLAYING</div>
-  </div>
-</div>
+<!-- Retro Scrolling Credits -->  
+<div class="credits-overlay" id="creditsOverlay">  
+  <div class="credits-content">  
+    <div class="credit-line">ARCADE POEM DUNGEON</div>  
+    <div class="credit-line">CREATED BY</div>  
+    <div class="credit-line">CHRISTINE</div>  
+    <div class="credit-line">PIXEL DUNGEON BACKGROUND</div>  
+    <div class="credit-line">SYNTH NARRATOR VOICE</div>  
+    <div class="credit-line">8-BIT SOUNDTRACK</div>  
+    <div class="credit-line">GLITCH FX & CRT FILTER</div>  
+    <div class="credit-line">POEM ENEMY COMBAT</div>  
+    <div class="credit-line">BOSS: GLITCHED VERSE</div>  
+    <div class="credit-line">THANK YOU FOR PLAYING</div>  
+  </div>  
+</div>  
 
-<!-- Audio -->
-<audio id="bgm" loop>
-  <source src="https://files.catbox.moe/8bitloop.mp3" type="audio/mpeg">
-</audio>
-<audio id="voice">
-  <source src="https://files.catbox.moe/synthvoice.mp3" type="audio/mpeg">
-</audio>
-<audio id="hitSfx">
-  <source src="https://files.catbox.moe/hitbeep.mp3" type="audio/mpeg">
-</audio>
+<!-- Audio -->  
+<audio id="bgm" loop>  
+  <source src="https://files.catbox.moe/8bitloop.mp3" type="audio/mpeg">  
+</audio>  
+<audio id="voice">  
+  <source src="https://files.catbox.moe/synthvoice.mp3" type="audio/mpeg">  
+</audio>  
+<audio id="hitSfx">  
+  <source src="https://files.catbox.moe/hitbeep.mp3" type="audio/mpeg">  
+</audio>  
 
-<script>
-let health = 100;
-const healthFill = document.getElementById("healthFill");
-const boss = document.getElementById("boss");
-const poemGrid = document.getElementById("poemGrid");
-const enemies = document.querySelectorAll(".enemy");
-const bgm = document.getElementById("bgm");
-const voice = document.getElementById("voice");
-const hitSfx = document.getElementById("hitSfx");
-const gameOver = document.getElementById("gameOver");
+<script>  
+let health = 100;  
+const healthFill = document.getElementById("healthFill");  
+const boss = document.getElementById("boss");  
+const poemGrid = document.getElementById("poemGrid");  
+const enemies = document.querySelectorAll(".enemy");  
+const bgm = document.getElementById("bgm");  
+const voice = document.getElementById("voice");  
+const hitSfx = document.getElementById("hitSfx");  
+const gameOver = document.getElementById("gameOver");  
+  
+/* Menu navigation */  
+function openCharacterSelect() {  
+  document.getElementById("menuScreen").style.display = "none";  
+  document.getElementById("characterSelect").style.display = "block";  
+}  
+function openSaveSlots() {  
+  document.getElementById("menuScreen").style.display = "none";  
+  document.getElementById("saveScreen").style.display = "block";  
+}  
+function chooseCharacter(name) {  
+  localStorage.setItem("character", name);  
+  startGame();  
+}  
+function loadSlot(slot) {  
+  alert("Loaded Slot " + slot);  
+  startGame();  
+}  
+  
+/* Credits: scrolling crawl */  
+function showCredits() {  
+  const overlay = document.getElementById("creditsOverlay");  
+  overlay.style.display = "block";  
+  voice.play();  
+  setTimeout(() => {  
+    overlay.style.display = "none";  
+  }, 18000);  
+}  
+  
+/* Instructions */  
+function showInstructions() {  
+  alert("Poem words are enemies.\nClick them to defeat.\nBoss appears after all words fall.\nHealth drops when boss attacks.\nPress ESC for settings.");  
+}  
+  
+/* Settings */  
+function openSettings() {  
+  document.getElementById("settingsOverlay").style.display = "flex";  
+}  
+function closeSettings() {  
+  document.getElementById("settingsOverlay").style.display = "none";  
+}  
+document.getElementById("crtRange").addEventListener("input", (e) => {  
+  const val = e.target.value;  
+  document.body.style.opacity = val;  
+});  
+document.getElementById("glitchRange").addEventListener("input", (e) => {  
+  const val = e.target.value;  
+  const title = document.querySelector(".menu-title");  
+  title.style.animationDuration = (0.25 + (1 - val) * 0.5) + "s";  
+});  
+document.getElementById("volumeRange").addEventListener("input", (e) => {  
+  bgm.volume = e.target.value;  
+});  
 
-/* Menu navigation */
-function openCharacterSelect() {
-  document.getElementById("menuScreen").style.display = "none";
-  document.getElementById("characterSelect").style.display = "block";
+/* Reset Enemy States */
+function resetEnemies() {
+  enemies.forEach((enemy) => {
+    enemy.style.opacity = "1";
+    enemy.style.transform = "scale(1)";
+    enemy.style.pointerEvents = "auto";
+  });
 }
-function openSaveSlots() {
-  document.getElementById("menuScreen").style.display = "none";
-  document.getElementById("saveScreen").style.display = "block";
-}
-function chooseCharacter(name) {
-  localStorage.setItem("character", name);
+
+/* Replay Game */
+function replayGame() {
+  resetEnemies();
+  gameOver.style.display = "none";
   startGame();
 }
-function loadSlot(slot) {
-  alert("Loaded Slot " + slot);
-  startGame();
-}
 
-/* Credits: scrolling crawl */
-function showCredits() {
-  const overlay = document.getElementById("creditsOverlay");
-  overlay.style.display = "block";
-  voice.play();
-  setTimeout(() => {
-    overlay.style.display = "none";
-  }, 18000);
-}
-
-/* Instructions */
-function showInstructions() {
-  alert("Poem words are enemies.\nClick them to defeat.\nBoss appears after all words fall.\nHealth drops when boss attacks.\nPress ESC for settings.");
-}
-
-/* Settings */
-function openSettings() {
-  document.getElementById("settingsOverlay").style.display = "flex";
-}
-function closeSettings() {
-  document.getElementById("settingsOverlay").style.display = "none";
-}
-document.getElementById("crtRange").addEventListener("input", (e) => {
-  const val = e.target.value;
-  document.body.style.opacity = val;
-});
-document.getElementById("glitchRange").addEventListener("input", (e) => {
-  const val = e.target.value;
-  const title = document.querySelector(".menu-title");
-  title.style.animationDuration = (0.25 + (1 - val) * 0.5) + "s";
-});
-document.getElementById("volumeRange").addEventListener("input", (e) => {
-  bgm.volume = e.target.value;
-});
-
-/* Start game */
-function startGame() {
+/* Return to Main Menu */
+function returnToMenu() {
+  resetEnemies();
+  boss.style.display = "none";
+  poemGrid.style.display = "none";
+  gameOver.style.display = "none";
   document.getElementById("characterSelect").style.display = "none";
   document.getElementById("saveScreen").style.display = "none";
-  poemGrid.style.display = "grid";
-  boss.style.display = "none";
-  health = 100;
-  updateHealth();
-  bgm.volume = 0.6;
-  bgm.play();
-  voice.play();
-}
-
-/* Health */
-function updateHealth() {
-  healthFill.style.width = health + "%";
-  if (health <= 0) {
-    triggerGameOver();
-  }
-}
-function triggerGameOver() {
-  gameOver.style.display = "flex";
+  document.getElementById("menuScreen").style.display = "flex";
   bgm.pause();
+  bgm.currentTime = 0;
 }
-
-/* Enemy behavior: poem combat mode */
-enemies.forEach((enemy) => {
-  enemy.addEventListener("click", () => {
-    enemy.style.opacity = "0";
-    enemy.style.transform = "scale(0.5)";
-    enemy.style.pointerEvents = "none";
-    spawnParticles();
-    hitSfx.play();
-    checkAllEnemiesDefeated();
-  });
-});
-
-/* Check if all enemies defeated */
-function checkAllEnemiesDefeated() {
-  const remaining = Array.from(enemies).filter(e => e.style.pointerEvents !== "none");
-  if (remaining.length === 0) {
-    boss.style.display = "block";
-    voice.play();
-  }
-}
-
-/* Boss attacks: periodic damage */
-setInterval(() => {
-  if (poemGrid.style.display === "grid" && boss.style.display === "block" && health > 0) {
-    health -= 10;
-    updateHealth();
-    spawnParticles();
-  }
-}, 3000);
-
-/* Particles */
-function spawnParticles() {
-  for (let i = 0; i < 20; i++) {
-    const p = document.createElement("div");
-    p.classList.add("particle");
-    const dx = (Math.random() * 400 - 200) + "px";
-    const dy = (Math.random() * 400 - 200) + "px";
-    p.style.setProperty("--dx", dx);
-    p.style.setProperty("--dy", dy);
-    p.style.left = (window.innerWidth / 2) + "px";
-    p.style.top = (window.innerHeight / 2) + "px";
-    document.body.appendChild(p);
-    setTimeout(() => p.remove(), 1200);
-  }
-}
-
-/* ESC: close credits or open settings */
-document.addEventListener("keydown", (e) => {
-  if (e.key === "Escape") {
-    const credits = document.getElementById("creditsOverlay");
-    if (credits.style.display === "block") {
-      credits.style.display = "none";
-    } else {
-      openSettings();
-    }
-  }
-});
-</script>
-
-</body>
+  
+/* Start game */  
+function startGame() {  
+  document.getElementById("menuScreen").style.display = "none";
+  document.getElementById("characterSelect").style.display = "none";  
+  document.getElementById("saveScreen").style.display = "none";  
+  poemGrid.style.display = "grid";  
+  boss.style.display = "none";  
+  health = 100;  
+  updateHealth();  
+  bgm.volume = 0.6;  
+  bgm.play();  
+  voice.play();  
+}  
+  
+/* Health */  
+function updateHealth() {  
+  healthFill.style.width = health + "%";  
+  if (health <= 0) {  
+    triggerGameOver();  
+  }  
+}  
+function triggerGameOver() {  
+  gameOver.style.display = "flex";  
+  bgm.pause();  
+}  
+  
+/* Enemy behavior: poem combat mode */  
+enemies.forEach((enemy) => {  
+  enemy.addEventListener("click", () => {  
+    enemy.style.opacity = "0";  
+    enemy.style.transform = "scale(0.5)";  
+    enemy.style.pointerEvents = "none";  
+    spawnParticles();  
+    hitSfx.play();  
+    checkAllEnemiesDefeated();  
+  });  
+});  
+  
+/* Check if all enemies defeated */  
+function checkAllEnemiesDefeated() {  
+  const remaining = Array.from(enemies).filter(e => e.style.pointerEvents !== "none");  
+  if (remaining.length === 0) {  
+    boss.style.display = "block";  
+    voice.play();  
+  }  
+}  
+  
+/* Boss attacks: periodic damage */  
+setInterval(() => {  
+  if (poemGrid.style.display === "grid" && boss.style.display === "block" && health > 0) {  
+    health -= 10;  
+    updateHealth();  
+    spawnParticles();  
+  }  
+}, 3000);  
+  
+/* Particles */  
+function spawnParticles() {  
+  for (let i = 0; i < 20; i++) {  
+    const p = document.createElement("div");  
+    p.classList.add("particle");  
+    const dx = (Math.random() * 400 - 200) + "px";  
+    const dy = (Math.random() * 400 - 200) + "px";  
+    p.style.setProperty("--dx", dx);  
+    p.style.setProperty("--dy", dy);  
+    p.style.left = (window.innerWidth / 2) + "px";  
+    p.style.top = (window.innerHeight / 2) + "px";  
+    document.body.appendChild(p);  
+    setTimeout(() => p.remove(), 1200);  
+  }  
+}  
+  
+/* ESC: close credits or open settings */  
+document.addEventListener("keydown", (e) => {  
+  if (e.key === "Escape") {  
+    const credits = document.getElementById("creditsOverlay");  
+    if (credits.style.display === "block") {  
+      credits.style.display = "none";  
+    } else {  
+      openSettings();  
+    }  
+  }  
+});  
+</script>  
+</body>  
 </html>
