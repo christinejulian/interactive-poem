@@ -1,1 +1,422 @@
+/* style.css */
+
+/* ==========================================================================
+   1. CORE BASE & CRT SCANLINES
+   ========================================================================== */
+html, body {  
+  margin: 0;  
+  padding: 0;  
+  height: 100%;  
+  background: #000;  
+  font-family: "Press Start 2P", monospace;  
+  overflow: hidden;  
+}  
+  
+/* CRT Scanline Overlay */  
+body::before {  
+  content: "";  
+  position: fixed;  
+  inset: 0;  
+  background: repeating-linear-gradient(  
+    to bottom,  
+    rgba(255,255,255,0.03) 0px,  
+    rgba(255,255,255,0.03) 2px,  
+    rgba(0,0,0,0.05) 3px  
+  );  
+  pointer-events: none;  
+  z-index: 1000;  
+}  
+
+/* ==========================================================================
+   2. ANIMATIONS & AMBIENT EFFECTS
+   ========================================================================== */
+/* VHS Glitch Animation */  
+@keyframes glitch {  
+  0% { transform: translate(0,0); }  
+  20% { transform: translate(-2px, 1px); }  
+  40% { transform: translate(2px, -1px); }  
+  60% { transform: translate(-1px, 2px); }  
+  80% { transform: translate(1px, -2px); }  
+  100% { transform: translate(0,0); }  
+}  
+.vhs {  
+  animation: glitch 0.25s infinite;  
+}  
+  
+/* Ambient Arcade Lighting Overlay */  
+.arcade-glow {  
+  position: fixed;  
+  inset: 0;  
+  background:  
+    radial-gradient(circle at 50% 20%, rgba(0,255,153,0.25), transparent 60%),  
+    radial-gradient(circle at 10% 80%, rgba(255,0,153,0.25), transparent 60%),  
+    radial-gradient(circle at 90% 60%, rgba(0,153,255,0.25), transparent 60%);  
+  mix-blend-mode: screen;  
+  pointer-events: none;  
+  z-index: 900;  
+}  
+
+/* Player Idle Bobbing Animation */
+@keyframes idle {  
+  0% { transform: translateX(-50%) translateY(0); }  
+  50% { transform: translateX(-50%) translateY(-4px); }  
+  100% { transform: translateX(-50%) translateY(0); }  
+}  
+
+/* Particle Fly-Away Animation */
+@keyframes fly {  
+  from { transform: translate(0,0); opacity: 1; }  
+  to { transform: translate(var(--dx), var(--dy)); opacity: 0; }  
+}  
+
+/* Retro Star Wars Style Credits Scroll */
+@keyframes scrollCredits {  
+  from { bottom: -100%; }  
+  to { bottom: 110%; }  
+}  
+
+/* ==========================================================================
+   3. CABINET & DUNGEON BACKGROUND
+   ========================================================================== */
+.cabinet {  
+  position: absolute;  
+  top: 50%;  
+  left: 50%;  
+  width: 88vw;  
+  height: 88vh;  
+  transform: translate(-50%, -50%);  
+  background: #111;  
+  border: 12px solid #0ff;  
+  border-radius: 18px;  
+  box-shadow:  
+    0 0 40px #0ff,  
+    0 0 80px #0ff inset,  
+    0 0 120px rgba(0,255,255,0.4) inset;  
+  overflow: hidden;  
+}  
+  
+.dungeon-bg {  
+  position: absolute;  
+  inset: 0;  
+  background-image:  
+    linear-gradient(#050505 1px, transparent 1px),  
+    linear-gradient(90deg, #050505 1px, transparent 1px);  
+  background-size: 32px 32px;  
+  opacity: 0.4;  
+  pointer-events: none;  
+}  
+
+/* ==========================================================================
+   4. NAVIGATION & MENUS (MAIN, CHARACTERS, SLOTS)
+   ========================================================================== */
+.menu-screen {  
+  width: 100%;  
+  height: 100%;  
+  padding-top: 4rem;  
+  text-align: center;  
+  color: #0ff;  
+  display: flex;  
+  flex-direction: column;  
+  gap: 2rem;  
+  font-size: 1.2rem;  
+  position: relative;  
+  z-index: 2;  
+}  
+
+.menu-title {  
+  font-size: 2rem;  
+  text-shadow: 0 0 12px #0ff, 0 0 24px #0ff;  
+  letter-spacing: 0.15em;  
+}  
+
+.menu-option {  
+  padding: 1rem;  
+  margin: 0 auto;  
+  width: 60%;  
+  border: 3px solid #0ff;  
+  border-radius: 12px;  
+  cursor: pointer;  
+  transition: background 0.3s, color 0.3s;  
+}  
+
+.menu-option:hover {  
+  background: #0ff;  
+  color: #000;  
+}  
+
+/* Character Selection Screen */  
+.character-select {  
+  display: none;  
+  width: 100%;  
+  height: 100%;  
+  padding-top: 3rem;  
+  text-align: center;  
+  color: #0ff;  
+  position: relative;  
+  z-index: 2;  
+}  
+
+.character-grid {  
+  display: flex;  
+  justify-content: center;  
+  gap: 3rem;  
+  margin-top: 2rem;  
+}  
+
+.character {  
+  width: 140px;  
+  height: 140px;  
+  border: 3px solid #0ff;  
+  border-radius: 12px;  
+  display: flex;  
+  flex-direction: column;  
+  align-items: center;  
+  justify-content: center;  
+  cursor: pointer;  
+  transition: transform 0.3s, background 0.3s;  
+}  
+
+.character:hover {  
+  background: #0ff;  
+  color: #000;  
+  transform: scale(1.1);  
+}  
+
+.sprite {  
+  width: 64px;  
+  height: 64px;  
+  image-rendering: pixelated;  
+  background-size: cover;  
+  margin-bottom: 0.5rem;  
+}  
+
+/* Save Slots Screen */  
+.save-screen {  
+  display: none;  
+  width: 100%;  
+  height: 100%;  
+  padding-top: 3rem;  
+  text-align: center;  
+  color: #0ff;  
+  position: relative;  
+  z-index: 2;  
+}  
+
+.save-slot {  
+  padding: 1rem;  
+  margin: 1rem auto;  
+  width: 60%;  
+  border: 3px solid #0ff;  
+  border-radius: 12px;  
+  cursor: pointer;  
+}  
+
+.save-slot:hover {  
+  background: #0ff;  
+  color: #000;  
+}  
+
+/* ==========================================================================
+   5. IN-GAME UI, CONTROLS & HUD
+   ========================================================================== */
+.game-controls {  
+  position: absolute;  
+  top: 1rem;  
+  right: 1rem;  
+  display: flex;  
+  gap: 0.5rem;  
+  z-index: 10;  
+}  
+
+.ctrl-btn {  
+  background: #000;  
+  color: #0ff;  
+  border: 2px solid #0ff;  
+  padding: 0.5rem 0.8rem;  
+  font-family: inherit;  
+  font-size: 0.7rem;  
+  border-radius: 6px;  
+  cursor: pointer;  
+  box-shadow: 0 0 8px #0ff;  
+  transition: background 0.2s, color 0.2s, transform 0.1s;  
+}  
+
+.ctrl-btn:hover {  
+  background: #0ff;  
+  color: #000;  
+}  
+
+.ctrl-btn:active {  
+  transform: scale(0.95);  
+}  
+
+/* Health Bar HUD */  
+.health-bar {  
+  position: absolute;  
+  top: 1rem;  
+  left: 1rem;  
+  width: 200px;  
+  height: 24px;  
+  border: 3px solid #f00;  
+  border-radius: 8px;  
+  background: #300;  
+  overflow: hidden;  
+  z-index: 3;  
+}  
+
+.health-fill {  
+  height: 100%;  
+  width: 100%;  
+  background: linear-gradient(90deg, #0f0, #ff0, #f00);  
+}  
+
+/* ==========================================================================
+   6. SPRITES, ENEMIES & POEM GRID
+   ========================================================================== */
+.player {  
+  position: absolute;  
+  bottom: 10%;  
+  left: 50%;  
+  transform: translateX(-50%);  
+  width: 64px;  
+  height: 64px;  
+  background: #0ff;  
+  border-radius: 4px;  
+  box-shadow: 0 0 12px #0ff;  
+  image-rendering: pixelated;  
+  z-index: 3;  
+  animation: idle 1s infinite;  
+}  
+
+.poem-grid {  
+  display: none;  
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));  
+  gap: 2rem;  
+  padding: 4rem 3rem 3rem 3rem;  
+  font-size: 1.2rem;  
+  color: #fff;  
+  text-align: center;  
+  transition: all 1s ease;  
+  position: relative;  
+  z-index: 2;  
+}  
+
+.poem-grid div {  
+  padding: 1rem;  
+  border: 2px solid #0ff;  
+  border-radius: 10px;  
+  background: rgba(0,0,0,0.6);  
+  box-shadow: 0 0 12px #0ff;  
+  transition: transform 0.6s ease, color 0.4s ease, text-shadow 0.4s ease, opacity 0.4s ease;  
+  cursor: pointer;  
+}  
+
+.beat {  
+  border-color: #ff0;  
+  box-shadow: 0 0 12px #ff0;  
+}  
+
+.boss {  
+  position: absolute;  
+  top: 10%;  
+  left: 50%;  
+  transform: translateX(-50%);  
+  font-size: 2rem;  
+  color: #f00;  
+  text-shadow: 0 0 12px #f00;  
+  display: none;  
+  z-index: 3;  
+}  
+
+/* ==========================================================================
+   7. OVERLAYS (SETTINGS, PARTICLES, GAME OVER, CREDITS)
+   ========================================================================== */
+.settings-overlay {  
+  position: fixed;  
+  inset: 0;  
+  background: rgba(0,0,0,0.8);  
+  color: #0ff;  
+  display: none;  
+  align-items: center;  
+  justify-content: center;  
+  z-index: 1100;  
+}  
+
+.settings-panel {  
+  border: 3px solid #0ff;  
+  padding: 2rem;  
+  border-radius: 12px;  
+  background: #111;  
+  width: 320px;  
+}  
+
+.settings-panel h2 {  
+  font-size: 1rem;  
+  margin-bottom: 1rem;  
+}  
+
+.settings-row {  
+  margin-bottom: 1rem;  
+  font-size: 0.8rem;  
+}  
+
+.settings-row label {  
+  display: block;  
+  margin-bottom: 0.3rem;  
+}  
+
+.settings-row input[type="range"] {  
+  width: 100%;  
+}  
+
+.particle {  
+  position: fixed;  
+  width: 6px;  
+  height: 6px;  
+  background: #0ff;  
+  border-radius: 50%;  
+  pointer-events: none;  
+  opacity: 0.8;  
+  animation: fly 1.2s linear forwards;  
+}  
+
+.game-over {  
+  position: absolute;  
+  inset: 0;  
+  display: none;  
+  flex-direction: column;  
+  align-items: center;  
+  justify-content: center;  
+  gap: 2rem;  
+  background: rgba(0,0,0,0.85);  
+  color: #f00;  
+  font-size: 2rem;  
+  text-shadow: 0 0 12px #f00;  
+  z-index: 5;  
+}  
+
+.credits-overlay {  
+  position: fixed;  
+  inset: 0;  
+  background: #000;  
+  display: none;  
+  overflow: hidden;  
+  z-index: 2000;  
+}  
+
+.credits-content {  
+  position: absolute;  
+  bottom: -100%;  
+  width: 100%;  
+  text-align: center;  
+  color: #0ff;  
+  font-size: 1.2rem;  
+  text-shadow: 0 0 12px #0ff;  
+  animation: scrollCredits 18s linear forwards;  
+}  
+
+.credit-line {  
+  margin: 1.2rem 0;  
+  letter-spacing: 0.15em;  
+}
 
