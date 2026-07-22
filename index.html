@@ -4,709 +4,198 @@
 <meta charset="UTF-8">
 <title>Arcade Poem Dungeon — Off the Grid</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<!-- Retro Pixel Font -->
 <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
-<style>
-/* styles.css */
-html, body {
-  margin: 0;
-  padding: 0;
-  height: 100%;
-  background: #000;
-  font-family: "Press Start 2P", monospace;
-  color: #0f0;
-  overflow: hidden;
-}
 
-body::before {
-  content: "";
-  position: fixed;
-  inset: 0;
-  background: repeating-linear-gradient(
-    to bottom,
-    rgba(0,255,0,0.04) 0px,
-    rgba(0,255,0,0.04) 2px,
-    rgba(0,0,0,0.08) 3px
-  );
-  mix-blend-mode: screen;
-  pointer-events: none;
-  z-index: 1000;
-}
-
-body::after {
-  content: "";
-  position: fixed;
-  inset: 0;
-  background: radial-gradient(circle at center, transparent 40%, rgba(0,0,0,0.8) 100%);
-  pointer-events: none;
-  z-index: 999;
-}
-
-@keyframes glitch {
-  0% { transform: translate(0,0); filter: none; }
-  20% { transform: translate(-1px, 0); filter: hue-rotate(10deg); }
-  40% { transform: translate(1px, -1px); filter: contrast(1.2); }
-  60% { transform: translate(-2px, 1px); filter: saturate(1.4); }
-  80% { transform: translate(1px, 2px); filter: hue-rotate(-10deg); }
-  100% { transform: translate(0,0); filter: none; }
-}
-
-.glitch {
-  animation: glitch 0.25s infinite;
-}
-
-.arcade-glow {
-  position: fixed;
-  inset: 0;
-  background:
-    radial-gradient(circle at 20% 20%, rgba(0,255,0,0.15), transparent 60%),
-    radial-gradient(circle at 80% 70%, rgba(0,255,0,0.1), transparent 60%);
-  mix-blend-mode: screen;
-  pointer-events: none;
-  z-index: 950;
-}
-
-.screen {
-  width: 100%;
-  height: 100%;
-  display: none;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-  position: absolute;
-  inset: 0;
-}
-
-#menuScreen {
-  display: flex;
-}
-
-.menu-title {
-  font-size: 1.8rem;
-  text-shadow: 0 0 10px #0f0, 0 0 20px #0f0;
-  letter-spacing: 0.2em;
-}
-
-.menu-subtitle {
-  margin-top: 1rem;
-  font-size: 0.8rem;
-  color: #0a0;
-}
-
-.menu-buttons {
-  margin-top: 2rem;
-}
-
-.menu-buttons button {
-  display: block;
-  padding: 0.8rem 1.2rem;
-  margin: 0.6rem auto;
-  width: 260px;
-  border: 2px solid #0f0;
-  border-radius: 4px;
-  background: rgba(0,0,0,0.8);
-  color: #0f0;
-  cursor: pointer;
-  font-size: 0.8rem;
-  text-transform: uppercase;
-  text-shadow: 0 0 6px #0f0;
-  box-shadow: 0 0 12px rgba(0,255,0,0.4);
-  transition: background 0.2s, color 0.2s, box-shadow 0.2s, transform 0.1s;
-}
-
-.menu-buttons button:hover {
-  background: #0f0;
-  color: #000;
-  box-shadow: 0 0 18px #0f0;
-  transform: translateY(-1px);
-}
-
-#levelSelect {
-  flex-direction: column;
-  align-items: center;
-  justify-content: flex-start;
-  padding-top: 3rem;
-}
-
-.level-select-title {
-  font-size: 1.2rem;
-  text-shadow: 0 0 10px #0f0;
-}
-
-.level-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
-  gap: 1rem;
-  width: 80%;
-  margin-top: 2rem;
-  max-height: 60vh;
-  overflow-y: auto;
-}
-
-.level-btn {
-  padding: 0.8rem;
-  border: 2px solid #0f0;
-  border-radius: 4px;
-  background: rgba(0,0,0,0.85);
-  color: #0f0;
-  cursor: pointer;
-  font-size: 0.8rem;
-  text-shadow: 0 0 6px #0f0;
-  box-shadow: 0 0 10px rgba(0,255,0,0.3);
-  transition: background 0.2s, color 0.2s, transform 0.1s, box-shadow 0.2s;
-}
-
-.level-btn:hover {
-  background: #0f0;
-  color: #000;
-  transform: translateY(-1px);
-  box-shadow: 0 0 16px #0f0;
-}
-
-.level-locked {
-  border-color: #044;
-  color: #044;
-  box-shadow: none;
-  cursor: not-allowed;
-  text-shadow: none;
-}
-
-.level-locked:hover {
-  background: rgba(0,0,0,0.85);
-  color: #044;
-  transform: none;
-}
-
-#scoreboard {
-  position: absolute;
-  top: 1.5rem;
-  left: 1.5rem;
-  right: 1.5rem;
-  display: none;
-  justify-content: space-between;
-  align-items: center;
-  color: #0f0;
-  font-size: 0.8rem;
-  text-shadow: 0 0 8px #0f0;
-  z-index: 10;
-}
-
-.health-bar {
-  width: 150px;
-  height: 16px;
-  border: 2px solid #f00;
-  background: #300;
-  border-radius: 3px;
-  overflow: hidden;
-}
-
-.health-fill {
-  height: 100%;
-  width: 100%;
-  background: #f00;
-  box-shadow: 0 0 8px #f00;
-  transition: width 0.2s ease;
-}
-
-#poemGrid {
-  display: none;
-  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-  gap: 1.5rem;
-  padding: 5rem 3rem 3rem 3rem;
-  font-size: 0.8rem;
-  color: #0f0;
-  text-align: center;
-  z-index: 5;
-}
-
-.poemWord {
-  padding: 0.8rem;
-  border: 2px solid #0f0;
-  border-radius: 4px;
-  background: rgba(0,0,0,0.9);
-  box-shadow: 0 0 10px rgba(0,255,0,0.4);
-  cursor: pointer;
-  text-shadow: 0 0 6px #0f0;
-  transition: transform 0.2s, opacity 0.2s, box-shadow 0.2s, border-color 0.2s, color 0.2s;
-}
-
-.poemWord:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 0 16px #0f0;
-}
-
-.poemWord.bad-word {
-  border-color: #f00;
-  color: #f00;
-  box-shadow: 0 0 10px rgba(255,0,0,0.4);
-}
-
-#levelComplete, #gameComplete, #gameOver {
-  background: radial-gradient(circle at center, rgba(0,0,0,0.95), #000);
-  z-index: 100;
-}
-
-#gameOver h1 {
-  color: #f00;
-  text-shadow: 0 0 14px #f00;
-}
-
-.overlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,0.9);
-  color: #0f0;
-  display: none;
-  align-items: center;
-  justify-content: center;
-  z-index: 2000;
-}
-
-.overlay-content {
-  text-align: center;
-  padding: 2rem;
-  border: 2px solid #0f0;
-  border-radius: 4px;
-  background: rgba(0,0,0,0.95);
-  box-shadow: 0 0 16px rgba(0,255,0,0.4);
-}
-
-.overlay-content h2 {
-  margin-bottom: 1rem;
-  text-shadow: 0 0 10px #0f0;
-}
-
-.overlay-content input[type="range"] {
-  width: 100%;
-  margin: 0.6rem 0;
-}
-
-.particle {
-  position: fixed;
-  width: 4px;
-  height: 4px;
-  background: #0f0;
-  border-radius: 50%;
-  pointer-events: none;
-  opacity: 0.8;
-  animation: fly 1.2s linear forwards;
-}
-
-@keyframes fly {
-  from { transform: translate(0,0); opacity: 1; }
-  to { transform: translate(var(--dx), var(--dy)); opacity: 0; }
-}
-
-@keyframes scrollCredits {
-  from { bottom: -100%; }
-  to { bottom: 110%; }
-}
-
-#creditsOverlay {
-  background: #000;
-  overflow: hidden;
-}
-
-#creditsOverlay .overlay-content {
-  position: absolute;
-  bottom: -100%;
-  width: 100%;
-  animation: scrollCredits 18s linear forwards;
-  text-shadow: 0 0 10px #0f0;
-  text-align: center;
-  font-size: 0.9rem;
-}
-</style>
+<!-- External CSS -->
+<link rel="stylesheet" href="styles.css">
 </head>
 <body>
 
+<!-- Ambient Glow Overlay -->
 <div class="arcade-glow"></div>
 
-<div class="cabinet" style="position:absolute; top:50%; left:50%; width:88vw; height:88vh; transform:translate(-50%, -50%); background:#111; border:12px solid #0f0; border-radius:18px; box-shadow:0 0 40px #0f0, 0 0 80px #0f0 inset; overflow:hidden;">
-  <div class="dungeon-bg" style="position:absolute; inset:0; background-image:linear-gradient(#020 1px, transparent 1px), linear-gradient(90deg, #020 1px, transparent 1px); background-size:32px 32px; opacity:0.4; pointer-events:none;"></div>
+<!-- Static Noise Overlay -->
+<div class="static-overlay"></div>
 
-  <!-- Scoreboard, Health, & Level HUD -->
+<!-- Boot-Up Terminal Intro -->
+<div id="bootIntro" class="screen">
+  <div class="boot-lines">
+    <p>BOOTING ARCADE SYSTEM...</p>
+    <p>LOADING POEM DUNGEON MODULE...</p>
+    <p>INITIALIZING GLITCH CORE...</p>
+    <p>ESTABLISHING NEON LINK...</p>
+    <p>DECRYPTING LEVEL MATRIX...</p>
+    <p class="boot-complete">SYSTEM ONLINE — PRESS START</p>
+  </div>
+</div>
+
+<!-- Main Game Cabinet -->
+<div class="cabinet">
+
+  <!-- Dungeon Grid Background -->
+  <div class="dungeon-bg"></div>
+
+  <!-- HUD -->
   <div id="scoreboard">
     <div id="levelIndicator">LEVEL 1 / 15</div>
-    <div class="health-bar"><div class="health-fill" id="healthFill"></div></div>
     <div id="scoreIndicator">SCORE: 0</div>
   </div>
 
-  <!-- Main Menu Screen with Play Button -->
+  <!-- Main Menu -->
   <div id="menuScreen" class="screen">
-    <div class="menu-title vhs">ARCADE POEM DUNGEON</div>
-    <div class="menu-subtitle">OFF THE GRID</div>
+    <div class="menu-title glitch">ARCADE POEM DUNGEON</div>
+    <div class="menu-subtitle">OFF THE GRID — TERMINAL EDITION</div>
+
+    <div class="menu-attract">
+      <p>INSERT COIN</p>
+      <p>PRESS START</p>
+      <p>BEGIN TRANSMISSION</p>
+    </div>
+
     <div class="menu-buttons">
-      <button onclick="playAudioAndOpenLevels()">▶ PLAY / START</button>
-      <button onclick="showInstructions()">❖ HOW TO PLAY</button>
-      <button onclick="showCredits()">★ CREDITS</button>
+      <button id="startGameBtn">▶ START GAME</button>
+      <button id="howToPlayBtn">❖ HOW TO PLAY</button>
+      <button id="creditsBtn">★ CREDITS</button>
     </div>
   </div>
 
-  <!-- Level Select Screen -->
+  <!-- Level Select -->
   <div id="levelSelect" class="screen">
-    <div class="level-select-title">SELECT LEVEL</div>
+    <div class="level-select-title glitch">SELECT LEVEL</div>
     <div class="level-grid" id="levelGrid"></div>
-    <div class="menu-buttons" style="margin-top: 1.5rem;">
-      <button onclick="returnToMenu()">🏠 MAIN MENU</button>
+
+    <div class="menu-buttons">
+      <button id="returnMenuBtn">🏠 MAIN MENU</button>
     </div>
   </div>
 
   <!-- Poem Word Grid -->
-  <div id="poemGrid"></div>
+  <div id="poemGrid" class="poem-grid"></div>
 
-  <!-- Level Complete Screen -->
+  <!-- Level Complete -->
   <div id="levelComplete" class="screen">
     <h1 id="levelCompleteTitle">LEVEL COMPLETED!</h1>
+    <p class="level-lore">
+      The neon words collapse.<br>
+      The terminal hums quietly.<br>
+      The next chamber awaits.
+    </p>
     <div class="menu-buttons">
-      <button class="nextLevelBtn" onclick="nextLevel()">▶ NEXT LEVEL</button>
-      <button onclick="returnToMenu()">🏠 MAIN MENU</button>
+      <button id="nextLevelBtn">▶ NEXT LEVEL</button>
+      <button id="mainMenuBtn1">🏠 MAIN MENU</button>
     </div>
   </div>
 
-  <!-- Game Over Screen -->
+  <!-- Game Over -->
   <div id="gameOver" class="screen">
-    <h1>GAME OVER</h1>
-    <p style="font-size: 0.7rem; color: #f00; margin: 1rem 0;">Too many unrelated words drained your health!</p>
+    <h1 class="glitch">GAME OVER</h1>
+    <p class="death-text">
+      The terminal overloads.<br>
+      The neon grid fractures.<br>
+      Your signal fades.
+    </p>
     <div class="menu-buttons">
-      <button onclick="restartLevel()">🔄 RETRY LEVEL</button>
-      <button onclick="returnToMenu()">🏠 MAIN MENU</button>
+      <button id="retryLevelBtn">🔄 RETRY LEVEL</button>
+      <button id="mainMenuBtn2">🏠 MAIN MENU</button>
     </div>
   </div>
 
-  <!-- Grand Victory Screen -->
+  <!-- Game Complete -->
   <div id="gameComplete" class="screen">
-    <h1>CONGRATULATIONS!<br>YOU BEAT ALL 15 LEVELS!</h1>
+    <h1 class="glitch">ALL 15 LEVELS CLEARED</h1>
+    <p class="victory-text">
+      The dungeon dissolves.<br>
+      The neon horizon opens.<br>
+      Your story becomes legend.
+    </p>
     <div class="menu-buttons">
-      <button onclick="restartFullGame()">🔄 PLAY AGAIN</button>
-      <button onclick="returnToMenu()">🏠 MAIN MENU</button>
+      <button id="playAgainBtn">🔄 PLAY AGAIN</button>
+      <button id="mainMenuBtn3">🏠 MAIN MENU</button>
     </div>
   </div>
+
 </div>
 
 <!-- Settings Overlay -->
 <div class="overlay" id="settingsOverlay">
   <div class="overlay-content">
     <h2>SYSTEM SETTINGS</h2>
+
     <label>CRT Intensity</label>
     <input type="range" id="crtRange" min="0.2" max="1" step="0.1" value="1">
-    
+
     <label>Glitch Level</label>
     <input type="range" id="glitchRange" min="0" max="1" step="0.1" value="1">
-    
+
     <label>Soundtrack Volume</label>
     <input type="range" id="volumeRange" min="0" max="1" step="0.1" value="0.6">
-    
-    <div style="display: flex; gap: 1rem; justify-content: center; margin-top: 1.5rem;">
-      <button class="level-btn" onclick="closeSettings()">RESUME</button>
-      <button class="level-btn" style="border-color: #f00; color: #f00;" onclick="returnToMenuFromESC()">MAIN MENU</button>
+
+    <div class="settings-buttons">
+      <button class="level-btn" id="resumeBtn">RESUME</button>
+      <button class="level-btn" id="escMenuBtn" style="border-color:#f00;color:#f00;">MAIN MENU</button>
     </div>
   </div>
 </div>
 
-<!-- Retro Scrolling Credits -->
+<!-- Credits Overlay -->
 <div class="overlay" id="creditsOverlay">
-  <div class="overlay-content">
-    <div class="credit-line">ARCADE POEM DUNGEON</div>
-    <div class="credit-line">CREATED BY</div>
-    <div class="credit-line">Christine Julian</div>
-    <div class="credit-line">PIXEL DUNGEON BACKGROUND</div>
-    <div class="credit-line">8-BIT SOUNDTRACK</div>
-    <div class="credit-line">THANK YOU FOR PLAYING</div>
+  <div class="overlay-content credits-scroll">
+
+    <h2 class="glitch">★ ARCADE POEM DUNGEON ★</h2>
+    <p>Terminal Overload Edition</p>
+    <br>
+
+    <h3>FINAL POEM</h3>
+    <p>The neon grid flickers.</p>
+    <p>The terminal breathes.</p>
+    <p>The dungeon listens.</p>
+    <br>
+
+    <p>You walked through static corridors.</p>
+    <p>You decoded fractured verses.</p>
+    <p>You survived the glitch storms.</p>
+    <br>
+
+    <p>Every word was a spark.</p>
+    <p>Every level a memory.</p>
+    <p>Every victory a pulse.</p>
+    <br>
+
+    <p>Now the system sleeps.</p>
+    <p>But your signal remains.</p>
+    <br>
+
+    <h3>CREATED BY</h3>
+    <p>Christine Julian</p>
+    <br>
+
+    <h3>THANK YOU FOR PLAYING</h3>
+    <p>★ GAME COMPLETE ★</p>
+
+    <div style="margin-top:2rem;">
+      <button class="level-btn" id="creditsMenuBtn">🏠 MAIN MENU</button>
+    </div>
+
   </div>
 </div>
 
-<!-- Audio Elements -->
+<!-- Audio -->
 <audio id="bgm" loop>
-  <source src="https://open.spotify.com/track/1p7sFVhNF4hGzB3m0oy3ax" type="audio/mpeg">
   <source src="https://files.catbox.moe/8bitloop.mp3" type="audio/mpeg">
 </audio>
+
 <audio id="hitSfx">
   <source src="https://files.catbox.moe/hitbeep.mp3" type="audio/mpeg">
 </audio>
+
 <audio id="damageSfx">
   <source src="https://files.catbox.moe/hitbeep.mp3" type="audio/mpeg">
 </audio>
 
-<script>
-let currentLevel = 1;
-let unlockedLevels = parseInt(localStorage.getItem("unlockedLevels")) || 1;
-const maxLevel = 15;
-let score = 0;
-let health = 100;
+<!-- External JS -->
+<script src="main.js"></script>
 
-const levelTargets = {};
-for (let i = 1; i <= maxLevel; i++) {
-  levelTargets[i] = i * 10; 
-}
-
-const gamingWords = [
-  "controller", "pixel", "quest", "level-up", "respawn", "boss-fight", 
-  "co-op", "loot", "arcade", "save-point", "combo", "high-score", 
-  "speedrun", "cyber", "glitch", "dungeon", "rpg", "console", "virtual"
-];
-
-const unrelatedWords = [
-  "boredom", "lag", "work", "chores", "offline", "disconnect", 
-  "taxes", "error-404", "sleep", "walk-outside", "spreadsheet"
-];
-
-const menuScreen = document.getElementById("menuScreen");
-const levelSelect = document.getElementById("levelSelect");
-const levelGrid = document.getElementById("levelGrid");
-const poemGrid = document.getElementById("poemGrid");
-const scoreboard = document.getElementById("scoreboard");
-const levelIndicator = document.getElementById("levelIndicator");
-const scoreIndicator = document.getElementById("scoreIndicator");
-const healthFill = document.getElementById("healthFill");
-const levelComplete = document.getElementById("levelComplete");
-const gameOver = document.getElementById("gameOver");
-const gameComplete = document.getElementById("gameComplete");
-const settingsOverlay = document.getElementById("settingsOverlay");
-const creditsOverlay = document.getElementById("creditsOverlay");
-
-const bgm = document.getElementById("bgm");
-const hitSfx = document.getElementById("hitSfx");
-const damageSfx = document.getElementById("damageSfx");
-
-function playAudioAndOpenLevels() {
-  bgm.volume = 0.6;
-  bgm.play().catch(e => console.log("Audio play needs user interaction"));
-  openLevelSelect();
-}
-
-function openLevelSelect() {
-  menuScreen.style.display = "none";
-  gameOver.style.display = "none";
-  buildLevelSelectButtons();
-  levelSelect.style.display = "flex";
-}
-
-function buildLevelSelectButtons() {
-  levelGrid.innerHTML = "";
-  for (let i = 1; i <= maxLevel; i++) {
-    const btn = document.createElement("button");
-    btn.classList.add("level-btn");
-    
-    if (i <= unlockedLevels) {
-      btn.textContent = `LEVEL ${i}`;
-      btn.onclick = () => {
-        currentLevel = i;
-        score = 0;
-        health = 100;
-        levelSelect.style.display = "none";
-        startGame();
-      };
-    } else {
-      btn.textContent = `🔒 LCK ${i}`;
-      btn.classList.add("level-locked");
-    }
-    levelGrid.appendChild(btn);
-  }
-}
-
-function showCredits() {
-  creditsOverlay.style.display = "flex";
-  setTimeout(() => {
-    creditsOverlay.style.display = "none";
-  }, 18000);
-}
-
-function showInstructions() {
-  alert("Gaming Love Poem Dungeon:\n- Click green gaming words to build your score.\n- Avoid red unrelated words (chores, lag) which drain your health (-25 HP)!\n- Reach target score to clear each level and advance.\n- If health hits 0, it's Game Over!\n- Press ESC anytime for settings.");
-}
-
-function openSettings() {
-  settingsOverlay.style.display = "flex";
-}
-function closeSettings() {
-  settingsOverlay.style.display = "none";
-}
-function returnToMenuFromESC() {
-  closeSettings();
-  returnToMenu();
-}
-
-document.getElementById("crtRange").addEventListener("input", (e) => {
-  document.body.style.opacity = e.target.value;
-});
-document.getElementById("glitchRange").addEventListener("input", (e) => {
-  const val = e.target.value;
-  const title = document.querySelector(".menu-title");
-  if (title) {
-    title.style.animationDuration = (0.25 + (1 - val) * 0.5) + "s";
-  }
-});
-document.getElementById("volumeRange").addEventListener("input", (e) => {
-  bgm.volume = e.target.value;
-});
-
-function startGame() {
-  menuScreen.style.display = "none";
-  levelSelect.style.display = "none";
-  levelComplete.style.display = "none";
-  gameComplete.style.display = "none";
-  gameOver.style.display = "none";
-  
-  scoreboard.style.display = "flex";
-  bgm.play().catch(e => {});
-  loadLevel(currentLevel);
-  updateHUD();
-}
-
-function loadLevel(level) {
-  poemGrid.innerHTML = "";
-  poemGrid.style.display = "grid";
-  
-  for (let i = 0; i < 10; i++) {
-    const word = document.createElement("div");
-    word.classList.add("poemWord");
-    
-    let isUnrelated = Math.random() < 0.3;
-    if (i === 0) isUnrelated = false;
-    
-    if (isUnrelated) {
-      const badWord = unrelatedWords[Math.floor(Math.random() * unrelatedWords.length)];
-      word.textContent = badWord;
-      word.classList.add("bad-word");
-      
-      word.addEventListener("click", () => {
-        health -= 25;
-        updateHUD();
-        damageSfx.currentTime = 0;
-        damageSfx.play().catch(e => {});
-        spawnParticles(true);
-        word.style.opacity = "0";
-        word.style.transform = "scale(0.5)";
-        word.style.pointerEvents = "none";
-        
-        if (health <= 0) {
-          triggerGameOver();
-        }
-      });
-    } else {
-      const goodWord = gamingWords[Math.floor(Math.random() * gamingWords.length)];
-      word.textContent = goodWord;
-      
-      word.addEventListener("click", () => {
-        score++;
-        updateHUD();
-        hitSfx.currentTime = 0;
-        hitSfx.play().catch(e => {});
-        spawnParticles(false);
-        word.style.opacity = "0";
-        word.style.transform = "scale(0.5)";
-        word.style.pointerEvents = "none";
-        
-        if (score >= levelTargets[currentLevel]) {
-          completeLevel();
-        }
-      });
-    }
-    poemGrid.appendChild(word);
-  }
-}
-
-function updateHUD() {
-  levelIndicator.textContent = `LEVEL ${currentLevel} / ${maxLevel}`;
-  scoreIndicator.textContent = `SCORE: ${score}`;
-  healthFill.style.width = Math.max(0, health) + "%";
-}
-
-function triggerGameOver() {
-  poemGrid.style.display = "none";
-  scoreboard.style.display = "none";
-  gameOver.style.display = "flex";
-  bgm.pause();
-}
-
-function restartLevel() {
-  health = 100;
-  score = 0;
-  gameOver.style.display = "none";
-  startGame();
-}
-
-function completeLevel() {
-  poemGrid.style.display = "none";
-  scoreboard.style.display = "none";
-  bgm.pause();
-  
-  if (currentLevel + 1 > unlockedLevels && currentLevel < maxLevel) {
-    unlockedLevels = currentLevel + 1;
-    localStorage.setItem("unlockedLevels", unlockedLevels);
-  }
-
-  if (currentLevel < maxLevel) {
-    levelComplete.style.display = "flex";
-    document.getElementById("levelCompleteTitle").textContent = `LEVEL ${currentLevel} COMPLETE!`;
-  } else {
-    gameComplete.style.display = "flex";
-  }
-}
-
-function nextLevel() {
-  levelComplete.style.display = "none";
-  currentLevel++;
-  score = 0;
-  health = Math.min(100, health + 25);
-  scoreboard.style.display = "flex";
-  bgm.play().catch(e => {});
-  loadLevel(currentLevel);
-  updateHUD();
-}
-
-function restartFullGame() {
-  currentLevel = 1;
-  score = 0;
-  health = 100;
-  gameComplete.style.display = "none";
-  scoreboard.style.display = "flex";
-  bgm.play().catch(e => {});
-  loadLevel(currentLevel);
-  updateHUD();
-}
-
-function returnToMenu() {
-  poemGrid.style.display = "none";
-  scoreboard.style.display = "none";
-  levelComplete.style.display = "none";
-  gameComplete.style.display = "none";
-  gameOver.style.display = "none";
-  levelSelect.style.display = "none";
-  creditsOverlay.style.display = "none";
-  settingsOverlay.style.display = "none";
-  
-  menuScreen.style.display = "flex";
-  bgm.pause();
-  bgm.currentTime = 0;
-}
-
-function spawnParticles(isBad) {
-  for (let i = 0; i < 12; i++) {
-    const p = document.createElement("div");
-    p.classList.add("particle");
-    if (isBad) p.style.background = "#f00";
-    const dx = (Math.random() * 300 - 150) + "px";
-    const dy = (Math.random() * 300 - 150) + "px";
-    p.style.setProperty("--dx", dx);
-    p.style.setProperty("--dy", dy);
-    p.style.left = (window.innerWidth / 2) + "px";
-    p.style.top = (window.innerHeight / 2) + "px";
-    document.body.appendChild(p);
-    setTimeout(() => p.remove(), 1200);
-  }
-}
-
-document.addEventListener("keydown", (e) => {
-  if (e.key === "Escape") {
-    if (settingsOverlay.style.display === "flex") {
-      closeSettings();
-    } else {
-      openSettings();
-    }
-  }
-});
-</script>
 </body>
 </html>
