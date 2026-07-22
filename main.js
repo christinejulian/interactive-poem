@@ -130,7 +130,7 @@ creditsMenuBtn.onclick = showMenu;
 settingsBackBtn.onclick = showMenu;
 
 // ============================================================
-// BUILD STAGE SELECT GRID
+// BUILD STAGE SELECT GRID (TRUE LEVEL PROGRESSION)
 // ============================================================
 function buildStageButtons() {
     levelGrid.innerHTML = "";
@@ -139,9 +139,18 @@ function buildStageButtons() {
         const b = document.createElement("button");
         b.textContent = "STAGE " + i;
 
-        if (i <= highestUnlocked) {
+        // Stage 1 always unlocked
+        if (i === 1) {
             b.onclick = () => startStage(i);
-        } else {
+        }
+
+        // Unlock only after previous stage is cleared
+        else if (i <= highestUnlocked) {
+            b.onclick = () => startStage(i);
+        }
+
+        // Locked stages
+        else {
             b.disabled = true;
             b.textContent = "LOCKED";
         }
@@ -225,13 +234,14 @@ function checkStage() {
 
     if (score >= SCORE_GOAL) {
 
+        // Unlock next stage
         if (currentStage > highestUnlocked) {
             highestUnlocked = currentStage;
             localStorage.setItem("highestUnlocked", highestUnlocked);
         }
 
+        // Final stage → show poem
         if (currentStage === MAX_STAGES) {
-            // Show final poem overlay
             creditsOverlay.style.display = "flex";
 
             setTimeout(() => {
