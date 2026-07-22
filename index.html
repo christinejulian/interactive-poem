@@ -4,65 +4,20 @@
 <meta charset="UTF-8">
 <title>Arcade Poem Dungeon</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
 <link rel="stylesheet" href="styles.css">
-
 </head>
 <body>
 
-<!-- ========================================================= -->
-<!-- FULLSCREEN ARCADE CABINET WRAPPER                          -->
-<!-- ========================================================= -->
 <div id="gameContainer">
-
-    <!-- ========================================================= -->
-    <!-- CRT ARCADE CABINET FRAME                                  -->
-    <!-- ========================================================= -->
     <div class="crtFrame">
 
-        <!-- Decorative bezel text -->
-        <div class="cabinet-top-label">NEON PIXEL SYSTEM // MODEL 86‑A</div>
-        <div class="cabinet-bottom-label">PROPERTY OF ARCADE POEM DUNGEON</div>
-
-        <!-- Fake ventilation grills -->
-        <div class="cabinet-vent-left"></div>
-        <div class="cabinet-vent-right"></div>
-
-        <!-- Fake speaker grills -->
-        <div class="cabinet-speaker-left"></div>
-        <div class="cabinet-speaker-right"></div>
-
-        <!-- Fake coin slot -->
-        <div class="coin-slot">
-            <div class="coin-slot-inner"></div>
-            <div class="coin-slot-light"></div>
-            <div class="coin-slot-label">INSERT COIN</div>
-        </div>
-
-        <!-- Neon Dungeon Background Grid -->
         <div class="dungeon-bg"></div>
-        <div class="dungeon-bg-layer2"></div>
-        <div class="dungeon-bg-layer3"></div>
 
-        <!-- Ambient glow overlay -->
-        <div class="ambient-glow"></div>
-
-        <!-- ========================================================= -->
-        <!-- ATTRACT MODE (Arcade Intro Screen)                        -->
-        <!-- ========================================================= -->
+        <!-- ATTRACT MODE -->
         <div id="attractScreen" class="screen active">
-
             <div class="attract-title">ARCADE<br>POEM<br>DUNGEON</div>
-
             <div class="attract-subtitle">A Neon‑Lit Word Quest</div>
-
-            <div class="attract-flash">
-                PRESS ANY KEY<br>
-                OR<br>
-                CLICK ANYWHERE<br>
-                TO START
-            </div>
-
+            <div class="attract-flash">PRESS ANY KEY OR CLICK TO START</div>
             <div class="attract-lore">
                 <p>Deep beneath the neon city,</p>
                 <p>a forgotten arcade cabinet hums softly.</p>
@@ -71,234 +26,93 @@
                 <p>Those who dare to play must master the poem</p>
                 <p>to escape the dungeon of words.</p>
             </div>
-
-            <div class="attract-warning">
-                <p>WARNING:</p>
-                <p>This cabinet contains unstable linguistic energy.</p>
-                <p>Incorrect word selections may result in health loss.</p>
-                <p>Proceed with caution.</p>
-            </div>
-
-            <div class="attract-bottom">
-                <p>© 1986 NEON PIXEL ARCADE SYSTEM</p>
-                <p>INSERT COIN — 1 CREDIT</p>
-                <p>SERIAL NO. NP‑DUNGEON‑042</p>
-            </div>
         </div>
 
-        <!-- ========================================================= -->
-        <!-- HUD (Hidden until gameplay)                               -->
-        <!-- ========================================================= -->
+        <!-- HUD -->
         <div id="scoreboard">
             <div id="levelIndicator">LEVEL 1 / 15</div>
             <div id="scoreIndicator">SCORE: 0</div>
             <div id="healthIndicator">HEALTH: 100</div>
         </div>
 
-        <!-- ========================================================= -->
-        <!-- MAIN MENU SCREEN                                           -->
-        <!-- ========================================================= -->
+        <!-- MENU -->
         <div id="menuScreen" class="screen">
-
             <h1 class="menu-title">ARCADE POEM DUNGEON</h1>
-
             <div class="menu-buttons">
                 <button id="startGameBtn">▶ START GAME</button>
                 <button id="howToPlayBtn">❖ HOW TO PLAY</button>
                 <button id="settingsBtn">⚙ SETTINGS</button>
                 <button id="creditsBtn">★ CREDITS</button>
             </div>
-
-            <div class="menu-lore">
-                <p>The neon dungeon awaits.</p>
-                <p>Every word is a weapon.</p>
-                <p>Every mistake drains your life.</p>
-                <p>Only the bravest players reach the final poem.</p>
-                <p>Will you?</p>
-            </div>
-
-            <div class="menu-footer">
-                <p>NEON PIXEL SYSTEM // READY</p>
-                <p>PRESS START TO CONTINUE</p>
-            </div>
         </div>
 
-        <!-- ========================================================= -->
-        <!-- LEVEL SELECT SCREEN                                        -->
-        <!-- ========================================================= -->
+        <!-- LEVEL SELECT -->
         <div id="levelSelect" class="screen">
-
             <h2 class="screen-title">SELECT LEVEL</h2>
-
-            <div class="level-lore">
-                <p>Each chamber contains fragments of the neon poem.</p>
-                <p>Clear all 15 to unlock the final verse.</p>
-            </div>
-
             <div id="levelGrid"></div>
-
             <button id="returnMenuBtn">🏠 MAIN MENU</button>
-
-            <div class="level-footer">
-                <p>NEON PIXEL SYSTEM // LEVEL DIRECTORY</p>
-            </div>
         </div>
 
-        <!-- ========================================================= -->
-        <!-- POEM GRID (Gameplay Area)                                  -->
-        <!-- ========================================================= -->
+        <!-- GAMEPLAY GRID -->
         <div id="poemGrid"></div>
 
-        <!-- ========================================================= -->
-        <!-- LEVEL COMPLETE SCREEN                                      -->
-        <!-- ========================================================= -->
+        <!-- LEVEL COMPLETE -->
         <div id="levelComplete" class="screen">
-
             <h1 id="levelCompleteTitle">LEVEL COMPLETE</h1>
-
-            <div class="level-complete-text">
-                <p>You cleared the neon chamber.</p>
-                <p>The next verse awaits.</p>
-            </div>
-
             <button id="nextLevelBtn">▶ NEXT LEVEL</button>
             <button id="mainMenuBtn1">🏠 MAIN MENU</button>
-
-            <div class="level-complete-footer">
-                <p>NEON PIXEL SYSTEM // CHAMBER CLEARED</p>
-            </div>
         </div>
 
-        <!-- ========================================================= -->
-        <!-- GAME OVER SCREEN                                           -->
-        <!-- ========================================================= -->
+        <!-- GAME OVER -->
         <div id="gameOver" class="screen">
-
             <h1 class="game-over-title">GAME OVER</h1>
-
-            <div class="game-over-text">
-                <p>Your neon heart has faded.</p>
-                <p>The dungeon claims another soul.</p>
-                <p>But the poem still calls to you…</p>
-            </div>
-
+            <p>You ran out of health.</p>
             <button id="retryLevelBtn">🔄 RETRY LEVEL</button>
             <button id="mainMenuBtn2">🏠 MAIN MENU</button>
-
-            <div class="game-over-footer">
-                <p>NEON PIXEL SYSTEM // PLAYER TERMINATED</p>
-            </div>
         </div>
 
-        <!-- ========================================================= -->
-        <!-- GAME COMPLETE SCREEN                                       -->
-        <!-- ========================================================= -->
+        <!-- GAME COMPLETE -->
         <div id="gameComplete" class="screen">
-
             <h1 class="game-complete-title">ALL LEVELS CLEARED</h1>
-
-            <div class="game-complete-text">
-                <p>You mastered the neon poem.</p>
-                <p>The dungeon bows to your words.</p>
-                <p>The cabinet hums softly, awaiting another challenger.</p>
-            </div>
-
             <button id="playAgainBtn">🔄 PLAY AGAIN</button>
             <button id="mainMenuBtn3">🏠 MAIN MENU</button>
-
-            <div class="game-complete-footer">
-                <p>NEON PIXEL SYSTEM // FINAL VERSE UNLOCKED</p>
-            </div>
         </div>
 
-        <!-- ========================================================= -->
-        <!-- SETTINGS SCREEN                                            -->
-        <!-- ========================================================= -->
+        <!-- SETTINGS -->
         <div id="settingsScreen" class="screen">
-
             <h2 class="screen-title">SETTINGS</h2>
-
-            <div class="settings-group">
-                <label class="settings-label">
-                    Volume:
-                    <input id="volumeSlider" type="range" min="0" max="1" step="0.01">
-                </label>
-            </div>
-
-            <div class="settings-lore">
-                <p>Adjust the neon resonance of the dungeon.</p>
-                <p>Higher volume increases immersion.</p>
-                <p>Lower volume reduces psychic interference.</p>
-            </div>
-
+            <label class="settings-label">
+                Volume:
+                <input id="volumeSlider" type="range" min="0" max="1" step="0.01">
+            </label>
             <button id="settingsBackBtn">🏠 BACK</button>
-
-            <div class="settings-footer">
-                <p>NEON PIXEL SYSTEM // AUDIO CONTROL</p>
-            </div>
         </div>
 
     </div>
 </div>
 
-<!-- ========================================================= -->
-<!-- CREDITS OVERLAY                                            -->
-<!-- ========================================================= -->
+<!-- CREDITS OVERLAY -->
 <div class="overlay" id="creditsOverlay">
     <div class="overlay-content">
-
         <h2>★ ARCADE POEM DUNGEON ★</h2>
-
         <p>You reached the final chamber.</p>
         <p>The neon lights dim softly.</p>
-
         <h3>FINAL POEM</h3>
-
         <p>I entered searching for another high score.</p>
         <p>Neon lights blinked, coins echoed, and every level asked me to continue.</p>
         <p>Every enemy was only another word.</p>
         <p>Every puzzle became another verse.</p>
-        <p>Victory is not measured by points alone, but by every story we choose to finish.</p>
-
-        <p>The arcade sleeps. The screen flickers. The controller rests.</p>
-        <p>Yet somewhere a single pixel still glows… waiting.</p>
-
-        <h3>THANK YOU FOR PLAYING</h3>
-        <p>Created by Christine Julian</p>
-
         <button id="creditsMenuBtn">🏠 MAIN MENU</button>
-
     </div>
 </div>
 
-<!-- ========================================================= -->
-<!-- BACKGROUND MUSIC (Music.mp3)                               -->
-<!-- ========================================================= -->
+<!-- MUSIC -->
 <audio id="bgMusic" autoplay loop>
     <source src="Music.mp3" type="audio/mpeg">
-    Your browser does not support the audio element.
 </audio>
 
-<script>
-// Background Music Logic
-const bgMusic = document.getElementById("bgMusic");
-bgMusic.volume = localStorage.getItem("volume") || 0.4;
-
-document.addEventListener("click", function startMusic() {
-    bgMusic.play().catch(() => {});
-    document.removeEventListener("click", startMusic);
-}, { once: true });
-
-document.addEventListener("visibilitychange", () => {
-    if (document.hidden) bgMusic.pause();
-    else bgMusic.play().catch(() => {});
-});
-</script>
-
-<!-- ========================================================= -->
-<!-- MAIN GAME LOGIC                                            -->
-<!-- ========================================================= -->
-<script src="main.js"></script>
+<!-- ⭐ THE FIX: load main.js LAST and DEFER it -->
+<script src="main.js" defer></script>
 
 </body>
 </html>
