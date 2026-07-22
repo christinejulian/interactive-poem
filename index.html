@@ -294,6 +294,7 @@ body::before {
   text-shadow: 0 0 12px #f00;  
   display: none;  
   z-index: 3;  
+  cursor: pointer;
 }  
   
 /* Settings overlay */  
@@ -346,8 +347,8 @@ body::before {
   to { transform: translate(var(--dx), var(--dy)); opacity: 0; }  
 }  
   
-/* Game over overlay with replay CTA */  
-.game-over {  
+/* Game over / Victory overlay with replay CTA */  
+.game-over, .victory-screen {  
   position: absolute;  
   inset: 0;  
   display: none;  
@@ -356,10 +357,17 @@ body::before {
   justify-content: center;  
   gap: 2rem;  
   background: rgba(0,0,0,0.85);  
+  z-index: 5;  
+}  
+.game-over {  
   color: #f00;  
   font-size: 2rem;  
   text-shadow: 0 0 12px #f00;  
-  z-index: 5;  
+}
+.victory-screen {  
+  color: #0f0;  
+  font-size: 2rem;  
+  text-shadow: 0 0 12px #0f0;  
 }  
   
 /* Scrolling retro credits */  
@@ -411,7 +419,7 @@ body::before {
   <div class="player" id="player"></div>    
 
   <!-- Boss -->    
-  <div class="boss" id="boss">👾 BOSS: GLITCHED VERSE</div>    
+  <div class="boss" id="boss" onclick="defeatBoss()">👾 BOSS: GLITCHED VERSE</div>    
 
   <!-- Menu -->    
   <div class="menu-screen" id="menuScreen">  
@@ -476,6 +484,12 @@ body::before {
     <div>GAME OVER</div>  
     <button class="ctrl-btn" style="font-size: 1rem; padding: 0.8rem 1.5rem;" onclick="replayGame()">🔄 TRY AGAIN</button>  
   </div>  
+
+  <!-- Victory Screen -->
+  <div class="victory-screen" id="victoryScreen">  
+    <div>LEVEL COMPLETED!</div>  
+    <button class="ctrl-btn" style="font-size: 1rem; padding: 0.8rem 1.5rem;" onclick="replayGame()">🔄 PLAY AGAIN</button>  
+  </div>
 </div>  
 
 <!-- Settings overlay -->  
@@ -492,7 +506,7 @@ body::before {
     </div>  
     <div class="settings-row">  
       <label for="volumeRange">Soundtrack Volume</label>  
-      <input type="range" id="volumeRange" min="0" max="1" step="0.1" value="0.6">  
+      <input type="range" id="volumeRange" num="0" max="1" step="0.1" value="0.6">  
     </div>  
     <button class="ctrl-btn" onclick="closeSettings()">Close</button>  
   </div>  
@@ -535,6 +549,7 @@ const bgm = document.getElementById("bgm");
 const voice = document.getElementById("voice");  
 const hitSfx = document.getElementById("hitSfx");  
 const gameOver = document.getElementById("gameOver");  
+const victoryScreen = document.getElementById("victoryScreen");
   
 /* Menu navigation */  
 function openCharacterSelect() {  
@@ -566,7 +581,7 @@ function showCredits() {
   
 /* Instructions */  
 function showInstructions() {  
-  alert("Poem words are enemies.\nClick them to defeat.\nBoss appears after all words fall.\nHealth drops when boss attacks.\nPress ESC for settings.");  
+  alert("Poem words are enemies.\nClick them to defeat.\nBoss appears after all words fall.\nClick the boss to defeat it!\nHealth drops when boss attacks.\nPress ESC for settings.");  
 }  
   
 /* Settings */  
@@ -599,23 +614,25 @@ function resetEnemies() {
 }
 
 /* Replay Game */
-function replayGame() {
-  resetEnemies();
-  gameOver.style.display = "none";
-  startGame();
+function replayGame() {  
+  resetEnemies();  
+  gameOver.style.display = "none";  
+  victoryScreen.style.display = "none";  
+  startGame();  
 }
 
 /* Return to Main Menu */
-function returnToMenu() {
-  resetEnemies();
-  boss.style.display = "none";
-  poemGrid.style.display = "none";
-  gameOver.style.display = "none";
-  document.getElementById("characterSelect").style.display = "none";
-  document.getElementById("saveScreen").style.display = "none";
-  document.getElementById("menuScreen").style.display = "flex";
-  bgm.pause();
-  bgm.currentTime = 0;
+function returnToMenu() {  
+  resetEnemies();  
+  boss.style.display = "none";  
+  poemGrid.style.display = "none";  
+  gameOver.style.display = "none";  
+  victoryScreen.style.display = "none";  
+  document.getElementById("characterSelect").style.display = "none";  
+  document.getElementById("saveScreen").style.display = "none";  
+  document.getElementById("menuScreen").style.display = "flex";  
+  bgm.pause();  
+  bgm.currentTime = 0;  
 }
   
 /* Start game */  
@@ -643,6 +660,15 @@ function triggerGameOver() {
   gameOver.style.display = "flex";  
   bgm.pause();  
 }  
+
+/* Defeat Boss to finish level */
+function defeatBoss() {
+  boss.style.display = "none";
+  victoryScreen.style.display = "flex";
+  bgm.pause();
+  spawnParticles();
+  hitSfx.play();
+}
   
 /* Enemy behavior: poem combat mode */  
 enemies.forEach((enemy) => {  
@@ -660,6 +686,7 @@ enemies.forEach((enemy) => {
 function checkAllEnemiesDefeated() {  
   const remaining = Array.from(enemies).filter(e => e.style.pointerEvents !== "none");  
   if (remaining.length === 0) {  
+    poemGrid.style.display = "none";
     boss.style.display = "block";  
     voice.play();  
   }  
