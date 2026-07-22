@@ -1,3 +1,4 @@
+
 /* styles.css */
 
 /* ==========================================================================
@@ -130,6 +131,7 @@ body::after {
   justify-content: flex-start;
   padding-top: 3rem;
   text-align: center;
+  height: 100%;
 }
 
 .level-select-title {
@@ -190,6 +192,7 @@ body::after {
   color: #0f0;
   font-size: 0.9rem;
   text-shadow: 0 0 8px #0f0;
+  z-index: 10;
 }
 
 #scoreboard div {
@@ -330,6 +333,11 @@ body::after {
 /* ==========================================================================
    10. CREDITS (SCROLLING TERMINAL)
    ========================================================================== */
+@keyframes scrollCredits {
+  from { bottom: -100%; }
+  to { bottom: 110%; }
+}
+
 #creditsOverlay {
   background: #000;
   overflow: hidden;
@@ -339,13 +347,11 @@ body::after {
   position: absolute;
   bottom: -100%;
   width: 100%;
-  animation: scrollCredits 18s linear forwards;
+  animation: scrollCredits 35s linear forwards; /* Updated to 35 seconds */
   text-shadow: 0 0 10px #0f0;
   text-align: center;
   font-size: 0.9rem;
-}
-
-@keyframes scrollCredits {
-  from { bottom: -100%; }
-  to { bottom: 110%; }
+  border: none;
+  background: transparent;
+  box-shadow: none;
 }
