@@ -65,13 +65,20 @@ body::after {
   z-index: 950;
 }
 
-#menuScreen {
-  display: flex;
+.screen {
+  width: 100%;
+  height: 100%;
+  display: none;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  height: 100%;
   text-align: center;
+  position: absolute;
+  inset: 0;
+}
+
+#menuScreen {
+  display: flex;
 }
 
 .menu-title {
@@ -115,13 +122,10 @@ body::after {
 }
 
 #levelSelect {
-  display: none;
   flex-direction: column;
   align-items: center;
   justify-content: flex-start;
   padding-top: 3rem;
-  text-align: center;
-  height: 100%;
 }
 
 .level-select-title {
@@ -173,9 +177,7 @@ body::after {
   transform: none;
 }
 
-/* HUD & Health Bar */
 #scoreboard {
-  display: none;
   position: absolute;
   top: 1.5rem;
   left: 1.5rem;
@@ -214,6 +216,7 @@ body::after {
   font-size: 0.8rem;
   color: #0f0;
   text-align: center;
+  z-index: 5;
 }
 
 .poemWord {
@@ -239,14 +242,8 @@ body::after {
 }
 
 #levelComplete, #gameComplete, #gameOver {
-  display: none;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  height: 100%;
-  background: radial-gradient(circle at center, rgba(0,0,0,0.9), #000);
-  color: #0f0;
-  text-shadow: 0 0 10px #0f0;
+  background: radial-gradient(circle at center, rgba(0,0,0,0.95), #000);
+  z-index: 100;
 }
 
 #gameOver h1 {
@@ -351,7 +348,7 @@ body::after {
     <div class="level-select-title">SELECT LEVEL</div>
     <div class="level-grid" id="levelGrid"></div>
     <div class="menu-buttons" style="margin-top: 1.5rem;">
-      <button onclick="returnToMenu()">🏠 BACK</button>
+      <button onclick="returnToMenu()">🏠 MAIN MENU</button>
     </div>
   </div>
 
@@ -414,7 +411,6 @@ body::after {
     <div class="credit-line">CREATED BY</div>
     <div class="credit-line">Christine Julian</div>
     <div class="credit-line">PIXEL DUNGEON BACKGROUND</div>
-    <div class="credit-line">SYNTH NARRATOR VOICE</div>
     <div class="credit-line">8-BIT SOUNDTRACK</div>
     <div class="credit-line">THANK YOU FOR PLAYING</div>
   </div>
