@@ -430,17 +430,16 @@ body::after {
 
 <script>
 let currentLevel = 1;
-let highestUnlockedLevel = parseInt(localStorage.getItem("highestUnlockedLevel")) || 1;
-const maxLevels = 15;
+let unlockedLevels = parseInt(localStorage.getItem("unlockedLevels")) || 1;
+const maxLevel = 15;
 let score = 0;
 let health = 100;
 
 const levelTargets = {};
-for (let i = 1; i <= maxLevels; i++) {
+for (let i = 1; i <= maxLevel; i++) {
   levelTargets[i] = i * 10; 
 }
 
-/* Word Pools */
 const gamingWords = [
   "controller", "pixel", "quest", "level-up", "respawn", "boss-fight", 
   "co-op", "loot", "arcade", "save-point", "combo", "high-score", 
@@ -485,11 +484,11 @@ function openLevelSelect() {
 
 function buildLevelSelectButtons() {
   levelGrid.innerHTML = "";
-  for (let i = 1; i <= maxLevels; i++) {
+  for (let i = 1; i <= maxLevel; i++) {
     const btn = document.createElement("button");
     btn.classList.add("level-btn");
     
-    if (i <= highestUnlockedLevel) {
+    if (i <= unlockedLevels) {
       btn.textContent = `LEVEL ${i}`;
       btn.onclick = () => {
         currentLevel = i;
@@ -514,7 +513,7 @@ function showCredits() {
 }
 
 function showInstructions() {
-  alert("Gaming Love Poem Dungeon:\n- Click green gaming words to build your score.\n- Avoid red unrelated words (chores, lag) which drain your health (-25 HP)!\n- Reach target score to clear each level.\n- If health hits 0, it's Game Over!\n- Press ESC anytime for settings.");
+  alert("Gaming Love Poem Dungeon:\n- Click green gaming words to build your score.\n- Avoid red unrelated words (chores, lag) which drain your health (-25 HP)!\n- Reach target score to clear each level and advance.\n- If health hits 0, it's Game Over!\n- Press ESC anytime for settings.");
 }
 
 function openSettings() {
@@ -564,7 +563,7 @@ function loadLevel(level) {
     word.classList.add("poemWord");
     
     let isUnrelated = Math.random() < 0.3;
-    if (i === 0) isUnrelated = false; // guarantee at least one scoring word
+    if (i === 0) isUnrelated = false;
     
     if (isUnrelated) {
       const badWord = unrelatedWords[Math.floor(Math.random() * unrelatedWords.length)];
@@ -609,7 +608,7 @@ function loadLevel(level) {
 }
 
 function updateHUD() {
-  levelIndicator.textContent = `LEVEL ${currentLevel} / ${maxLevels}`;
+  levelIndicator.textContent = `LEVEL ${currentLevel} / ${maxLevel}`;
   scoreIndicator.textContent = `SCORE: ${score}`;
   healthFill.style.width = Math.max(0, health) + "%";
 }
@@ -633,12 +632,12 @@ function completeLevel() {
   scoreboard.style.display = "none";
   bgm.pause();
   
-  if (currentLevel > highestUnlockedLevel) {
-    highestUnlockedLevel = currentLevel;
-    localStorage.setItem("highestUnlockedLevel", highestUnlockedLevel);
+  if (currentLevel + 1 > unlockedLevels && currentLevel < maxLevel) {
+    unlockedLevels = currentLevel + 1;
+    localStorage.setItem("unlockedLevels", unlockedLevels);
   }
 
-  if (currentLevel < maxLevels) {
+  if (currentLevel < maxLevel) {
     levelComplete.style.display = "flex";
     document.getElementById("levelCompleteTitle").textContent = `LEVEL ${currentLevel} COMPLETE!`;
   } else {
