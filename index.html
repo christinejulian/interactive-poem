@@ -21,13 +21,12 @@ body::before {
   content: "";
   position: fixed;
   inset: 0;
-  background:
-    repeating-linear-gradient(
-      to bottom,
-      rgba(0,255,0,0.04) 0px,
-      rgba(0,255,0,0.04) 2px,
-      rgba(0,0,0,0.08) 3px
-    );
+  background: repeating-linear-gradient(
+    to bottom,
+    rgba(0,255,0,0.04) 0px,
+    rgba(0,255,0,0.04) 2px,
+    rgba(0,0,0,0.08) 3px
+  );
   mix-blend-mode: screen;
   pointer-events: none;
   z-index: 1000;
@@ -37,8 +36,7 @@ body::after {
   content: "";
   position: fixed;
   inset: 0;
-  background:
-    radial-gradient(circle at center, transparent 40%, rgba(0,0,0,0.8) 100%);
+  background: radial-gradient(circle at center, transparent 40%, rgba(0,0,0,0.8) 100%);
   pointer-events: none;
   z-index: 999;
 }
@@ -137,6 +135,8 @@ body::after {
   gap: 1rem;
   width: 80%;
   margin-top: 2rem;
+  max-height: 60vh;
+  overflow-y: auto;
 }
 
 .level-btn {
@@ -173,27 +173,45 @@ body::after {
   transform: none;
 }
 
+/* HUD & Health Bar */
 #scoreboard {
   display: none;
   position: absolute;
   top: 1.5rem;
   left: 1.5rem;
+  right: 1.5rem;
+  display: none;
+  justify-content: space-between;
+  align-items: center;
   color: #0f0;
-  font-size: 0.9rem;
+  font-size: 0.8rem;
   text-shadow: 0 0 8px #0f0;
   z-index: 10;
 }
 
-#scoreboard div {
-  margin-bottom: 0.4rem;
+.health-bar {
+  width: 150px;
+  height: 16px;
+  border: 2px solid #f00;
+  background: #300;
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.health-fill {
+  height: 100%;
+  width: 100%;
+  background: #f00;
+  box-shadow: 0 0 8px #f00;
+  transition: width 0.2s ease;
 }
 
 #poemGrid {
   display: none;
   grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
   gap: 1.5rem;
-  padding: 4rem 3rem;
-  font-size: 0.9rem;
+  padding: 5rem 3rem 3rem 3rem;
+  font-size: 0.8rem;
   color: #0f0;
   text-align: center;
 }
@@ -206,7 +224,7 @@ body::after {
   box-shadow: 0 0 10px rgba(0,255,0,0.4);
   cursor: pointer;
   text-shadow: 0 0 6px #0f0;
-  transition: transform 0.2s, opacity 0.2s, box-shadow 0.2s;
+  transition: transform 0.2s, opacity 0.2s, box-shadow 0.2s, border-color 0.2s, color 0.2s;
 }
 
 .poemWord:hover {
@@ -214,7 +232,13 @@ body::after {
   box-shadow: 0 0 16px #0f0;
 }
 
-#levelComplete {
+.poemWord.bad-word {
+  border-color: #f00;
+  color: #f00;
+  box-shadow: 0 0 10px rgba(255,0,0,0.4);
+}
+
+#levelComplete, #gameComplete, #gameOver {
   display: none;
   flex-direction: column;
   align-items: center;
@@ -225,31 +249,9 @@ body::after {
   text-shadow: 0 0 10px #0f0;
 }
 
-#levelComplete h1 {
-  font-size: 1.4rem;
-  margin-bottom: 1rem;
-}
-
-#levelComplete button {
-  padding: 0.8rem;
-  margin: 0.6rem;
-  width: 220px;
-  border: 2px solid #0f0;
-  border-radius: 4px;
-  background: rgba(0,0,0,0.85);
-  color: #0f0;
-  cursor: pointer;
-  font-size: 0.8rem;
-  text-shadow: 0 0 6px #0f0;
-  box-shadow: 0 0 10px rgba(0,255,0,0.3);
-  transition: background 0.2s, color 0.2s, box-shadow 0.2s, transform 0.1s;
-}
-
-#levelComplete button:hover {
-  background: #0f0;
-  color: #000;
-  box-shadow: 0 0 16px #0f0;
-  transform: translateY(-1px);
+#gameOver h1 {
+  color: #f00;
+  text-shadow: 0 0 14px #f00;
 }
 
 .overlay {
@@ -261,29 +263,20 @@ body::after {
   align-items: center;
   justify-content: center;
   z-index: 2000;
-  overflow-y: auto;
 }
 
 .overlay-content {
   text-align: center;
-  padding: 3rem 2rem;
+  padding: 2rem;
   border: 2px solid #0f0;
   border-radius: 4px;
   background: rgba(0,0,0,0.95);
   box-shadow: 0 0 16px rgba(0,255,0,0.4);
-  max-width: 600px;
-  margin: auto;
 }
 
-.overlay-content h2, .overlay-content h3 {
+.overlay-content h2 {
   margin-bottom: 1rem;
   text-shadow: 0 0 10px #0f0;
-}
-
-.overlay-content p {
-  font-size: 0.8rem;
-  margin: 0.3rem 0;
-  color: #0a0;
 }
 
 .overlay-content input[type="range"] {
@@ -308,19 +301,23 @@ body::after {
 }
 
 @keyframes scrollCredits {
-  from { transform: translateY(100%); }
-  to { transform: translateY(-100%); }
+  from { bottom: -100%; }
+  to { bottom: 110%; }
 }
 
 #creditsOverlay {
   background: #000;
-  overflow-y: auto;
+  overflow: hidden;
 }
 
 #creditsOverlay .overlay-content {
-  border: none;
-  background: transparent;
-  box-shadow: none;
+  position: absolute;
+  bottom: -100%;
+  width: 100%;
+  animation: scrollCredits 18s linear forwards;
+  text-shadow: 0 0 10px #0f0;
+  text-align: center;
+  font-size: 0.9rem;
 }
 </style>
 </head>
@@ -331,18 +328,19 @@ body::after {
 <div class="cabinet" style="position:absolute; top:50%; left:50%; width:88vw; height:88vh; transform:translate(-50%, -50%); background:#111; border:12px solid #0f0; border-radius:18px; box-shadow:0 0 40px #0f0, 0 0 80px #0f0 inset; overflow:hidden;">
   <div class="dungeon-bg" style="position:absolute; inset:0; background-image:linear-gradient(#020 1px, transparent 1px), linear-gradient(90deg, #020 1px, transparent 1px); background-size:32px 32px; opacity:0.4; pointer-events:none;"></div>
 
-  <!-- Scoreboard & Level HUD -->
+  <!-- Scoreboard, Health, & Level HUD -->
   <div id="scoreboard">
     <div id="levelIndicator">LEVEL 1 / 15</div>
+    <div class="health-bar"><div class="health-fill" id="healthFill"></div></div>
     <div id="scoreIndicator">SCORE: 0</div>
   </div>
 
-  <!-- Main Menu Screen -->
+  <!-- Main Menu Screen with Play Button -->
   <div id="menuScreen" class="screen">
     <div class="menu-title vhs">ARCADE POEM DUNGEON</div>
     <div class="menu-subtitle">OFF THE GRID</div>
     <div class="menu-buttons">
-      <button onclick="openLevelSelect()">🗺️ LEVEL SELECT</button>
+      <button onclick="playAudioAndOpenLevels()">▶ PLAY / START</button>
       <button onclick="showInstructions()">❖ HOW TO PLAY</button>
       <button onclick="showCredits()">★ CREDITS</button>
     </div>
@@ -368,6 +366,25 @@ body::after {
       <button onclick="returnToMenu()">🏠 MAIN MENU</button>
     </div>
   </div>
+
+  <!-- Game Over Screen -->
+  <div id="gameOver" class="screen">
+    <h1>GAME OVER</h1>
+    <p style="font-size: 0.7rem; color: #f00; margin: 1rem 0;">Too many unrelated words drained your health!</p>
+    <div class="menu-buttons">
+      <button onclick="restartLevel()">🔄 RETRY LEVEL</button>
+      <button onclick="returnToMenu()">🏠 MAIN MENU</button>
+    </div>
+  </div>
+
+  <!-- Grand Victory Screen -->
+  <div id="gameComplete" class="screen">
+    <h1>CONGRATULATIONS!<br>YOU BEAT ALL 15 LEVELS!</h1>
+    <div class="menu-buttons">
+      <button onclick="restartFullGame()">🔄 PLAY AGAIN</button>
+      <button onclick="returnToMenu()">🏠 MAIN MENU</button>
+    </div>
+  </div>
 </div>
 
 <!-- Settings Overlay -->
@@ -390,108 +407,28 @@ body::after {
   </div>
 </div>
 
-<!-- Final Level Epic Credits & Poem Overlay -->
+<!-- Retro Scrolling Credits -->
 <div class="overlay" id="creditsOverlay">
-    <div class="overlay-content">
-
-        <h2>★ ARCADE POEM DUNGEON ★</h2>
-
-        <p>Congratulations, Player.</p>
-
-        <br>
-
-        <p>You reached the final room.</p>
-        <p>The glowing pixels fade.</p>
-        <p>The dungeon grows quiet.</p>
-
-        <br>
-
-        <h3>FINAL POEM</h3>
-
-        <p>I entered searching</p>
-        <p>for another high score.</p>
-
-        <br>
-
-        <p>Neon lights blinked,</p>
-        <p>coins echoed,</p>
-        <p>and every level</p>
-        <p>asked me to continue.</p>
-
-        <br>
-
-        <p>Every enemy</p>
-        <p>was only another word.</p>
-
-        <p>Every puzzle</p>
-        <p>became another verse.</p>
-
-        <br>
-
-        <p>I learned</p>
-        <p>that victory</p>
-        <p>is not measured</p>
-        <p>by points alone,</p>
-
-        <p>but by every story</p>
-        <p>we choose to finish.</p>
-
-        <br>
-
-        <p>The arcade sleeps.</p>
-
-        <p>The screen flickers.</p>
-
-        <p>The controller rests.</p>
-
-        <br>
-
-        <p>Yet somewhere</p>
-
-        <p>a single pixel</p>
-
-        <p>still glows.</p>
-
-        <br>
-
-        <p>Waiting…</p>
-
-        <p>for another player.</p>
-
-        <br><br>
-
-        <h3>THANK YOU FOR PLAYING</h3>
-
-        <p>Created by</p>
-        <p>Christine Julian</p>
-
-        <br>
-
-        <p>Interactive Poem</p>
-        <p>Arcade Poem Dungeon</p>
-
-        <br>
-
-        <p>GAME COMPLETE</p>
-
-        <p>★★★★★</p>
-
-        <br><br><br>
-
-        <h2>THE END</h2>
-
-        <div style="margin-top: 2rem;">
-          <button class="level-btn" onclick="returnToMenuFromCredits()">🏠 MAIN MENU</button>
-        </div>
-
-    </div>
+  <div class="overlay-content">
+    <div class="credit-line">ARCADE POEM DUNGEON</div>
+    <div class="credit-line">CREATED BY</div>
+    <div class="credit-line">Christine Julian</div>
+    <div class="credit-line">PIXEL DUNGEON BACKGROUND</div>
+    <div class="credit-line">SYNTH NARRATOR VOICE</div>
+    <div class="credit-line">8-BIT SOUNDTRACK</div>
+    <div class="credit-line">THANK YOU FOR PLAYING</div>
+  </div>
 </div>
 
 <!-- Audio Elements -->
 <audio id="bgm" loop>
+  <source src="https://open.spotify.com/track/1p7sFVhNF4hGzB3m0oy3ax" type="audio/mpeg">
   <source src="https://files.catbox.moe/8bitloop.mp3" type="audio/mpeg">
 </audio>
 <audio id="hitSfx">
+  <source src="https://files.catbox.moe/hitbeep.mp3" type="audio/mpeg">
+</audio>
+<audio id="damageSfx">
   <source src="https://files.catbox.moe/hitbeep.mp3" type="audio/mpeg">
 </audio>
 
@@ -500,11 +437,24 @@ let currentLevel = 1;
 let highestUnlockedLevel = parseInt(localStorage.getItem("highestUnlockedLevel")) || 1;
 const maxLevels = 15;
 let score = 0;
+let health = 100;
 
 const levelTargets = {};
 for (let i = 1; i <= maxLevels; i++) {
   levelTargets[i] = i * 10; 
 }
+
+/* Word Pools */
+const gamingWords = [
+  "controller", "pixel", "quest", "level-up", "respawn", "boss-fight", 
+  "co-op", "loot", "arcade", "save-point", "combo", "high-score", 
+  "speedrun", "cyber", "glitch", "dungeon", "rpg", "console", "virtual"
+];
+
+const unrelatedWords = [
+  "boredom", "lag", "work", "chores", "offline", "disconnect", 
+  "taxes", "error-404", "sleep", "walk-outside", "spreadsheet"
+];
 
 const menuScreen = document.getElementById("menuScreen");
 const levelSelect = document.getElementById("levelSelect");
@@ -513,15 +463,26 @@ const poemGrid = document.getElementById("poemGrid");
 const scoreboard = document.getElementById("scoreboard");
 const levelIndicator = document.getElementById("levelIndicator");
 const scoreIndicator = document.getElementById("scoreIndicator");
+const healthFill = document.getElementById("healthFill");
 const levelComplete = document.getElementById("levelComplete");
+const gameOver = document.getElementById("gameOver");
+const gameComplete = document.getElementById("gameComplete");
 const settingsOverlay = document.getElementById("settingsOverlay");
 const creditsOverlay = document.getElementById("creditsOverlay");
 
 const bgm = document.getElementById("bgm");
 const hitSfx = document.getElementById("hitSfx");
+const damageSfx = document.getElementById("damageSfx");
+
+function playAudioAndOpenLevels() {
+  bgm.volume = 0.6;
+  bgm.play().catch(e => console.log("Audio play needs user interaction"));
+  openLevelSelect();
+}
 
 function openLevelSelect() {
   menuScreen.style.display = "none";
+  gameOver.style.display = "none";
   buildLevelSelectButtons();
   levelSelect.style.display = "flex";
 }
@@ -537,6 +498,7 @@ function buildLevelSelectButtons() {
       btn.onclick = () => {
         currentLevel = i;
         score = 0;
+        health = 100;
         levelSelect.style.display = "none";
         startGame();
       };
@@ -550,15 +512,13 @@ function buildLevelSelectButtons() {
 
 function showCredits() {
   creditsOverlay.style.display = "flex";
-}
-
-function returnToMenuFromCredits() {
-  creditsOverlay.style.display = "none";
-  returnToMenu();
+  setTimeout(() => {
+    creditsOverlay.style.display = "none";
+  }, 18000);
 }
 
 function showInstructions() {
-  alert("Click poem words to gain score.\nReach the target score to complete each level.\nLevels 2 through 15 unlock progressively.\nPress ESC anytime to open settings or return to menu.");
+  alert("Gaming Love Poem Dungeon:\n- Click green gaming words to build your score.\n- Avoid red unrelated words (chores, lag) which drain your health (-25 HP)!\n- Reach target score to clear each level.\n- If health hits 0, it's Game Over!\n- Press ESC anytime for settings.");
 }
 
 function openSettings() {
@@ -590,11 +550,11 @@ function startGame() {
   menuScreen.style.display = "none";
   levelSelect.style.display = "none";
   levelComplete.style.display = "none";
-  creditsOverlay.style.display = "none";
+  gameComplete.style.display = "none";
+  gameOver.style.display = "none";
   
   scoreboard.style.display = "flex";
-  bgm.volume = 0.6;
-  bgm.play();
+  bgm.play().catch(e => {});
   loadLevel(currentLevel);
   updateHUD();
 }
@@ -606,20 +566,48 @@ function loadLevel(level) {
   for (let i = 0; i < 10; i++) {
     const word = document.createElement("div");
     word.classList.add("poemWord");
-    word.textContent = `word ${i + 1}`;
-    word.addEventListener("click", () => {
-      score++;
-      updateHUD();
-      hitSfx.play();
-      spawnParticles();
-      word.style.opacity = "0";
-      word.style.transform = "scale(0.5)";
-      word.style.pointerEvents = "none";
+    
+    let isUnrelated = Math.random() < 0.3;
+    if (i === 0) isUnrelated = false; // guarantee at least one scoring word
+    
+    if (isUnrelated) {
+      const badWord = unrelatedWords[Math.floor(Math.random() * unrelatedWords.length)];
+      word.textContent = badWord;
+      word.classList.add("bad-word");
       
-      if (score >= levelTargets[currentLevel]) {
-        completeLevel();
-      }
-    });
+      word.addEventListener("click", () => {
+        health -= 25;
+        updateHUD();
+        damageSfx.currentTime = 0;
+        damageSfx.play().catch(e => {});
+        spawnParticles(true);
+        word.style.opacity = "0";
+        word.style.transform = "scale(0.5)";
+        word.style.pointerEvents = "none";
+        
+        if (health <= 0) {
+          triggerGameOver();
+        }
+      });
+    } else {
+      const goodWord = gamingWords[Math.floor(Math.random() * gamingWords.length)];
+      word.textContent = goodWord;
+      
+      word.addEventListener("click", () => {
+        score++;
+        updateHUD();
+        hitSfx.currentTime = 0;
+        hitSfx.play().catch(e => {});
+        spawnParticles(false);
+        word.style.opacity = "0";
+        word.style.transform = "scale(0.5)";
+        word.style.pointerEvents = "none";
+        
+        if (score >= levelTargets[currentLevel]) {
+          completeLevel();
+        }
+      });
+    }
     poemGrid.appendChild(word);
   }
 }
@@ -627,6 +615,21 @@ function loadLevel(level) {
 function updateHUD() {
   levelIndicator.textContent = `LEVEL ${currentLevel} / ${maxLevels}`;
   scoreIndicator.textContent = `SCORE: ${score}`;
+  healthFill.style.width = Math.max(0, health) + "%";
+}
+
+function triggerGameOver() {
+  poemGrid.style.display = "none";
+  scoreboard.style.display = "none";
+  gameOver.style.display = "flex";
+  bgm.pause();
+}
+
+function restartLevel() {
+  health = 100;
+  score = 0;
+  gameOver.style.display = "none";
+  startGame();
 }
 
 function completeLevel() {
@@ -643,8 +646,7 @@ function completeLevel() {
     levelComplete.style.display = "flex";
     document.getElementById("levelCompleteTitle").textContent = `LEVEL ${currentLevel} COMPLETE!`;
   } else {
-    // Final level (15) complete -> trigger the epic poem overlay!
-    creditsOverlay.style.display = "flex";
+    gameComplete.style.display = "flex";
   }
 }
 
@@ -652,8 +654,20 @@ function nextLevel() {
   levelComplete.style.display = "none";
   currentLevel++;
   score = 0;
+  health = Math.min(100, health + 25);
   scoreboard.style.display = "flex";
-  bgm.play();
+  bgm.play().catch(e => {});
+  loadLevel(currentLevel);
+  updateHUD();
+}
+
+function restartFullGame() {
+  currentLevel = 1;
+  score = 0;
+  health = 100;
+  gameComplete.style.display = "none";
+  scoreboard.style.display = "flex";
+  bgm.play().catch(e => {});
   loadLevel(currentLevel);
   updateHUD();
 }
@@ -662,6 +676,8 @@ function returnToMenu() {
   poemGrid.style.display = "none";
   scoreboard.style.display = "none";
   levelComplete.style.display = "none";
+  gameComplete.style.display = "none";
+  gameOver.style.display = "none";
   levelSelect.style.display = "none";
   creditsOverlay.style.display = "none";
   settingsOverlay.style.display = "none";
@@ -671,10 +687,11 @@ function returnToMenu() {
   bgm.currentTime = 0;
 }
 
-function spawnParticles() {
-  for (let i = 0; i < 15; i++) {
+function spawnParticles(isBad) {
+  for (let i = 0; i < 12; i++) {
     const p = document.createElement("div");
     p.classList.add("particle");
+    if (isBad) p.style.background = "#f00";
     const dx = (Math.random() * 300 - 150) + "px";
     const dy = (Math.random() * 300 - 150) + "px";
     p.style.setProperty("--dx", dx);
