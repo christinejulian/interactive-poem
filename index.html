@@ -214,15 +214,18 @@ body::before {
   transform: scale(0.95);  
 }  
 
-/* Level Indicator HUD */  
-.level-indicator {  
+/* HUD (Level & Score) */  
+.hud-display {  
   position: absolute;  
   top: 1rem;  
   left: 1rem;  
   color: #0ff;  
-  font-size: 0.9rem;  
+  font-size: 0.8rem;  
   text-shadow: 0 0 8px #0ff;  
   z-index: 3;  
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
 }
   
 /* Player sprite */  
@@ -341,7 +344,7 @@ body::before {
   text-shadow: 0 0 12px #0f0;  
 }  
 
-/* Grand Victory Screen (After Level 5) */
+/* Grand Victory Screen (After Level 15) */
 .grand-victory-screen {  
   position: absolute;  
   inset: 0;  
@@ -376,7 +379,7 @@ body::before {
   color: #0ff;  
   font-size: 1.2rem;  
   text-shadow: 0 0 12px #0ff;  
-  animation: scrollCredits 18s linear forwards;  
+  animation: scrollCredits 20s linear forwards;  
 }  
 .credit-line {  
   margin: 1.2rem 0;  
@@ -398,8 +401,11 @@ body::before {
     <button class="ctrl-btn" onclick="returnToMenu()">🏠 MENU</button>  
   </div>  
 
-  <!-- Level Indicator -->    
-  <div class="level-indicator" id="levelIndicator">LEVEL 1 / 5</div>    
+  <!-- HUD: Level & Score -->    
+  <div class="hud-display" id="hudDisplay">  
+    <div id="levelIndicator">LEVEL 1 / 15</div>  
+    <div id="scoreIndicator">SCORE: 0</div>  
+  </div>    
 
   <!-- Player sprite -->    
   <div class="player" id="player"></div>    
@@ -450,9 +456,9 @@ body::before {
     <button class="ctrl-btn" style="font-size: 1rem; padding: 0.8rem 1.5rem;" onclick="nextLevel()">▶ NEXT LEVEL</button>  
   </div>  
 
-  <!-- Grand Victory Screen (After Level 5 Complete) -->
+  <!-- Grand Victory Screen (After Level 15) -->
   <div class="grand-victory-screen" id="grandVictoryScreen">  
-    <div>CONGRATULATIONS!<br>YOU BEAT ALL 5 LEVELS!</div>  
+    <div>CONGRATULATIONS!<br>YOU BEAT ALL 15 LEVELS!</div>  
     <button class="ctrl-btn" style="font-size: 1rem; padding: 0.8rem 1.5rem;" onclick="restartFullGame()">🔄 PLAY AGAIN FROM LEVEL 1</button>  
   </div>
 </div>  
@@ -482,7 +488,7 @@ body::before {
   <div class="credits-content">  
     <div class="credit-line">ARCADE POEM DUNGEON</div>  
     <div class="credit-line">CREATED BY</div>  
-    <div class="credit-line">CHRISTINE</div>  
+    <div class="credit-line">CHRISTINE & JULIAN</div>  
     <div class="credit-line">PIXEL DUNGEON BACKGROUND</div>  
     <div class="credit-line">SYNTH NARRATOR VOICE</div>  
     <div class="credit-line">8-BIT SOUNDTRACK</div>  
@@ -505,15 +511,26 @@ body::before {
 
 <script>  
 let currentLevel = 1;
-const maxLevels = 5;
+const maxLevels = 15;
+let score = 0;
 
-// Word pools for each of the 5 levels
+// Expanded Word pools across 15 levels
 const levelWordSets = {
-  1: ["arcade", "neon", "hum", "pixel", "dreams", "fights"],
-  2: ["pulse", "through", "midnight", "party", "queues", "hearts", "level"],
-  3: ["up", "in", "co-op", "syntax", "glitch", "dungeon", "cipher", "matrix"],
-  4: ["shadow", "echo", "terminal", "packet", "buffer", "overflow", "kernel", "daemon"],
-  5: ["quantum", "singularity", "mainframe", "nexus", "infinity", "core", "genesis", "zenith", "omega"]
+  1: ["arcade", "neon", "hum", "pixel", "dreams"],
+  2: ["pulse", "through", "midnight", "party", "queues", "hearts"],
+  3: ["level", "up", "in", "co-op", "syntax", "glitch"],
+  4: ["dungeon", "cipher", "matrix", "shadow", "echo", "terminal"],
+  5: ["packet", "buffer", "overflow", "kernel", "daemon", "quantum"],
+  6: ["singularity", "mainframe", "nexus", "infinity", "core", "genesis"],
+  7: ["zenith", "vortex", "plasma", "spectrum", "circuit", "binary"],
+  8: ["firewall", "encrypted", "protocol", "syntax", "runtime", "compile"],
+  9: ["vector", "matrix", "payload", "script", "node", "cluster"],
+  10: ["hyperlink", "domain", "packet", "gateway", "firewall", "router"],
+  11: ["photon", "neutron", "quark", "fusion", "galaxy", "nebula"],
+  12: ["stellar", "orbit", "eclipse", "comet", "gravity", "pulsar"],
+  13: ["chronos", "entropy", "horizon", "paradox", "infinity", "cosmos"],
+  14: ["zenith", "apex", "meridian", "solstice", "eclipse", "umbra"],
+  15: ["omega", "alpha", "genesis", "eternal", "nirvana", "absolute"]
 };
 
 const poemGrid = document.getElementById("poemGrid");  
@@ -523,6 +540,7 @@ const hitSfx = document.getElementById("hitSfx");
 const victoryScreen = document.getElementById("victoryScreen");
 const grandVictoryScreen = document.getElementById("grandVictoryScreen");
 const levelIndicator = document.getElementById("levelIndicator");
+const scoreIndicator = document.getElementById("scoreIndicator");
   
 /* Menu navigation */  
 function openCharacterSelect() {  
@@ -536,11 +554,13 @@ function openSaveSlots() {
 function chooseCharacter(name) {  
   localStorage.setItem("character", name);  
   currentLevel = 1;
+  score = 0;
   startGame();  
 }  
 function loadSlot(slot) {  
   alert("Loaded Slot " + slot);  
   currentLevel = 1;
+  score = 0;
   startGame();  
 }  
   
@@ -551,12 +571,12 @@ function showCredits() {
   voice.play();  
   setTimeout(() => {  
     overlay.style.display = "none";  
-  }, 18000);  
+  }, 20000);  
 }  
   
 /* Instructions */  
 function showInstructions() {  
-  alert("Poem words are enemies across 5 Levels.\nClick them all to clear each level.\nComplete Level 5 to win the entire game!\nPress ESC for settings.");  
+  alert("Poem words are enemies across 15 Levels.\nClick them to score points and defeat them.\nClear all words to advance.\nPress ESC anytime for settings or menu options.");  
 }  
   
 /* Settings */  
@@ -596,6 +616,8 @@ function buildLevelGrid(levelNum) {
       div.style.opacity = "0";  
       div.style.transform = "scale(0.5)";  
       div.style.pointerEvents = "none";  
+      score += 1;
+      updateHUD();
       spawnParticles();  
       hitSfx.play();  
       checkAllEnemiesDefeated();  
@@ -603,6 +625,11 @@ function buildLevelGrid(levelNum) {
 
     poemGrid.appendChild(div);
   });
+}
+
+function updateHUD() {
+  levelIndicator.textContent = `LEVEL ${currentLevel} / ${maxLevels}`;
+  scoreIndicator.textContent = `SCORE: ${score}`;
 }
 
 /* Start game */  
@@ -613,7 +640,7 @@ function startGame() {
   victoryScreen.style.display = "none";
   grandVictoryScreen.style.display = "none";
   
-  levelIndicator.textContent = `LEVEL ${currentLevel} / ${maxLevels}`;
+  updateHUD();
   buildLevelGrid(currentLevel);
   poemGrid.style.display = "grid";  
   
@@ -639,6 +666,7 @@ function nextLevel() {
 /* Restart Full Game from Level 1 */
 function restartFullGame() {
   currentLevel = 1;
+  score = 0;
   grandVictoryScreen.style.display = "none";
   startGame();
 }
@@ -652,6 +680,7 @@ function returnToMenu() {
   document.getElementById("saveScreen").style.display = "none";  
   document.getElementById("menuScreen").style.display = "flex";  
   levelIndicator.textContent = "";
+  scoreIndicator.textContent = "";
   bgm.pause();  
   bgm.currentTime = 0;  
 }
@@ -688,7 +717,7 @@ function spawnParticles() {
   }  
 }  
   
-/* ESC: close credits or open settings */  
+/* ESC: open settings or return to menu */  
 document.addEventListener("keydown", (e) => {  
   if (e.key === "Escape") {  
     const credits = document.getElementById("creditsOverlay");  
