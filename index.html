@@ -2,181 +2,470 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Arcade Poem Dungeon — Retro 80s Arcade</title>
+<title>Arcade Poem Dungeon — Neon CRT Edition</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-</head>
-<body style="margin:0; background:#000; color:#0f0; font-family: monospace;">
 
-<!-- Retro 80s Arcade Marquee -->
-<div style="text-align:center; padding:20px; border-bottom:2px solid #0f0; box-shadow:0 0 20px #0f0;">
-  <h1 style="margin:0; font-size:24px; text-shadow:0 0 10px #0f0;">
-    ARCADE POEM DUNGEON
-  </h1>
-  <p style="margin:5px 0; font-size:12px; color:#0a0;">
-    OFF THE GRID — RETRO 80s ARCADE EDITION
-  </p>
+<!-- ============================
+     EMBEDDED RETRO CRT CSS
+     ============================ -->
+<style>
+    body {
+        margin: 0;
+        background: #000;
+        font-family: "Press Start 2P", monospace;
+        color: #0f0;
+        overflow: hidden;
+    }
+
+    /* CRT Scanlines */
+    body::before {
+        content: "";
+        position: fixed;
+        inset: 0;
+        background: repeating-linear-gradient(
+            to bottom,
+            rgba(0,255,0,0.05) 0px,
+            rgba(0,255,0,0.05) 2px,
+            rgba(0,0,0,0.1) 3px
+        );
+        pointer-events: none;
+        z-index: 999;
+    }
+
+    /* Cabinet Frame */
+    .cabinet {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 88vw;
+        height: 88vh;
+        transform: translate(-50%, -50%);
+        background: #111;
+        border: 12px solid #0f0;
+        border-radius: 18px;
+        box-shadow: 0 0 40px #0f0, 0 0 80px #0f0 inset;
+        overflow: hidden;
+    }
+
+    /* Dungeon Grid */
+    .dungeon-bg {
+        position: absolute;
+        inset: 0;
+        background-image:
+            linear-gradient(#020 1px, transparent 1px),
+            linear-gradient(90deg, #020 1px, transparent 1px);
+        background-size: 32px 32px;
+        opacity: 0.4;
+        pointer-events: none;
+    }
+
+    /* Screens */
+    .screen {
+        display: none;
+        position: absolute;
+        inset: 0;
+        padding: 2rem;
+        text-align: center;
+    }
+
+    /* Menu */
+    .menu-title {
+        font-size: 1.8rem;
+        margin-top: 3rem;
+        text-shadow: 0 0 10px #0f0;
+    }
+
+    .menu-buttons button {
+        display: block;
+        margin: 1rem auto;
+        padding: 1rem;
+        width: 260px;
+        background: transparent;
+        border: 2px solid #0f0;
+        color: #0f0;
+        cursor: pointer;
+    }
+
+    /* HUD */
+    #scoreboard {
+        position: absolute;
+        top: 1rem;
+        left: 1rem;
+        font-size: 0.9rem;
+        display: none;
+    }
+
+    /* Poem Grid */
+    #poemGrid {
+        display: none;
+        position: absolute;
+        inset: 0;
+        padding: 4rem;
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+        gap: 1.5rem;
+        text-align: center;
+    }
+
+    .poemWord {
+        padding: 1rem;
+        border: 2px solid #0f0;
+        background: rgba(0,0,0,0.8);
+        cursor: pointer;
+        transition: 0.2s;
+    }
+
+    .poemWord:hover {
+        background: #0f0;
+        color: #000;
+    }
+
+    /* Overlay */
+    .overlay {
+        position: fixed;
+        inset: 0;
+        background: rgba(0,0,0,0.9);
+        color: #0f0;
+        display: none;
+        overflow-y: auto;
+        padding: 2rem;
+        text-align: center;
+    }
+
+    .overlay-content {
+        max-width: 600px;
+        margin: auto;
+        line-height: 1.8;
+    }
+
+    .overlay-content h2, .overlay-content h3 {
+        text-shadow: 0 0 10px #0f0;
+    }
+</style>
+</head>
+
+<body>
+
+<!-- ============================
+     CABINET
+     ============================ -->
+<div class="cabinet">
+
+    <div class="dungeon-bg"></div>
+
+    <!-- HUD -->
+    <div id="scoreboard">
+        <div id="levelIndicator">LEVEL 1 / 15</div>
+        <div id="scoreIndicator">SCORE: 0</div>
+        <div id="healthIndicator">HEALTH: 100</div>
+    </div>
+
+    <!-- MENU -->
+    <div id="menuScreen" class="screen" style="display:flex; flex-direction:column; align-items:center;">
+        <div class="menu-title">ARCADE POEM DUNGEON</div>
+        <div class="menu-buttons">
+            <button id="startGameBtn">▶ START GAME</button>
+            <button id="howToPlayBtn">❖ HOW TO PLAY</button>
+            <button id="creditsBtn">★ CREDITS</button>
+        </div>
+    </div>
+
+    <!-- LEVEL SELECT -->
+    <div id="levelSelect" class="screen">
+        <h2>SELECT LEVEL</h2>
+        <div id="levelGrid"></div>
+        <div class="menu-buttons">
+            <button id="returnMenuBtn">🏠 MAIN MENU</button>
+        </div>
+    </div>
+
+    <!-- POEM GRID -->
+    <div id="poemGrid"></div>
+
+    <!-- LEVEL COMPLETE -->
+    <div id="levelComplete" class="screen">
+        <h1 id="levelCompleteTitle">LEVEL COMPLETED!</h1>
+        <div class="menu-buttons">
+            <button id="nextLevelBtn">▶ NEXT LEVEL</button>
+            <button id="mainMenuBtn1">🏠 MAIN MENU</button>
+        </div>
+    </div>
+
+    <!-- GAME OVER -->
+    <div id="gameOver" class="screen">
+        <h1>GAME OVER</h1>
+        <p>You lost all your health.</p>
+        <div class="menu-buttons">
+            <button id="retryLevelBtn">🔄 RETRY LEVEL</button>
+            <button id="mainMenuBtn2">🏠 MAIN MENU</button>
+        </div>
+    </div>
+
+    <!-- GAME COMPLETE -->
+    <div id="gameComplete" class="screen">
+        <h1>ALL 15 LEVELS CLEARED</h1>
+        <div class="menu-buttons">
+            <button id="playAgainBtn">🔄 PLAY AGAIN</button>
+            <button id="mainMenuBtn3">🏠 MAIN MENU</button>
+        </div>
+    </div>
+
 </div>
 
-<!-- Main Cabinet Area -->
-<div style="margin:20px auto; max-width:800px; border:4px solid #0f0; border-radius:12px; padding:20px; box-shadow:0 0 30px #0f0;">
+<!-- ============================
+     FULL CREDITS OVERLAY
+     ============================ -->
+<div class="overlay" id="creditsOverlay">
+    <div class="overlay-content">
 
-  <!-- Screen Frame -->
-  <div style="border:2px solid #0f0; padding:16px; background:#020; box-shadow:inset 0 0 20px #000;">
-    
-    <!-- Fake CRT Scanlines -->
-    <div style="background-image:linear-gradient(rgba(0,255,0,0.08) 1px, transparent 1px); background-size:100% 3px; padding:16px;">
+        <h2>★ ARCADE POEM DUNGEON ★</h2>
 
-      <!-- Main Menu (Static) -->
-      <div style="text-align:center; margin-bottom:24px;">
-        <h2 style="margin:0 0 10px; font-size:18px; text-shadow:0 0 8px #0f0;">
-          INSERT COIN
-        </h2>
-        <p style="margin:4px 0; font-size:11px;">PRESS START TO BEGIN</p>
-        <p style="margin:4px 0; font-size:11px;">SELECT LEVEL • READ POEM • SURVIVE THE DUNGEON</p>
-      </div>
+        <p>Congratulations, Player.</p>
 
-      <!-- Static Level Select Mockup -->
-      <div style="margin:0 auto 24px; max-width:500px; text-align:center;">
-        <h3 style="margin:0 0 10px; font-size:14px;">LEVEL GRID (1–15)</h3>
-        <div style="display:inline-block; text-align:left; font-size:11px; line-height:1.6;">
-          <p>LEVEL 1 — UNLOCKED</p>
-          <p>LEVEL 2 — LOCKED</p>
-          <p>LEVEL 3 — LOCKED</p>
-          <p>LEVEL 4 — LOCKED</p>
-          <p>LEVEL 5 — LOCKED</p>
-          <p>LEVEL 6 — LOCKED</p>
-          <p>LEVEL 7 — LOCKED</p>
-          <p>LEVEL 8 — LOCKED</p>
-          <p>LEVEL 9 — LOCKED</p>
-          <p>LEVEL 10 — LOCKED</p>
-          <p>LEVEL 11 — LOCKED</p>
-          <p>LEVEL 12 — LOCKED</p>
-          <p>LEVEL 13 — LOCKED</p>
-          <p>LEVEL 14 — LOCKED</p>
-          <p>LEVEL 15 — LOCKED</p>
-        </div>
-      </div>
+        <br>
 
-      <!-- Static HUD Mockup -->
-      <div style="display:flex; justify-content:space-between; font-size:11px; margin-bottom:24px;">
-        <div>LEVEL: 1 / 15</div>
-        <div>SCORE: 0000</div>
-        <div>HEALTH: ████████</div>
-      </div>
+        <p>You reached the final room.</p>
+        <p>The glowing pixels fade.</p>
+        <p>The dungeon grows quiet.</p>
 
-      <!-- Poem Word Grid Mockup -->
-      <div style="display:grid; grid-template-columns:repeat(3, 1fr); gap:8px; font-size:11px;">
-        <div style="border:1px solid #0f0; padding:6px; text-align:center;">WORD 1</div>
-        <div style="border:1px solid #0f0; padding:6px; text-align:center;">WORD 2</div>
-        <div style="border:1px solid #0f0; padding:6px; text-align:center;">WORD 3</div>
-        <div style="border:1px solid #0f0; padding:6px; text-align:center;">WORD 4</div>
-        <div style="border:1px solid #0f0; padding:6px; text-align:center;">WORD 5</div>
-        <div style="border:1px solid #0f0; padding:6px; text-align:center;">WORD 6</div>
-      </div>
+        <br>
+
+        <h3>FINAL POEM</h3>
+
+        <p>I entered searching</p>
+        <p>for another high score.</p>
+
+        <br>
+
+        <p>Neon lights blinked,</p>
+        <p>coins echoed,</p>
+        <p>and every level</p>
+        <p>asked me to continue.</p>
+
+        <br>
+
+        <p>Every enemy</p>
+        <p>was only another word.</p>
+
+        <p>Every puzzle</p>
+        <p>became another verse.</p>
+
+        <br>
+
+        <p>I learned</p>
+        <p>that victory</p>
+        <p>is not measured</p>
+        <p>by points alone,</p>
+
+        <p>but by every story</p>
+        <p>we choose to finish.</p>
+
+        <br>
+
+        <p>The arcade sleeps.</p>
+
+        <p>The screen flickers.</p>
+
+        <p>The controller rests.</p>
+
+        <br>
+
+        <p>Yet somewhere</p>
+
+        <p>a single pixel</p>
+
+        <p>still glows.</p>
+
+        <br>
+
+        <p>Waiting…</p>
+
+        <p>for another player.</p>
+
+        <br><br>
+
+        <h3>THANK YOU FOR PLAYING</h3>
+
+        <p>Created by</p>
+        <p>Christine Julian</p>
+
+        <br>
+
+        <p>Interactive Poem</p>
+        <p>Arcade Poem Dungeon</p>
+
+        <br>
+
+        <p>GAME COMPLETE</p>
+
+        <p>★★★★★</p>
+
+        <br><br><br>
+
+        <h2>THE END</h2>
+
+        <br>
+        <button id="creditsMenuBtn" style="padding:10px; border:2px solid #0f0; background:transparent; color:#0f0;">
+            🏠 MAIN MENU
+        </button>
 
     </div>
-  </div>
-
-  <!-- Control Panel -->
-  <div style="margin-top:20px; text-align:center; font-size:11px;">
-    <p>START • SELECT • OPTIONS</p>
-    <p>THIS IS A STATIC RETRO MOCKUP — NO SCRIPTS, PURE HTML</p>
-  </div>
 </div>
 
-<!-- Credits Overlay (Your Full Text) -->
-<div style="margin:40px auto; max-width:700px; border-top:2px solid #0f0; padding-top:20px; text-align:center; font-size:11px; line-height:1.8;">
+<!-- ============================
+     EMBEDDED INTERACTIVE JS
+     ============================ -->
+<script>
+// main.js (embedded)
 
-  <div>
+let currentLevel = 1;
+let unlockedLevels = 1;
+let score = 0;
+let health = 100;
 
-    <h2 style="margin-bottom:10px; text-shadow:0 0 8px #0f0;">★ ARCADE POEM DUNGEON ★</h2>
+const maxLevel = 15;
+const levelTargets = {};
+for (let i = 1; i <= maxLevel; i++) levelTargets[i] = i * 10;
 
-    <p>Congratulations, Player.</p>
+const menuScreen = document.getElementById("menuScreen");
+const levelSelect = document.getElementById("levelSelect");
+const poemGrid = document.getElementById("poemGrid");
+const scoreboard = document.getElementById("scoreboard");
+const levelIndicator = document.getElementById("levelIndicator");
+const scoreIndicator = document.getElementById("scoreIndicator");
+const healthIndicator = document.getElementById("healthIndicator");
 
-    <br>
+const levelComplete = document.getElementById("levelComplete");
+const gameOver = document.getElementById("gameOver");
+const gameComplete = document.getElementById("gameComplete");
+const creditsOverlay = document.getElementById("creditsOverlay");
 
-    <p>You reached the final room.</p>
-    <p>The glowing pixels fade.</p>
-    <p>The dungeon grows quiet.</p>
+/* MENU BUTTONS */
+document.getElementById("startGameBtn").onclick = () => openLevelSelect();
+document.getElementById("howToPlayBtn").onclick = () => alert("Click words to gain score.\nAvoid losing health.\nReach the target score.\nLevels unlock sequentially.");
+document.getElementById("creditsBtn").onclick = () => creditsOverlay.style.display = "block";
+document.getElementById("creditsMenuBtn").onclick = () => { creditsOverlay.style.display = "none"; returnToMenu(); };
 
-    <br>
+document.getElementById("returnMenuBtn").onclick = () => returnToMenu();
 
-    <h3 style="margin-bottom:8px;">FINAL POEM</h3>
+/* LEVEL SELECT */
+function openLevelSelect() {
+    menuScreen.style.display = "none";
+    levelSelect.style.display = "block";
+    renderLevelButtons();
+}
 
-    <p>I entered searching</p>
-    <p>for another high score.</p>
+function renderLevelButtons() {
+    const grid = document.getElementById("levelGrid");
+    grid.innerHTML = "";
+    for (let i = 1; i <= maxLevel; i++) {
+        const btn = document.createElement("button");
+        btn.textContent = "LEVEL " + i;
+        btn.style.cssText = "display:block;margin:6px auto;padding:8px;border:2px solid #0f0;background:transparent;color:#0f0;cursor:pointer;width:200px;";
+        if (i > unlockedLevels) {
+            btn.style.opacity = "0.3";
+            btn.style.cursor = "not-allowed";
+        } else {
+            btn.onclick = () => startLevel(i);
+        }
+        grid.appendChild(btn);
+    }
+}
 
-    <br>
+/* START LEVEL */
+function startLevel(level) {
+    currentLevel = level;
+    score = 0;
+    health = 100;
 
-    <p>Neon lights blinked,</p>
-    <p>coins echoed,</p>
-    <p>and every level</p>
-    <p>asked me to continue.</p>
+    levelSelect.style.display = "none";
+    levelComplete.style.display = "none";
+    gameOver.style.display = "none";
+    gameComplete.style.display = "none";
 
-    <br>
+    scoreboard.style.display = "block";
+    poemGrid.style.display = "grid";
 
-    <p>Every enemy</p>
-    <p>was only another word.</p>
+    updateHUD();
+    loadPoemWords();
+}
 
-    <p>Every puzzle</p>
-    <p>became another verse.</p>
+/* LOAD WORDS */
+function loadPoemWords() {
+    poemGrid.innerHTML = "";
+    for (let i = 0; i < 12; i++) {
+        const word = document.createElement("div");
+        word.className = "poemWord";
+        word.textContent = "WORD " + (i + 1);
+        word.onclick = () => {
+            score++;
+            updateHUD();
+            word.style.opacity = "0.3";
+            word.style.pointerEvents = "none";
+            if (score >= levelTargets[currentLevel]) completeLevel();
+        };
+        poemGrid.appendChild(word);
+    }
 
-    <br>
+    /* Random health loss */
+    const interval = setInterval(() => {
+        if (poemGrid.style.display !== "grid") { clearInterval(interval); return; }
+        if (Math.random() < 0.15) {
+            health -= 10;
+            updateHUD();
+            if (health <= 0) {
+                clearInterval(interval);
+                triggerGameOver();
+            }
+        }
+    }, 1500);
+}
 
-    <p>I learned</p>
-    <p>that victory</p>
-    <p>is not measured</p>
-    <p>by points alone,</p>
+/* HUD */
+function updateHUD() {
+    levelIndicator.textContent = `LEVEL ${currentLevel} / ${maxLevel}`;
+    scoreIndicator.textContent = `SCORE: ${score}`;
+    healthIndicator.textContent = `HEALTH: ${health}`;
+}
 
-    <p>but by every story</p>
-    <p>we choose to finish.</p>
+/* LEVEL COMPLETE */
+document.getElementById("nextLevelBtn").onclick = () => startLevel(currentLevel + 1);
 
-    <br>
+function completeLevel() {
+    poemGrid.style.display = "none";
+    scoreboard.style.display = "none";
+    unlockedLevels = Math.max(unlockedLevels, currentLevel + 1);
+    levelComplete.style.display = "block";
+    document.getElementById("levelCompleteTitle").textContent = `LEVEL ${currentLevel} COMPLETE!`;
+}
 
-    <p>The arcade sleeps.</p>
+/* GAME OVER */
+document.getElementById("retryLevelBtn").onclick = () => startLevel(currentLevel);
 
-    <p>The screen flickers.</p>
+function triggerGameOver() {
+    poemGrid.style.display = "none";
+    scoreboard.style.display = "none";
+    gameOver.style.display = "block";
+}
 
-    <p>The controller rests.</p>
+/* GAME COMPLETE */
+document.getElementById("playAgainBtn").onclick = () => {
+    unlockedLevels = 1;
+    startLevel(1);
+};
 
-    <br>
-
-    <p>Yet somewhere</p>
-
-    <p>a single pixel</p>
-
-    <p>still glows.</p>
-
-    <br>
-
-    <p>Waiting…</p>
-
-    <p>for another player.</p>
-
-    <br><br>
-
-    <h3 style="margin-bottom:8px;">THANK YOU FOR PLAYING</h3>
-
-    <p>Created by</p>
-    <p>Christine Julian</p>
-
-    <br>
-
-    <p>Interactive Poem</p>
-    <p>Arcade Poem Dungeon</p>
-
-    <br>
-
-    <p>GAME COMPLETE</p>
-
-    <p>★★★★★</p>
-
-    <br><br><br>
-
-    <h2 style="margin-bottom:0;">THE END</h2>
-
-  </div>
-</div>
+/* RETURN TO MENU */
+function returnToMenu() {
+    menuScreen.style.display = "flex";
+    levelSelect.style.display = "none";
+    poemGrid.style.display = "none";
+    scoreboard.style.display = "none";
+    levelComplete.style.display = "none";
+    gameOver.style.display = "none";
+    gameComplete.style.display = "none";
+    creditsOverlay.style.display = "none";
+}
+</script>
 
 </body>
 </html>
