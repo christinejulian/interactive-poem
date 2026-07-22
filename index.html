@@ -17,7 +17,7 @@
         <!-- ATTRACT MODE -->
         <div id="attractScreen" class="screen active">
             <div class="attract-title">NEON<br>FOCUS<br>ARCADE</div>
-            <div class="attract-subtitle">A Retro Cognitive Challenge</div>
+            <div class="attract-subtitle">A Retro Gaming Intuition Test</div>
 
             <div class="attract-flash">
                 PRESS ANY KEY<br>
@@ -26,10 +26,12 @@
             </div>
 
             <div class="attract-lore">
-                <p>This cabinet trains your attention.</p>
-                <p>Correct words sharpen your clarity.</p>
-                <p>Wrong words overload your mind.</p>
-                <p>Stay focused. Stay sharp.</p>
+                <p>This cabinet tests your gaming instincts.</p>
+                <p>Select ONLY words related to video games:</p>
+                <p><strong>player, enemy, boss, level, controller, respawn, inventory…</strong></p>
+                <p>Clicking unrelated words (flower, spoon, cloud, etc.)</p>
+                <p><strong>instantly drains 50% of your health.</strong></p>
+                <p>Stay sharp. Stay neon.</p>
             </div>
 
             <div class="attract-bottom">
@@ -41,8 +43,8 @@
         <!-- HUD -->
         <div id="scoreboard">
             <div id="levelIndicator">STAGE 1 / 15</div>
-            <div id="scoreIndicator">FOCUS: 0</div>
-            <div id="healthIndicator">CLARITY: 100%</div>
+            <div id="scoreIndicator">SCORE: 0</div>
+            <div id="healthIndicator">HEALTH: 100%</div>
         </div>
 
         <!-- MAIN MENU -->
@@ -50,15 +52,15 @@
             <h1 class="menu-title">NEON FOCUS ARCADE</h1>
 
             <div class="menu-buttons">
-                <button id="startGameBtn">▶ BEGIN TRAINING</button>
-                <button id="howToPlayBtn">❖ HOW IT WORKS</button>
+                <button id="startGameBtn">▶ START GAME</button>
+                <button id="howToPlayBtn">❖ HOW TO PLAY</button>
                 <button id="settingsBtn">⚙ SETTINGS</button>
             </div>
 
             <div class="menu-lore">
-                <p>This is a cognitive focus simulator.</p>
-                <p>Select meaningful words to strengthen clarity.</p>
-                <p>Avoid distractions — they drain 10% clarity.</p>
+                <p>Choose only video‑game related words.</p>
+                <p>Wrong words drain <strong>50% of your health</strong> instantly.</p>
+                <p>Clear all stages to complete the neon challenge.</p>
             </div>
         </div>
 
@@ -75,24 +77,25 @@
         <!-- STAGE COMPLETE -->
         <div id="levelComplete" class="screen">
             <h1 id="levelCompleteTitle">STAGE COMPLETE</h1>
-            <p>Your clarity remains strong.</p>
+            <p>You selected the correct gaming terms.</p>
             <button id="nextLevelBtn">▶ NEXT STAGE</button>
             <button id="mainMenuBtn1">🏠 MAIN MENU</button>
         </div>
 
-        <!-- SESSION OVER -->
+        <!-- GAME OVER -->
         <div id="gameOver" class="screen">
-            <h1 class="game-over-title">CLARITY LOST</h1>
-            <p>Your mind overloaded.</p>
-            <button id="retryLevelBtn">🔄 TRY AGAIN</button>
+            <h1 class="game-over-title">GAME OVER</h1>
+            <p>You clicked too many unrelated words.</p>
+            <p>Your neon clarity has faded.</p>
+            <button id="retryLevelBtn">🔄 RETRY STAGE</button>
             <button id="mainMenuBtn2">🏠 MAIN MENU</button>
         </div>
 
-        <!-- SESSION COMPLETE -->
+        <!-- GAME COMPLETE -->
         <div id="gameComplete" class="screen">
-            <h1 class="game-complete-title">TRAINING COMPLETE</h1>
-            <p>You maintained clarity through all stages.</p>
-            <button id="playAgainBtn">🔄 RESTART</button>
+            <h1 class="game-complete-title">ALL STAGES CLEARED</h1>
+            <p>You mastered the neon gaming intuition test.</p>
+            <button id="playAgainBtn">🔄 PLAY AGAIN</button>
             <button id="mainMenuBtn3">🏠 MAIN MENU</button>
         </div>
 
@@ -114,17 +117,34 @@
 <!-- FINAL MESSAGE OVERLAY -->
 <div class="overlay" id="creditsOverlay">
     <div class="overlay-content">
-        <h2>TRAINING SUMMARY</h2>
-        <p>You completed all stages with strong clarity.</p>
-        <p>Remember: focus improves with practice.</p>
+        <h2>NEON SUMMARY</h2>
+        <p>You completed all stages.</p>
+        <p>Your gaming intuition is strong.</p>
         <button id="creditsMenuBtn">🏠 MAIN MENU</button>
     </div>
 </div>
 
 <!-- MUSIC -->
-<audio id="bgMusic" autoplay loop>
+<audio id="bgMusic" loop>
     <source src="Music.mp3" type="audio/mpeg">
 </audio>
+
+<!-- FIXED: unified start for music + attract exit -->
+<script>
+function startEverything() {
+    const bgMusic = document.getElementById("bgMusic");
+    bgMusic.play().catch(() => {});
+
+    attractScreen.classList.remove("active");
+    menuScreen.classList.add("active");
+
+    document.removeEventListener("click", startEverything);
+    document.removeEventListener("keydown", startEverything);
+}
+
+document.addEventListener("click", startEverything, { once: true });
+document.addEventListener("keydown", startEverything, { once: true });
+</script>
 
 <script src="main.js" defer></script>
 
