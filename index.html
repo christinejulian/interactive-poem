@@ -214,8 +214,7 @@ body::after {
   box-shadow: 0 0 16px #0f0;
 }
 
-#levelComplete,
-#gameComplete {
+#levelComplete {
   display: none;
   flex-direction: column;
   align-items: center;
@@ -226,18 +225,12 @@ body::after {
   text-shadow: 0 0 10px #0f0;
 }
 
-#gameComplete {
-  text-shadow: 0 0 14px #0f0;
-}
-
-#levelComplete h1,
-#gameComplete h1 {
+#levelComplete h1 {
   font-size: 1.4rem;
   margin-bottom: 1rem;
 }
 
-#levelComplete button,
-#gameComplete button {
+#levelComplete button {
   padding: 0.8rem;
   margin: 0.6rem;
   width: 220px;
@@ -252,8 +245,7 @@ body::after {
   transition: background 0.2s, color 0.2s, box-shadow 0.2s, transform 0.1s;
 }
 
-#levelComplete button:hover,
-#gameComplete button:hover {
+#levelComplete button:hover {
   background: #0f0;
   color: #000;
   box-shadow: 0 0 16px #0f0;
@@ -269,20 +261,29 @@ body::after {
   align-items: center;
   justify-content: center;
   z-index: 2000;
+  overflow-y: auto;
 }
 
 .overlay-content {
   text-align: center;
-  padding: 2rem;
+  padding: 3rem 2rem;
   border: 2px solid #0f0;
   border-radius: 4px;
   background: rgba(0,0,0,0.95);
   box-shadow: 0 0 16px rgba(0,255,0,0.4);
+  max-width: 600px;
+  margin: auto;
 }
 
-.overlay-content h2 {
+.overlay-content h2, .overlay-content h3 {
   margin-bottom: 1rem;
   text-shadow: 0 0 10px #0f0;
+}
+
+.overlay-content p {
+  font-size: 0.8rem;
+  margin: 0.3rem 0;
+  color: #0a0;
 }
 
 .overlay-content input[type="range"] {
@@ -307,23 +308,19 @@ body::after {
 }
 
 @keyframes scrollCredits {
-  from { bottom: -100%; }
-  to { bottom: 110%; }
+  from { transform: translateY(100%); }
+  to { transform: translateY(-100%); }
 }
 
 #creditsOverlay {
   background: #000;
-  overflow: hidden;
+  overflow-y: auto;
 }
 
 #creditsOverlay .overlay-content {
-  position: absolute;
-  bottom: -100%;
-  width: 100%;
-  animation: scrollCredits 18s linear forwards;
-  text-shadow: 0 0 10px #0f0;
-  text-align: center;
-  font-size: 0.9rem;
+  border: none;
+  background: transparent;
+  box-shadow: none;
 }
 </style>
 </head>
@@ -371,15 +368,6 @@ body::after {
       <button onclick="returnToMenu()">🏠 MAIN MENU</button>
     </div>
   </div>
-
-  <!-- Grand Victory Screen -->
-  <div id="gameComplete" class="screen">
-    <h1>CONGRATULATIONS!<br>YOU BEAT ALL 15 LEVELS!</h1>
-    <div class="menu-buttons">
-      <button onclick="restartFullGame()">🔄 PLAY AGAIN</button>
-      <button onclick="returnToMenu()">🏠 MAIN MENU</button>
-    </div>
-  </div>
 </div>
 
 <!-- Settings Overlay -->
@@ -402,20 +390,104 @@ body::after {
   </div>
 </div>
 
-<!-- Retro Scrolling Credits -->
+<!-- Final Level Epic Credits & Poem Overlay -->
 <div class="overlay" id="creditsOverlay">
-  <div class="overlay-content">
-    <div class="credit-line">ARCADE POEM DUNGEON</div>
-    <div class="credit-line">CREATED BY</div>
-    <div class="credit-line">Christine Julian</div>
-    <div class="credit-line">PIXEL DUNGEON BACKGROUND</div>
-    <div class="credit-line">SYNTH NARRATOR VOICE</div>
-    <div class="credit-line">8-BIT SOUNDTRACK</div>
-    <div class="credit-line">THANK YOU FOR PLAYING</div>
-  </div>
+    <div class="overlay-content">
+
+        <h2>★ ARCADE POEM DUNGEON ★</h2>
+
+        <p>Congratulations, Player.</p>
+
+        <br>
+
+        <p>You reached the final room.</p>
+        <p>The glowing pixels fade.</p>
+        <p>The dungeon grows quiet.</p>
+
+        <br>
+
+        <h3>FINAL POEM</h3>
+
+        <p>I entered searching</p>
+        <p>for another high score.</p>
+
+        <br>
+
+        <p>Neon lights blinked,</p>
+        <p>coins echoed,</p>
+        <p>and every level</p>
+        <p>asked me to continue.</p>
+
+        <br>
+
+        <p>Every enemy</p>
+        <p>was only another word.</p>
+
+        <p>Every puzzle</p>
+        <p>became another verse.</p>
+
+        <br>
+
+        <p>I learned</p>
+        <p>that victory</p>
+        <p>is not measured</p>
+        <p>by points alone,</p>
+
+        <p>but by every story</p>
+        <p>we choose to finish.</p>
+
+        <br>
+
+        <p>The arcade sleeps.</p>
+
+        <p>The screen flickers.</p>
+
+        <p>The controller rests.</p>
+
+        <br>
+
+        <p>Yet somewhere</p>
+
+        <p>a single pixel</p>
+
+        <p>still glows.</p>
+
+        <br>
+
+        <p>Waiting…</p>
+
+        <p>for another player.</p>
+
+        <br><br>
+
+        <h3>THANK YOU FOR PLAYING</h3>
+
+        <p>Created by</p>
+        <p>Christine Julian</p>
+
+        <br>
+
+        <p>Interactive Poem</p>
+        <p>Arcade Poem Dungeon</p>
+
+        <br>
+
+        <p>GAME COMPLETE</p>
+
+        <p>★★★★★</p>
+
+        <br><br><br>
+
+        <h2>THE END</h2>
+
+        <div style="margin-top: 2rem;">
+          <button class="level-btn" onclick="returnToMenuFromCredits()">🏠 MAIN MENU</button>
+        </div>
+
+    </div>
 </div>
 
-<!-- Audio Elements (BGM sourced from user Spotify intent reference track) -->
+<!-- Audio Elements -->
 <audio id="bgm" loop>
   <source src="https://files.catbox.moe/8bitloop.mp3" type="audio/mpeg">
 </audio>
@@ -442,7 +514,6 @@ const scoreboard = document.getElementById("scoreboard");
 const levelIndicator = document.getElementById("levelIndicator");
 const scoreIndicator = document.getElementById("scoreIndicator");
 const levelComplete = document.getElementById("levelComplete");
-const gameComplete = document.getElementById("gameComplete");
 const settingsOverlay = document.getElementById("settingsOverlay");
 const creditsOverlay = document.getElementById("creditsOverlay");
 
@@ -479,9 +550,11 @@ function buildLevelSelectButtons() {
 
 function showCredits() {
   creditsOverlay.style.display = "flex";
-  setTimeout(() => {
-    creditsOverlay.style.display = "none";
-  }, 18000);
+}
+
+function returnToMenuFromCredits() {
+  creditsOverlay.style.display = "none";
+  returnToMenu();
 }
 
 function showInstructions() {
@@ -517,7 +590,7 @@ function startGame() {
   menuScreen.style.display = "none";
   levelSelect.style.display = "none";
   levelComplete.style.display = "none";
-  gameComplete.style.display = "none";
+  creditsOverlay.style.display = "none";
   
   scoreboard.style.display = "flex";
   bgm.volume = 0.6;
@@ -570,7 +643,8 @@ function completeLevel() {
     levelComplete.style.display = "flex";
     document.getElementById("levelCompleteTitle").textContent = `LEVEL ${currentLevel} COMPLETE!`;
   } else {
-    gameComplete.style.display = "flex";
+    // Final level (15) complete -> trigger the epic poem overlay!
+    creditsOverlay.style.display = "flex";
   }
 }
 
@@ -584,21 +658,10 @@ function nextLevel() {
   updateHUD();
 }
 
-function restartFullGame() {
-  currentLevel = 1;
-  score = 0;
-  gameComplete.style.display = "none";
-  scoreboard.style.display = "flex";
-  bgm.play();
-  loadLevel(currentLevel);
-  updateHUD();
-}
-
 function returnToMenu() {
   poemGrid.style.display = "none";
   scoreboard.style.display = "none";
   levelComplete.style.display = "none";
-  gameComplete.style.display = "none";
   levelSelect.style.display = "none";
   creditsOverlay.style.display = "none";
   settingsOverlay.style.display = "none";
