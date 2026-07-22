@@ -10,11 +10,14 @@
 </head>
 <body>
 
-<!-- FULLSCREEN GAME WRAPPER -->
+<!-- FULLSCREEN GAME CONTAINER -->
 <div id="gameContainer">
 
-    <!-- CRT FRAME -->
+    <!-- CRT CABINET FRAME -->
     <div class="crtFrame">
+
+        <!-- Neon Grid Background -->
+        <div class="dungeon-bg"></div>
 
         <!-- HUD -->
         <div id="scoreboard">
@@ -23,7 +26,7 @@
             <div id="healthIndicator">HEALTH: 100</div>
         </div>
 
-        <!-- MENU -->
+        <!-- MENU SCREEN -->
         <div id="menuScreen" class="screen active">
             <h1 class="menu-title">ARCADE POEM DUNGEON</h1>
 
@@ -164,6 +167,35 @@
     </div>
 </div>
 
+<!-- Background Music -->
+<audio id="bgMusic" autoplay loop>
+    <source src="80s Synthwave Game Music [ non copyright Music ] Short - Azxmo Non Copyright Music (128k).mp3" type="audio/mpeg">
+    Your browser does not support the audio element.
+</audio>
+
+<script>
+// Background Music Logic
+const bgMusic = document.getElementById("bgMusic");
+bgMusic.volume = 0.4;
+
+// Modern browsers require user interaction before playing audio.
+document.addEventListener("click", function startMusic() {
+    bgMusic.play().catch(() => {});
+    document.removeEventListener("click", startMusic);
+}, { once: true });
+
+// Pause when page is hidden
+document.addEventListener("visibilitychange", () => {
+    if (document.hidden) {
+        bgMusic.pause();
+    } else {
+        bgMusic.play().catch(() => {});
+    }
+});
+</script>
+
+<!-- Main Game Logic -->
 <script src="main.js"></script>
+
 </body>
 </html>
