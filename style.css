@@ -1,279 +1,289 @@
+/* styles.css */
+
 /* ==========================================================================
    1. CORE BASE & CRT SCANLINES
    ========================================================================== */
-html, body {  
-  margin: 0;  
-  padding: 0;  
-  height: 100%;  
-  background: #000;  
-  font-family: "Press Start 2P", monospace;  
-  overflow: hidden;  
-}  
-  
-body::before {  
-  content: "";  
-  position: fixed;  
-  inset: 0;  
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  background: #000;
+  font-family: "Press Start 2P", monospace;
+  overflow: hidden;
+}
+
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
   background: repeating-linear-gradient(
     to bottom,
     rgba(255,255,255,0.03) 0px,
     rgba(255,255,255,0.03) 2px,
     rgba(0,0,0,0.05) 3px
-  );  
-  pointer-events: none;  
-  z-index: 1000;  
+  );
+  pointer-events: none;
+  z-index: 1000;
 }
 
 /* ==========================================================================
    2. ANIMATIONS & AMBIENT EFFECTS
    ========================================================================== */
-@keyframes glitch {  
-  0% { transform: translate(0,0); }  
-  20% { transform: translate(-2px, 1px); }  
-  40% { transform: translate(2px, -1px); }  
-  60% { transform: translate(-1px, 2px); }  
-  80% { transform: translate(1px, -2px); }  
-  100% { transform: translate(0,0); }  
+@keyframes glitch {
+  0% { transform: translate(0,0); }
+  20% { transform: translate(-2px, 1px); }
+  40% { transform: translate(2px, -1px); }
+  60% { transform: translate(-1px, 2px); }
+  80% { transform: translate(1px, -2px); }
+  100% { transform: translate(0,0); }
 }
 
-.vhs {  
-  animation: glitch 0.25s infinite;  
+.vhs {
+  animation: glitch 0.25s infinite;
 }
 
-.arcade-glow {  
-  position: fixed;  
-  inset: 0;  
+.arcade-glow {
+  position: fixed;
+  inset: 0;
   background:
     radial-gradient(circle at 50% 20%, rgba(0,255,153,0.25), transparent 60%),
     radial-gradient(circle at 10% 80%, rgba(255,0,153,0.25), transparent 60%),
-    radial-gradient(circle at 90% 60%, rgba(0,153,255,0.25), transparent 60%);  
-  mix-blend-mode: screen;  
-  pointer-events: none;  
-  z-index: 900;  
+    radial-gradient(circle at 90% 60%, rgba(0,153,255,0.25), transparent 60%);
+  mix-blend-mode: screen;
+  pointer-events: none;
+  z-index: 900;
 }
 
-@keyframes idle {  
-  0% { transform: translateX(-50%) translateY(0); }  
-  50% { transform: translateX(-50%) translateY(-4px); }  
-  100% { transform: translateX(-50%) translateY(0); }  
+@keyframes fly {
+  from { transform: translate(0,0); opacity: 1; }
+  to { transform: translate(var(--dx), var(--dy)); opacity: 0; }
 }
 
-@keyframes fly {  
-  from { transform: translate(0,0); opacity: 1; }  
-  to { transform: translate(var(--dx), var(--dy)); opacity: 0; }  
-}
-
-@keyframes scrollCredits {  
-  from { bottom: -100%; }  
-  to { bottom: 110%; }  
+@keyframes scrollCredits {
+  from { bottom: -100%; }
+  to { bottom: 110%; }
 }
 
 /* ==========================================================================
-   3. CABINET & DUNGEON BACKGROUND
+   3. MENU & NAVIGATION
    ========================================================================== */
-.cabinet {  
-  position: absolute;  
-  top: 50%;  
-  left: 50%;  
-  width: 88vw;  
-  height: 88vh;  
-  transform: translate(-50%, -50%);  
-  background: #111;  
-  border: 12px solid #0ff;  
-  border-radius: 18px;  
-  box-shadow:
-    0 0 40px #0ff,
-    0 0 80px #0ff inset,
-    0 0 120px rgba(0,255,255,0.4) inset;  
-  overflow: hidden;  
+.screen {
+  width: 100%;
+  height: 100%;
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: #0ff;
+  text-align: center;
+  padding: 2rem;
 }
 
-.dungeon-bg {  
-  position: absolute;  
-  inset: 0;  
-  background-image:
-    linear-gradient(#050505 1px, transparent 1px),
-    linear-gradient(90deg, #050505 1px, transparent 1px);  
-  background-size: 32px 32px;  
-  opacity: 0.4;  
-  pointer-events: none;  
+#menuScreen {
+  display: flex;
+}
+
+.menu-title {
+  font-size: 2rem;
+  text-shadow: 0 0 12px #0ff, 0 0 24px #0ff;
+  letter-spacing: 0.15em;
+}
+
+.menu-buttons button {
+  padding: 1rem;
+  margin: 1rem;
+  width: 260px;
+  border: 3px solid #0ff;
+  border-radius: 12px;
+  background: transparent;
+  color: #0ff;
+  cursor: pointer;
+  transition: background 0.3s, color 0.3s;
+}
+
+.menu-buttons button:hover {
+  background: #0ff;
+  color: #000;
 }
 
 /* ==========================================================================
-   4. MENUS & NAVIGATION
+   4. CHARACTER SELECT & SAVE SLOTS
    ========================================================================== */
-.screen {  
-  width: 100%;  
-  height: 100%;  
-  display: flex;  
-  flex-direction: column;  
-  align-items: center;  
-  justify-content: center;  
-  color: #0ff;  
-  text-align: center;  
-  padding: 2rem;  
+.character-grid {
+  display: flex;
+  gap: 2rem;
 }
 
-.menu-title {  
-  font-size: 2rem;  
-  text-shadow: 0 0 12px #0ff, 0 0 24px #0ff;  
-  letter-spacing: 0.15em;  
+.character-grid button {
+  padding: 1rem;
+  width: 160px;
+  border: 3px solid #0ff;
+  border-radius: 12px;
+  background: transparent;
+  color: #0ff;
+  cursor: pointer;
+  transition: transform 0.3s, background 0.3s;
 }
 
-.menu-buttons button {  
-  padding: 1rem;  
-  margin: 1rem;  
-  width: 260px;  
-  border: 3px solid #0ff;  
-  border-radius: 12px;  
-  background: transparent;  
-  color: #0ff;  
-  cursor: pointer;  
-  transition: background 0.3s, color 0.3s;  
+.character-grid button:hover {
+  background: #0ff;
+  color: #000;
+  transform: scale(1.1);
 }
 
-.menu-buttons button:hover {  
-  background: #0ff;  
-  color: #000;  
+.save-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
 }
 
-/* Character Select */
-.character-grid {  
-  display: flex;  
-  gap: 2rem;  
+.save-grid button {
+  padding: 1rem;
+  width: 260px;
+  border: 3px solid #0ff;
+  border-radius: 12px;
+  background: transparent;
+  color: #0ff;
+  cursor: pointer;
 }
 
-.character-grid button {  
-  padding: 1rem;  
-  width: 160px;  
-  border: 3px solid #0ff;  
-  border-radius: 12px;  
-  background: transparent;  
-  color: #0ff;  
-  cursor: pointer;  
-  transition: transform 0.3s, background 0.3s;  
-}
-
-.character-grid button:hover {  
-  background: #0ff;  
-  color: #000;  
-  transform: scale(1.1);  
-}
-
-/* Save Slots */
-.save-grid {  
-  display: flex;  
-  flex-direction: column;  
-  gap: 1rem;  
-}
-
-.save-grid button {  
-  padding: 1rem;  
-  width: 260px;  
-  border: 3px solid #0ff;  
-  border-radius: 12px;  
-  background: transparent;  
-  color: #0ff;  
-  cursor: pointer;  
-}
-
-.save-grid button:hover {  
-  background: #0ff;  
-  color: #000;  
+.save-grid button:hover {
+  background: #0ff;
+  color: #000;
 }
 
 /* ==========================================================================
-   5. HEALTH BAR
+   5. SCOREBOARD
    ========================================================================== */
-#healthBar {  
-  position: absolute;  
-  top: 1rem;  
-  left: 1rem;  
-  width: 200px;  
-  height: 24px;  
-  border: 3px solid #f00;  
-  border-radius: 8px;  
-  background: #300;  
-  overflow: hidden;  
-  z-index: 10;  
+#scoreboard {
+  display: none;
+  position: absolute;
+  top: 2rem;
+  left: 2rem;
+  color: #0ff;
+  font-size: 1.2rem;
+  text-shadow: 0 0 12px #0ff;
 }
 
-#healthFill {  
-  height: 100%;  
-  width: 100%;  
-  background: linear-gradient(90deg, #0f0, #ff0, #f00);  
+#scoreboard div {
+  margin-bottom: 1rem;
 }
 
 /* ==========================================================================
-   6. POEM GRID & ENEMIES
+   6. POEM WORD GRID (Clickable Score Items)
    ========================================================================== */
-.poem-grid {  
-  display: none;  
-  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));  
-  gap: 2rem;  
-  padding: 4rem;  
-  font-size: 1.2rem;  
-  color: #fff;  
-  text-align: center;  
+#poemGrid {
+  display: none;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 2rem;
+  padding: 4rem;
+  font-size: 1.2rem;
+  color: #fff;
+  text-align: center;
 }
 
-.enemy {  
-  padding: 1rem;  
-  border: 2px solid #0ff;  
-  border-radius: 10px;  
-  background: rgba(0,0,0,0.6);  
-  box-shadow: 0 0 12px #0ff;  
-  cursor: pointer;  
-  transition: transform 0.6s ease, opacity 0.4s ease;  
+.poemWord {
+  padding: 1rem;
+  border: 2px solid #0ff;
+  border-radius: 10px;
+  background: rgba(0,0,0,0.6);
+  box-shadow: 0 0 12px #0ff;
+  cursor: pointer;
+  transition: transform 0.6s ease, opacity 0.4s ease;
 }
 
 /* ==========================================================================
-   7. PARTICLES & OVERLAYS
+   7. LEVEL COMPLETE & GAME COMPLETE
    ========================================================================== */
-.particle {  
-  position: fixed;  
-  width: 6px;  
-  height: 6px;  
-  background: #0ff;  
-  border-radius: 50%;  
-  pointer-events: none;  
-  opacity: 0.8;  
-  animation: fly 1.2s linear forwards;  
+#levelComplete,
+#gameComplete {
+  display: none;
+  background: rgba(0,0,0,0.85);
+  color: #0ff;
+  text-shadow: 0 0 12px #0ff;
 }
 
-.overlay {  
-  position: fixed;  
-  inset: 0;  
-  background: rgba(0,0,0,0.85);  
-  color: #0ff;  
-  display: none;  
-  align-items: center;  
-  justify-content: center;  
-  z-index: 2000;  
+#gameComplete {
+  color: #0f0;
+  text-shadow: 0 0 12px #0f0;
 }
 
-.overlay-content {  
-  text-align: center;  
-  padding: 2rem;  
+#levelComplete button,
+#gameComplete button {
+  padding: 1rem;
+  margin: 1rem;
+  width: 240px;
+  border: 3px solid #0ff;
+  border-radius: 12px;
+  background: transparent;
+  color: #0ff;
+  cursor: pointer;
 }
 
-/* Game Over */
-#gameOver {  
-  background: rgba(0,0,0,0.85);  
-  color: #f00;  
-  text-shadow: 0 0 12px #f00;  
+#gameComplete button {
+  border-color: #0f0;
+  color: #0f0;
 }
 
-/* Credits */
-#creditsOverlay {  
-  background: #000;  
-  overflow: hidden;  
+#levelComplete button:hover {
+  background: #0ff;
+  color: #000;
 }
 
-#creditsOverlay .overlay-content {  
-  position: absolute;  
-  bottom: -100%;  
-  width: 100%;  
-  animation: scrollCredits 18s linear forwards;  
-  text-shadow: 0 0 12px #0ff;  
+#gameComplete button:hover {
+  background: #0f0;
+  color: #000;
+}
+
+/* ==========================================================================
+   8. SETTINGS OVERLAY
+   ========================================================================== */
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.85);
+  color: #0ff;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+}
+
+.overlay-content {
+  text-align: center;
+  padding: 2rem;
+}
+
+.overlay-content input[type="range"] {
+  width: 100%;
+}
+
+/* ==========================================================================
+   9. PARTICLES
+   ========================================================================== */
+.particle {
+  position: fixed;
+  width: 6px;
+  height: 6px;
+  background: #0ff;
+  border-radius: 50%;
+  pointer-events: none;
+  opacity: 0.8;
+  animation: fly 1.2s linear forwards;
+}
+
+/* ==========================================================================
+   10. CREDITS
+   ========================================================================== */
+#creditsOverlay {
+  background: #000;
+  overflow: hidden;
+}
+
+#creditsOverlay .overlay-content {
+  position: absolute;
+  bottom: -100%;
+  width: 100%;
+  animation: scrollCredits 18s linear forwards;
+  text-shadow: 0 0 12px #0ff;
 }
