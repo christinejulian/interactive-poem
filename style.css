@@ -1,7 +1,7 @@
 /* styles.css */
 
 /* ==========================================================================
-   1. CORE BASE & GREEN CRT TERMINAL
+   1. CORE BASE & CRT SCANLINES
    ========================================================================== */
 html, body {
   margin: 0;
@@ -29,19 +29,17 @@ body::before {
   z-index: 1000;
 }
 
-/* Subtle vignette */
 body::after {
   content: "";
   position: fixed;
   inset: 0;
-  background:
-    radial-gradient(circle at center, transparent 40%, rgba(0,0,0,0.8) 100%);
+  background: radial-gradient(circle at center, transparent 40%, rgba(0,0,0,0.8) 100%);
   pointer-events: none;
   z-index: 999;
 }
 
 /* ==========================================================================
-   2. GLITCH & NOISE EFFECTS
+   2. GLITCH EFFECTS
    ========================================================================== */
 @keyframes glitch {
   0% { transform: translate(0,0); filter: none; }
@@ -56,7 +54,6 @@ body::after {
   animation: glitch 0.25s infinite;
 }
 
-/* Static noise overlay */
 .arcade-glow {
   position: fixed;
   inset: 0;
@@ -69,7 +66,7 @@ body::after {
 }
 
 /* ==========================================================================
-   3. MAIN MENU (TERMINAL STYLE)
+   3. MAIN MENU
    ========================================================================== */
 #menuScreen {
   display: flex;
@@ -121,7 +118,7 @@ body::after {
 }
 
 /* ==========================================================================
-   4. LEVEL SELECT (LOCKED TERMINAL GRID)
+   4. LEVEL SELECT (Save Slot Removed)
    ========================================================================== */
 #levelSelect {
   display: none;
@@ -180,7 +177,7 @@ body::after {
 }
 
 /* ==========================================================================
-   5. SCOREBOARD (IN-LEVEL ONLY)
+   5. SCOREBOARD
    ========================================================================== */
 #scoreboard {
   display: none;
@@ -197,7 +194,7 @@ body::after {
 }
 
 /* ==========================================================================
-   6. POEM WORD GRID (GLITCH TERMINAL WORDS)
+   6. POEM WORD GRID
    ========================================================================== */
 #poemGrid {
   display: none;
@@ -276,7 +273,7 @@ body::after {
 }
 
 /* ==========================================================================
-   8. SETTINGS OVERLAY (ESC MENU)
+   8. SETTINGS OVERLAY
    ========================================================================== */
 .overlay {
   position: fixed;
@@ -309,7 +306,7 @@ body::after {
 }
 
 /* ==========================================================================
-   9. PARTICLES (TERMINAL SPARKS)
+   9. PARTICLES
    ========================================================================== */
 .particle {
   position: fixed;
@@ -323,7 +320,7 @@ body::after {
 }
 
 /* ==========================================================================
-   10. CREDITS (SCROLLING TERMINAL)
+   10. CREDITS
    ========================================================================== */
 #creditsOverlay {
   background: #000;
