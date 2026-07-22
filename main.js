@@ -5,10 +5,10 @@ let health = 100;
 
 // UI & Container Elements
 const healthFill = document.getElementById("healthFill");
-const boss = document.getElementById("boss");
 const poemGrid = document.getElementById("poemGrid");
 const enemies = document.querySelectorAll(".enemy");
 const gameOver = document.getElementById("gameOver");
+const levelComplete = document.getElementById("levelComplete");
 
 const menuScreen = document.getElementById("menuScreen");
 const characterSelect = document.getElementById("characterSelect");
@@ -53,7 +53,7 @@ function showCredits() {
 }  
 
 function showInstructions() {  
-  alert("Poem words are enemies.\nClick them to defeat.\nBoss appears after all words fall.\nHealth drops when boss attacks.\nPress ESC for settings.");  
+  alert("Poem words are enemies.\nClick them to defeat.\nFinish all words to complete the level.\nPress ESC for settings.");  
 }  
 
 function openSettings() {  
@@ -68,15 +68,13 @@ function closeSettings() {
    SETTINGS INPUT EVENT LISTENERS
    ========================================================================== */
 document.getElementById("crtRange").addEventListener("input", (e) => {  
-  const val = e.target.value;  
-  document.body.style.opacity = val;  
+  document.body.style.opacity = e.target.value;  
 });  
 
 document.getElementById("glitchRange").addEventListener("input", (e) => {  
-  const val = e.target.value;  
   const title = document.querySelector(".menu-title");  
   if (title) {
-    title.style.animationDuration = (0.25 + (1 - val) * 0.5) + "s";  
+    title.style.animationDuration = (0.25 + (1 - e.target.value) * 0.5) + "s";  
   }
 });  
 
@@ -87,7 +85,6 @@ document.getElementById("volumeRange").addEventListener("input", (e) => {
 /* ==========================================================================
    GAMEPLAY & REPLAY LOGIC
    ========================================================================== */
-// Resets all defeated words back to their original state
 function resetEnemies() {
   enemies.forEach((enemy) => {
     enemy.style.opacity = "1";
@@ -96,15 +93,14 @@ function resetEnemies() {
   });
 }
 
-// Starts a new game session
 function startGame() {  
   menuScreen.style.display = "none";
   characterSelect.style.display = "none";  
   saveScreen.style.display = "none";  
-  
+  levelComplete.style.display = "none";
+
   poemGrid.style.display = "grid";  
-  boss.style.display = "none";  
-  
+
   health = 100;  
   updateHealth();  
   
@@ -113,19 +109,18 @@ function startGame() {
   voice.play();  
 }  
 
-// Replay action: resets grid, hides game over screen, and restarts
 function replayGame() {
   resetEnemies();
   gameOver.style.display = "none";
+  levelComplete.style.display = "none";
   startGame();
 }
 
-// Menu action: resets state and returns to main menu screen
 function returnToMenu() {
   resetEnemies();
-  boss.style.display = "none";
   poemGrid.style.display = "none";
   gameOver.style.display = "none";
+  levelComplete.style.display = "none";
   characterSelect.style.display = "none";
   saveScreen.style.display = "none";
   
@@ -136,7 +131,7 @@ function returnToMenu() {
 }
 
 /* ==========================================================================
-   HEALTH & COMBAT MECHANICS
+   HEALTH SYSTEM (still here in case you want future mechanics)
    ========================================================================== */
 function updateHealth() {  
   healthFill.style.width = health + "%";  
@@ -148,9 +143,11 @@ function updateHealth() {
 function triggerGameOver() {  
   gameOver.style.display = "flex";  
   bgm.pause();  
-}  
+}
 
-// Enemy click handlers
+/* ==========================================================================
+   ENEMY CLICK HANDLERS
+   ========================================================================== */
 enemies.forEach((enemy) => {  
   enemy.addEventListener("click", () => {  
     enemy.style.opacity = "0";  
@@ -165,19 +162,15 @@ enemies.forEach((enemy) => {
 function checkAllEnemiesDefeated() {  
   const remaining = Array.from(enemies).filter(e => e.style.pointerEvents !== "none");  
   if (remaining.length === 0) {  
-    boss.style.display = "block";  
-    voice.play();  
+    finishLevel();
   }  
-}  
+}
 
-// Periodic boss damage loop
-setInterval(() => {  
-  if (poemGrid.style.display === "grid" && boss.style.display === "block" && health > 0) {  
-    health -= 10;  
-    updateHealth();  
-    spawnParticles();  
-  }  
-}, 3000);  
+function finishLevel() {
+  poemGrid.style.display = "none";
+  bgm.pause();
+  levelComplete.style.display = "flex";
+}
 
 /* ==========================================================================
    VISUAL EFFECTS & KEYBOARD CONTROLS
@@ -195,9 +188,8 @@ function spawnParticles() {
     document.body.appendChild(p);  
     setTimeout(() => p.remove(), 1200);  
   }  
-}  
+}
 
-// Keydown listeners for shortcuts
 document.addEventListener("keydown", (e) => {  
   if (e.key === "Escape") {  
     if (creditsOverlay.style.display === "block") {  
@@ -207,4 +199,3 @@ document.addEventListener("keydown", (e) => {
     }  
   }  
 });
-
