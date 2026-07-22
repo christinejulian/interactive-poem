@@ -1,15 +1,14 @@
 // main.js
-
 // ============================================================
 // GAME CONSTANTS
 // ============================================================
 const MAX_STAGES = 15;
-const DAMAGE_AMOUNT = 10; // 10% clarity loss
-const SCORE_GOAL = 10;
+const DAMAGE_AMOUNT = 50; // 50% health loss
+const SCORE_GOAL = 5;     // fewer correct words needed per stage
 
 let currentStage = 1;
 let score = 0;
-let clarity = 100;
+let health = 100;
 
 let highestUnlocked = Number(localStorage.getItem("highestUnlocked")) || 1;
 
@@ -67,13 +66,20 @@ volumeSlider.oninput = () => {
 };
 
 // ============================================================
-// WORD BANK (neutral, cognitive theme)
+// WORD BANKS
 // ============================================================
-const words = [
-    "focus","clarity","calm","present","aware",
-    "steady","mindful","center","breathe","observe",
-    "notice","attention","balance","still","clear",
-    "reflect","listen","sense","soft","gentle"
+// Correct words: video‑game related
+const gameWords = [
+    "controller","console","pixel","arcade","quest",
+    "level","boss","score","health","inventory",
+    "joystick","respawn","checkpoint","combo","powerup"
+];
+
+// Wrong words: unrelated to video games
+const nonGameWords = [
+    "sunflower","teacup","pillow","laundry","garden",
+    "cloud","notebook","candle","blanket","window",
+    "spoon","river","mountain","pasta","library"
 ];
 
 // ============================================================
@@ -98,10 +104,11 @@ startGameBtn.onclick = () => {
 
 howToPlayBtn.onclick = () => {
     alert(
-        "Correct words increase focus.\n" +
-        "Wrong words overload your mind and reduce clarity by 10%.\n" +
-        "If clarity reaches 0%, the session ends.\n\n" +
-        "Complete all 15 stages to finish the training."
+        "Click ONLY video‑game related words.\n\n" +
+        "Correct (game) word: +1 score.\n" +
+        "Wrong (non‑game) word: -50% health.\n\n" +
+        "If health reaches 0, the session ends.\n" +
+        "Reach the score goal to clear the stage."
     );
 };
 
@@ -144,7 +151,7 @@ function buildStageButtons() {
 function startStage(stage) {
     currentStage = stage;
     score = 0;
-    clarity = 100;
+    health = 100;
 
     hideAll();
 
@@ -160,8 +167,8 @@ function startStage(stage) {
 // ============================================================
 function updateHUD() {
     levelIndicator.textContent = `STAGE ${currentStage} / ${MAX_STAGES}`;
-    scoreIndicator.textContent = `FOCUS: ${score}`;
-    healthIndicator.textContent = `CLARITY: ${clarity}%`;
+    scoreIndicator.textContent = `SCORE: ${score}`;
+    healthIndicator.textContent = `HEALTH: ${health}%`;
 }
 
 // ============================================================
@@ -170,23 +177,27 @@ function updateHUD() {
 function createWords() {
     poemGrid.innerHTML = "";
 
-    const stageWords = [...words].sort(() => Math.random() - 0.5).slice(0, 10);
+    // mix game words and non‑game words
+    const mixed = [
+        ...gameWords.sort(() => Math.random() - 0.5).slice(0, 5),
+        ...nonGameWords.sort(() => Math.random() - 0.5).slice(0, 5)
+    ].sort(() => Math.random() - 0.5);
 
-    stageWords.forEach(word => {
+    mixed.forEach(word => {
         const div = document.createElement("div");
         div.className = "poemWord";
         div.textContent = word;
 
         div.onclick = () => {
-            const isCorrect = Math.random() > 0.3;
+            const isGameWord = gameWords.includes(word);
 
-            if (isCorrect) {
+            if (isGameWord) {
                 score++;
                 div.style.opacity = 0.25;
                 div.style.pointerEvents = "none";
             } else {
                 div.classList.add("wrong");
-                clarity -= DAMAGE_AMOUNT;
+                health -= DAMAGE_AMOUNT;
             }
 
             updateHUD();
@@ -202,7 +213,7 @@ function createWords() {
 // ============================================================
 function checkStage() {
 
-    if (clarity <= 0) {
+    if (health <= 0) {
         hideAll();
         gameOver.classList.add("active");
         return;
