@@ -10,59 +10,62 @@
 </head>
 <body>
 
-<div class="cabinet">
+<!-- FULLSCREEN GAME WRAPPER -->
+<div id="gameContainer">
 
-    <div class="dungeon-bg"></div>
+    <!-- CRT FRAME -->
+    <div class="crtFrame">
 
-    <!-- HUD -->
-    <div id="scoreboard">
-        <div id="levelIndicator">LEVEL 1 / 15</div>
-        <div id="scoreIndicator">SCORE: 0</div>
-        <div id="healthIndicator">HEALTH: 100</div>
-    </div>
-
-    <!-- MENU -->
-    <div id="menuScreen" class="screen active">
-        <h1 class="menu-title">ARCADE POEM DUNGEON</h1>
-
-        <div class="menu-buttons">
-            <button id="startGameBtn">▶ START GAME</button>
-            <button id="howToPlayBtn">❖ HOW TO PLAY</button>
-            <button id="creditsBtn">★ CREDITS</button>
+        <!-- HUD -->
+        <div id="scoreboard">
+            <div id="levelIndicator">LEVEL 1 / 15</div>
+            <div id="scoreIndicator">SCORE: 0</div>
+            <div id="healthIndicator">HEALTH: 100</div>
         </div>
+
+        <!-- MENU -->
+        <div id="menuScreen" class="screen active">
+            <h1 class="menu-title">ARCADE POEM DUNGEON</h1>
+
+            <div class="menu-buttons">
+                <button id="startGameBtn">▶ START GAME</button>
+                <button id="howToPlayBtn">❖ HOW TO PLAY</button>
+                <button id="creditsBtn">★ CREDITS</button>
+            </div>
+        </div>
+
+        <!-- LEVEL SELECT -->
+        <div id="levelSelect" class="screen">
+            <h2>SELECT LEVEL</h2>
+            <div id="levelGrid"></div>
+            <button id="returnMenuBtn">🏠 MAIN MENU</button>
+        </div>
+
+        <!-- POEM GRID -->
+        <div id="poemGrid"></div>
+
+        <!-- LEVEL COMPLETE -->
+        <div id="levelComplete" class="screen">
+            <h1 id="levelCompleteTitle">LEVEL COMPLETE</h1>
+            <button id="nextLevelBtn">▶ NEXT LEVEL</button>
+            <button id="mainMenuBtn1">🏠 MAIN MENU</button>
+        </div>
+
+        <!-- GAME OVER -->
+        <div id="gameOver" class="screen">
+            <h1>GAME OVER</h1>
+            <button id="retryLevelBtn">🔄 RETRY LEVEL</button>
+            <button id="mainMenuBtn2">🏠 MAIN MENU</button>
+        </div>
+
+        <!-- GAME COMPLETE -->
+        <div id="gameComplete" class="screen">
+            <h1>ALL LEVELS CLEARED</h1>
+            <button id="playAgainBtn">🔄 PLAY AGAIN</button>
+            <button id="mainMenuBtn3">🏠 MAIN MENU</button>
+        </div>
+
     </div>
-
-    <!-- LEVEL SELECT -->
-    <div id="levelSelect" class="screen">
-        <h2>SELECT LEVEL</h2>
-        <div id="levelGrid"></div>
-        <button id="returnMenuBtn">🏠 MAIN MENU</button>
-    </div>
-
-    <!-- POEM GRID -->
-    <div id="poemGrid"></div>
-
-    <!-- LEVEL COMPLETE -->
-    <div id="levelComplete" class="screen">
-        <h1 id="levelCompleteTitle">LEVEL COMPLETE</h1>
-        <button id="nextLevelBtn">▶ NEXT LEVEL</button>
-        <button id="mainMenuBtn1">🏠 MAIN MENU</button>
-    </div>
-
-    <!-- GAME OVER -->
-    <div id="gameOver" class="screen">
-        <h1>GAME OVER</h1>
-        <button id="retryLevelBtn">🔄 RETRY LEVEL</button>
-        <button id="mainMenuBtn2">🏠 MAIN MENU</button>
-    </div>
-
-    <!-- GAME COMPLETE -->
-    <div id="gameComplete" class="screen">
-        <h1>ALL LEVELS CLEARED</h1>
-        <button id="playAgainBtn">🔄 PLAY AGAIN</button>
-        <button id="mainMenuBtn3">🏠 MAIN MENU</button>
-    </div>
-
 </div>
 
 <!-- CREDITS OVERLAY -->
