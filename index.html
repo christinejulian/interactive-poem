@@ -1,135 +1,124 @@
-<!DOCTYPE html>  
-<html lang="en">  
-<head>  
-<meta charset="UTF-8" />  
-<title>Arcade Poem Dungeon — Off the Grid</title>  
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />  
-<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">  
-<link rel="stylesheet" href="styles.css">  
-</head>  
-<body>  
-<div class="arcade-glow"></div>  
-<div class="cabinet">  
-  <div class="dungeon-bg"></div>    
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Arcade Poem Dungeon — Off the Grid</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
 
-  <!-- Scoreboard & Level HUD (Only shown during gameplay, hidden on menu/level select) -->  
-  <div class="hud-display" id="hudDisplay" style="display: none;">  
-    <div id="levelIndicator">LEVEL 1 / 15</div>  
-    <div id="scoreIndicator">SCORE: 0</div>  
-  </div>    
+<div class="arcade-glow"></div>
 
-  <!-- Player sprite -->    
-  <div class="player" id="player"></div>    
+<div class="cabinet">
+  <div class="dungeon-bg"></div>
 
-  <!-- Menu Screen (No Menu Button Here) -->    
-  <div class="screen" id="menuScreen" style="display: flex;">  
-    <div class="menu-title vhs">ARCADE POEM DUNGEON</div>  
-    <div class="menu-buttons">  
-      <button onclick="openCharacterSelect()">▶ START GAME</button>  
-      <button onclick="openLevelSelect()">🗺️ LEVEL SELECT</button>  
-      <button onclick="openSaveSlots()">💾 SAVE SLOTS</button>  
-      <button onclick="showInstructions()">❖ HOW TO PLAY</button>  
-      <button onclick="showCredits()">★ CREDITS</button>  
-    </div>  
-  </div>    
-
-  <!-- Character Select -->    
-  <div class="screen" id="characterSelect">  
-    <div class="menu-title">SELECT YOUR HERO</div>  
-    <div class="character-grid">  
-      <button onclick="chooseCharacter('Warrior')">⚔️ Warrior</button>  
-      <button onclick="chooseCharacter('Mage')">✨ Mage</button>  
-      <button onclick="chooseCharacter('Rogue')">🗡️ Rogue</button>  
-    </div>  
-    <button class="ctrl-btn" style="margin-top: 2rem;" onclick="returnToMenu()">🏠 BACK</button>  
-  </div>    
-
-  <!-- Level Select (Levels 1-15, Locked until cleared) -->  
-  <div class="screen" id="levelSelectScreen">  
-    <div class="menu-title" style="font-size: 1.5rem; margin-bottom: 1rem;">SELECT LEVEL</div>  
-    <div class="level-grid" id="levelGrid">  
-      <!-- Dynamically populated via JS -->  
-    </div>  
-    <button class="ctrl-btn" style="margin-top: 1.5rem;" onclick="returnToMenu()">🏠 BACK</button>  
-  </div>  
-
-  <!-- Save slots -->    
-  <div class="screen" id="saveScreen">  
-    <div class="menu-title">SAVE SLOTS</div>  
-    <div class="save-grid">  
-      <button onclick="loadSlot(1)">Slot 1</button>  
-      <button onclick="loadSlot(2)">Slot 2</button>  
-      <button onclick="loadSlot(3)">Slot 3</button>  
-    </div>  
-    <button class="ctrl-btn" style="margin-top: 2rem;" onclick="returnToMenu()">🏠 BACK</button>  
-  </div>    
-
-  <!-- Poem word grid (score items) -->    
-  <div class="poem-grid" id="poemGrid"></div>    
-
-  <!-- Level Complete Screen -->  
-  <div class="screen" id="levelComplete">  
-    <h1>LEVEL COMPLETED!</h1>  
-    <button class="nextLevelBtn" onclick="nextLevel()">▶ NEXT LEVEL</button>  
-    <button onclick="returnToMenu()">🏠 MAIN MENU</button>  
-  </div>  
-
-  <!-- Grand Victory Screen (Level 15 Complete) -->  
-  <div class="screen" id="gameComplete">  
-    <h1 style="color: #0f0;">CONGRATULATIONS!<br>YOU BEAT ALL 15 LEVELS!</h1>  
-    <button onclick="restartFullGame()">🔄 PLAY AGAIN</button>  
-    <button onclick="returnToMenu()">🏠 MAIN MENU</button>  
+  <!-- Scoreboard & Level HUD (Only shown during gameplay) -->
+  <div id="scoreboard">
+    <div id="levelIndicator">LEVEL 1 / 15</div>
+    <div id="scoreIndicator">SCORE: 0</div>
   </div>
-</div>  
 
-<!-- Settings Overlay (Opened via ESC) -->  
-<div class="overlay" id="settingsOverlay">  
-  <div class="overlay-content">  
-    <h2>Settings & Menu</h2>  
-    <div style="margin-bottom: 1rem;">  
-      <label>CRT Intensity</label>  
-      <input type="range" id="crtRange" min="0" max="1" step="0.1" value="1">  
-    </div>  
-    <div style="margin-bottom: 1rem;">  
-      <label>Glitch Level</label>  
-      <input type="range" id="glitchRange" min="0" max="1" step="0.1" value="1">  
-    </div>  
-    <div style="margin-bottom: 1rem;">  
-      <label>Soundtrack Volume</label>  
-      <input type="range" id="volumeRange" min="0" max="1" step="0.1" value="0.6">  
-    </div>  
-    <div style="display: flex; gap: 1rem; justify-content: center; margin-top: 1.5rem;">  
-      <button class="ctrl-btn" onclick="closeSettings()">Close</button>  
-      <button class="ctrl-btn" style="border-color: #f00; color: #f00;" onclick="returnToMenuFromESC()">🏠 Main Menu</button>  
-    </div>  
-  </div>  
-</div>  
+  <!-- Main Menu Screen (No save slot or menu buttons) -->
+  <div id="menuScreen" class="screen">
+    <div class="menu-title vhs">ARCADE POEM DUNGEON</div>
+    <div class="menu-subtitle">OFF THE GRID</div>
+    <div class="menu-buttons">
+      <button onclick="openCharacterSelect()">▶ START GAME</button>
+      <button onclick="openLevelSelect()">🗺️ LEVEL SELECT</button>
+      <button onclick="showInstructions()">❖ HOW TO PLAY</button>
+      <button onclick="showCredits()">★ CREDITS</button>
+    </div>
+  </div>
 
-<!-- Retro Scrolling Credits -->  
-<div class="overlay" id="creditsOverlay">  
-  <div class="overlay-content">  
-    <div class="credit-line">ARCADE POEM DUNGEON</div>  
-    <div class="credit-line">CREATED BY</div>  
-    <div class="credit-line">Christine Julian</div>  
-    <div class="credit-line">PIXEL DUNGEON BACKGROUND</div>  
-    <div class="credit-line">SYNTH NARRATOR VOICE</div>  
-    <div class="credit-line">8-BIT SOUNDTRACK</div>  
-    <div class="credit-line">THANK YOU FOR PLAYING</div>  
-  </div>  
-</div>  
+  <!-- Character Select Screen -->
+  <div id="characterSelect" class="screen" style="display:none;">
+    <div class="menu-title">SELECT HERO</div>
+    <div class="menu-buttons">
+      <button onclick="chooseCharacter('Warrior')">⚔️ Warrior</button>
+      <button onclick="chooseCharacter('Mage')">✨ Mage</button>
+      <button onclick="chooseCharacter('Rogue')">🗡️ Rogue</button>
+      <button onclick="returnToMenu()">🏠 BACK</button>
+    </div>
+  </div>
 
-<!-- Audio -->  
-<audio id="bgm" loop>  
-  <source src="https://files.catbox.moe/8bitloop.mp3" type="audio/mpeg">  
-</audio>  
-<audio id="voice">  
-  <source src="https://files.catbox.moe/synthvoice.mp3" type="audio/mpeg">  
-</audio>  
-<audio id="hitSfx">  
-  <source src="https://files.catbox.moe/hitbeep.mp3" type="audio/mpeg">  
-</audio>  
+  <!-- Level Select Screen (Levels 1-15, locked until previous cleared) -->
+  <div id="levelSelect" class="screen">
+    <div class="level-select-title">SELECT LEVEL</div>
+    <div class="level-grid" id="levelGrid"></div>
+    <div class="menu-buttons" style="margin-top: 1.5rem;">
+      <button onclick="returnToMenu()">🏠 BACK</button>
+    </div>
+  </div>
 
-<script>  
+  <!-- Poem Word Grid (Clickable Score Items) -->
+  <div id="poemGrid"></div>
+
+  <!-- Level Complete Screen -->
+  <div id="levelComplete" class="screen">
+    <h1 id="levelCompleteTitle">LEVEL COMPLETED!</h1>
+    <div class="menu-buttons">
+      <button class="nextLevelBtn" onclick="nextLevel()">▶ NEXT LEVEL</button>
+      <button onclick="returnToMenu()">🏠 MAIN MENU</button>
+    </div>
+  </div>
+
+  <!-- Grand Victory Screen (Level 15 Complete) -->
+  <div id="gameComplete" class="screen">
+    <h1>CONGRATULATIONS!<br>YOU BEAT ALL 15 LEVELS!</h1>
+    <div class="menu-buttons">
+      <button onclick="restartFullGame()">🔄 PLAY AGAIN</button>
+      <button onclick="returnToMenu()">🏠 MAIN MENU</button>
+    </div>
+  </div>
+</div>
+
+<!-- Settings Overlay (Opened via ESC) -->
+<div class="overlay" id="settingsOverlay">
+  <div class="overlay-content">
+    <h2>SYSTEM SETTINGS</h2>
+    <label>CRT Intensity</label>
+    <input type="range" id="crtRange" min="0" max="1" step="0.1" value="1">
+    
+    <label>Glitch Level</label>
+    <input type="range" id="glitchRange" min="0" max="1" step="0.1" value="1">
+    
+    <label>Soundtrack Volume</label>
+    <input type="range" id="volumeRange" min="0" max="1" step="0.1" value="0.6">
+    
+    <div style="display: flex; gap: 1rem; justify-content: center; margin-top: 1.5rem;">
+      <button class="level-btn" onclick="closeSettings()">RESUME</button>
+      <button class="level-btn" style="border-color: #f00; color: #f00;" onclick="returnToMenuFromESC()">MAIN MENU</button>
+    </div>
+  </div>
+</div>
+
+<!-- Retro Scrolling Credits -->
+<div class="overlay" id="creditsOverlay">
+  <div class="overlay-content">
+    <div class="credit-line">ARCADE POEM DUNGEON</div>
+    <div class="credit-line">CREATED BY</div>
+    <div class="credit-line">Christine Julian</div>
+    <div class="credit-line">PIXEL DUNGEON BACKGROUND</div>
+    <div class="credit-line">SYNTH NARRATOR VOICE</div>
+    <div class="credit-line">8-BIT SOUNDTRACK</div>
+    <div class="credit-line">THANK YOU FOR PLAYING</div>
+  </div>
+</div>
+
+<!-- Audio Elements -->
+<audio id="bgm" loop>
+  <source src="https://files.catbox.moe/8bitloop.mp3" type="audio/mpeg">
+</audio>
+<audio id="voice">
+  <source src="https://files.catbox.moe/synthvoice.mp3" type="audio/mpeg">
+</audio>
+<audio id="hitSfx">
+  <source src="https://files.catbox.moe/hitbeep.mp3" type="audio/mpeg">
+</audio>
+
+<script>
 let currentLevel = 1;
 let highestUnlockedLevel = parseInt(localStorage.getItem("highestUnlockedLevel")) || 1;
 const maxLevels = 15;
@@ -140,225 +129,225 @@ for (let i = 1; i <= maxLevels; i++) {
   levelTargets[i] = i * 10; 
 }
 
-const menuScreen = document.getElementById("menuScreen");  
-const characterSelect = document.getElementById("characterSelect");  
-const saveScreen = document.getElementById("saveScreen");  
-const levelSelectScreen = document.getElementById("levelSelectScreen");  
-const levelGrid = document.getElementById("levelGrid");  
-const poemGrid = document.getElementById("poemGrid");  
-const hudDisplay = document.getElementById("hudDisplay");  
-const levelIndicator = document.getElementById("levelIndicator");  
-const scoreIndicator = document.getElementById("scoreIndicator");  
-const levelComplete = document.getElementById("levelComplete");  
-const gameComplete = document.getElementById("gameComplete");  
-const settingsOverlay = document.getElementById("settingsOverlay");  
-const creditsOverlay = document.getElementById("creditsOverlay");  
+const menuScreen = document.getElementById("menuScreen");
+const characterSelect = document.getElementById("characterSelect");
+const levelSelect = document.getElementById("levelSelect");
+const levelGrid = document.getElementById("levelGrid");
+const poemGrid = document.getElementById("poemGrid");
+const scoreboard = document.getElementById("scoreboard");
+const levelIndicator = document.getElementById("levelIndicator");
+const scoreIndicator = document.getElementById("scoreIndicator");
+const levelComplete = document.getElementById("levelComplete");
+const gameComplete = document.getElementById("gameComplete");
+const settingsOverlay = document.getElementById("settingsOverlay");
+const creditsOverlay = document.getElementById("creditsOverlay");
 
-const bgm = document.getElementById("bgm");  
-const voice = document.getElementById("voice");  
-const hitSfx = document.getElementById("hitSfx");  
+const bgm = document.getElementById("bgm");
+const voice = document.getElementById("voice");
+const hitSfx = document.getElementById("hitSfx");
 
-/* Navigation */  
-function openCharacterSelect() {  
-  menuScreen.style.display = "none";  
-  characterSelect.style.display = "flex";  
-}  
-function openSaveSlots() {  
-  menuScreen.style.display = "none";  
-  saveScreen.style.display = "flex";  
-}  
-function openLevelSelect() {  
-  menuScreen.style.display = "none";  
-  buildLevelSelectButtons();  
-  levelSelectScreen.style.display = "flex";  
-}  
-function chooseCharacter(name) {  
-  localStorage.setItem("character", name);  
+/* Navigation */
+function openCharacterSelect() {
+  menuScreen.style.display = "none";
+  characterSelect.style.display = "flex";
+}
+function openLevelSelect() {
+  menuScreen.style.display = "none";
+  buildLevelSelectButtons();
+  levelSelect.style.display = "flex";
+}
+function chooseCharacter(name) {
+  localStorage.setItem("character", name);
   currentLevel = 1;
   score = 0;
-  startGame();  
-}  
-function loadSlot(slot) {  
-  alert("Loaded Slot " + slot);  
-  currentLevel = 1;
-  score = 0;
-  startGame();  
-}  
+  startGame();
+}
 
 function buildLevelSelectButtons() {
   levelGrid.innerHTML = "";
   for (let i = 1; i <= maxLevels; i++) {
     const btn = document.createElement("button");
-    btn.classList.add("ctrl-btn");
-    btn.style.padding = "0.8rem";
-    btn.style.fontSize = "0.8rem";
+    btn.classList.add("level-btn");
     
     if (i <= highestUnlockedLevel) {
-      btn.textContent = `Level ${i}`;
+      btn.textContent = `LEVEL ${i}`;
       btn.onclick = () => {
         currentLevel = i;
         score = 0;
-        levelSelectScreen.style.display = "none";
+        levelSelect.style.display = "none";
         startGame();
       };
     } else {
-      btn.textContent = `🔒 Level ${i}`;
-      btn.style.borderColor = "#555";
-      btn.style.color = "#555";
-      btn.style.cursor = "not-allowed";
+      btn.textContent = `🔒 LCK ${i}`;
+      btn.classList.add("level-locked");
     }
     levelGrid.appendChild(btn);
   }
 }
 
-function showCredits() {  
-  creditsOverlay.style.display = "flex";  
-  voice.play();  
-  setTimeout(() => {  
-    creditsOverlay.style.display = "none";  
-  }, 18000);  
-}  
+function showCredits() {
+  creditsOverlay.style.display = "flex";
+  voice.play();
+  setTimeout(() => {
+    creditsOverlay.style.display = "none";
+  }, 18000);
+}
 
-function showInstructions() {  
-  alert("Click poem words to gain score.\nReach the target score to complete each level.\nLevels 2 through 15 unlock as you progress.\nPress ESC anytime to open settings or return to menu.");  
-}  
+function showInstructions() {
+  alert("Click poem words to gain score.\nReach the target score to complete each level.\nLevels 2 through 15 unlock progressively.\nPress ESC anytime to open settings or return to menu.");
+}
 
-function openSettings() {  
-  settingsOverlay.style.display = "flex";  
-}  
-function closeSettings() {  
-  settingsOverlay.style.display = "none";  
-}  
+function openSettings() {
+  settingsOverlay.style.display = "flex";
+}
+function closeSettings() {
+  settingsOverlay.style.display = "none";
+}
 function returnToMenuFromESC() {
   closeSettings();
   returnToMenu();
 }
 
-/* Settings Inputs */  
-document.getElementById("crtRange").addEventListener("input", (e) => {  
-  document.body.style.opacity = e.target.value;  
-});  
-document.getElementById("glitchRange").addEventListener("input", (e) => {  
-  const val = e.target.value;  
-  const title = document.querySelector(".menu-title");  
-  if (title) {  
-    title.style.animationDuration = (0.25 + (1 - val) * 0.5) + "s";  
-  }  
-});  
-document.getElementById("volumeRange").addEventListener("input", (e) => {  
-  bgm.volume = e.target.value;  
-});  
+/* Settings Inputs */
+document.getElementById("crtRange").addEventListener("input", (e) => {
+  document.body.style.opacity = e.target.value;
+});
+document.getElementById("glitchRange").addEventListener("input", (e) => {
+  const val = e.target.value;
+  const title = document.querySelector(".menu-title");
+  if (title) {
+    title.style.animationDuration = (0.25 + (1 - val) * 0.5) + "s";
+  }
+});
+document.getElementById("volumeRange").addEventListener("input", (e) => {
+  bgm.volume = e.target.value;
+});
 
-/* Gameplay */  
-function startGame() {  
-  menuScreen.style.display = "none";  
-  characterSelect.style.display = "none";  
-  saveScreen.style.display = "none";  
-  levelSelectScreen.style.display = "none";  
-  levelComplete.style.display = "none";  
-  gameComplete.style.display = "none";  
+/* Gameplay */
+function startGame() {
+  menuScreen.style.display = "none";
+  characterSelect.style.display = "none";
+  levelSelect.style.display = "none";
+  levelComplete.style.display = "none";
+  gameComplete.style.display = "none";
   
-  hudDisplay.style.display = "flex";  
-  bgm.volume = 0.6;  
-  bgm.play();  
-  voice.play();  
-  loadLevel(currentLevel);  
-  updateHUD();  
-}  
+  scoreboard.style.display = "flex";
+  bgm.volume = 0.6;
+  bgm.play();
+  voice.play();
+  loadLevel(currentLevel);
+  updateHUD();
+}
 
-function loadLevel(level) {  
-  poemGrid.innerHTML = "";  
-  poemGrid.style.display = "grid";  
+function loadLevel(level) {
+  poemGrid.innerHTML = "";
+  poemGrid.style.display = "grid";
   
-  for (let i = 0; i < 10; i++) {  
-    const word = document.createElement("div");  
-    word.classList.add("poemWord");  
-    word.textContent = `word ${i + 1}`;  
-    word.addEventListener("click", () => {  
-      score++;  
-      updateHUD();  
-      hitSfx.play();  
-      word.style.opacity = "0";  
-      word.style.transform = "scale(0.5)";  
-      word.style.pointerEvents = "none";  
+  for (let i = 0; i < 10; i++) {
+    const word = document.createElement("div");
+    word.classList.add("poemWord");
+    word.textContent = `word ${i + 1}`;
+    word.addEventListener("click", () => {
+      score++;
+      updateHUD();
+      hitSfx.play();
+      spawnParticles();
+      word.style.opacity = "0";
+      word.style.transform = "scale(0.5)";
+      word.style.pointerEvents = "none";
       
-      if (score >= levelTargets[currentLevel]) {  
-        completeLevel();  
-      }  
-    });  
-    poemGrid.appendChild(word);  
-  }  
-}  
+      if (score >= levelTargets[currentLevel]) {
+        completeLevel();
+      }
+    });
+    poemGrid.appendChild(word);
+  }
+}
 
-function updateHUD() {  
-  levelIndicator.textContent = `LEVEL ${currentLevel} / ${maxLevels}`;  
-  scoreIndicator.textContent = `SCORE: ${score}`;  
-}  
+function updateHUD() {
+  levelIndicator.textContent = `LEVEL ${currentLevel} / ${maxLevels}`;
+  scoreIndicator.textContent = `SCORE: ${score}`;
+}
 
-function completeLevel() {  
-  poemGrid.style.display = "none";  
-  hudDisplay.style.display = "none";  
-  bgm.pause();  
+function completeLevel() {
+  poemGrid.style.display = "none";
+  scoreboard.style.display = "none";
+  bgm.pause();
   
   if (currentLevel > highestUnlockedLevel) {
     highestUnlockedLevel = currentLevel;
     localStorage.setItem("highestUnlockedLevel", highestUnlockedLevel);
   }
 
-  if (currentLevel < maxLevels) {  
-    levelComplete.style.display = "flex";  
-    levelComplete.querySelector("h1").textContent = `Level ${currentLevel} Complete!`;  
-  } else {  
-    gameComplete.style.display = "flex";  
-  }  
-}  
+  if (currentLevel < maxLevels) {
+    levelComplete.style.display = "flex";
+    document.getElementById("levelCompleteTitle").textContent = `LEVEL ${currentLevel} COMPLETE!`;
+  } else {
+    gameComplete.style.display = "flex";
+  }
+}
 
-function nextLevel() {  
-  levelComplete.style.display = "none";  
-  currentLevel++;  
-  score = 0;  
-  hudDisplay.style.display = "flex";  
-  bgm.play();  
-  loadLevel(currentLevel);  
-  updateHUD();  
-}  
+function nextLevel() {
+  levelComplete.style.display = "none";
+  currentLevel++;
+  score = 0;
+  scoreboard.style.display = "flex";
+  bgm.play();
+  loadLevel(currentLevel);
+  updateHUD();
+}
 
-function restartFullGame() {  
-  currentLevel = 1;  
-  score = 0;  
-  gameComplete.style.display = "none";  
-  hudDisplay.style.display = "flex";  
-  bgm.play();  
-  loadLevel(currentLevel);  
-  updateHUD();  
-}  
+function restartFullGame() {
+  currentLevel = 1;
+  score = 0;
+  gameComplete.style.display = "none";
+  scoreboard.style.display = "flex";
+  bgm.play();
+  loadLevel(currentLevel);
+  updateHUD();
+}
 
-function returnToMenu() {  
-  poemGrid.style.display = "none";  
-  hudDisplay.style.display = "none";  
-  levelComplete.style.display = "none";  
-  gameComplete.style.display = "none";  
-  characterSelect.style.display = "none";  
-  saveScreen.style.display = "none";  
-  levelSelectScreen.style.display = "none";  
-  creditsOverlay.style.display = "none";  
-  settingsOverlay.style.display = "none";  
+function returnToMenu() {
+  poemGrid.style.display = "none";
+  scoreboard.style.display = "none";
+  levelComplete.style.display = "none";
+  gameComplete.style.display = "none";
+  characterSelect.style.display = "none";
+  levelSelect.style.display = "none";
+  creditsOverlay.style.display = "none";
+  settingsOverlay.style.display = "none";
   
-  menuScreen.style.display = "flex";  
-  bgm.pause();  
-  bgm.currentTime = 0;  
-}  
+  menuScreen.style.display = "flex";
+  bgm.pause();
+  bgm.currentTime = 0;
+}
 
-/* ESC key opens Settings (which includes Return to Menu) */  
-document.addEventListener("keydown", (e) => {  
-  if (e.key === "Escape") {  
-    if (settingsOverlay.style.display === "flex") {  
-      closeSettings();  
-    } else {  
-      openSettings();  
-    }  
-  }  
-});  
-</script>  
-</body>  
+/* Particles */
+function spawnParticles() {
+  for (let i = 0; i < 15; i++) {
+    const p = document.createElement("div");
+    p.classList.add("particle");
+    const dx = (Math.random() * 300 - 150) + "px";
+    const dy = (Math.random() * 300 - 150) + "px";
+    p.style.setProperty("--dx", dx);
+    p.style.setProperty("--dy", dy);
+    p.style.left = (window.innerWidth / 2) + "px";
+    p.style.top = (window.innerHeight / 2) + "px";
+    document.body.appendChild(p);
+    setTimeout(() => p.remove(), 1200);
+  }
+}
+
+/* ESC key opens Settings */
+document.addEventListener("keydown", (e) => {
+  if (e.key === "Escape") {
+    if (settingsOverlay.style.display === "flex") {
+      closeSettings();
+    } else {
+      openSettings();
+    }
+  }
+});
+</script>
+</body>
 </html>
