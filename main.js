@@ -65,7 +65,7 @@ const words = [
 // MENU BUTTONS
 // ===============================
 startGameBtn.onclick = () => {
-    menuScreen.classList.remove("active");
+    hideAll();
     levelSelect.classList.add("active");
     buildLevelButtons();
 };
