@@ -1,9 +1,11 @@
 // main.js
 // ============================================================
+
+// ============================================================
 // GAME CONSTANTS
 // ============================================================
 const MAX_STAGES = 15;
-const DAMAGE_AMOUNT = 50; // 50% health loss
+const DAMAGE_AMOUNT = 50; // wrong word = 50% health loss
 const SCORE_GOAL = 5;     // fewer correct words needed per stage
 
 let currentStage = 1;
@@ -70,28 +72,32 @@ volumeSlider.oninput = () => {
 // ============================================================
 // Correct words: video‑game related
 const gameWords = [
-    "controller","console","pixel","arcade","quest",
-    "level","boss","score","health","inventory",
-    "joystick","respawn","checkpoint","combo","powerup"
+    "player","enemy","boss","level","controller",
+    "respawn","inventory","quest","pixel","arcade",
+    "console","joystick","checkpoint","powerup","combo"
 ];
 
 // Wrong words: unrelated to video games
 const nonGameWords = [
-    "sunflower","teacup","pillow","laundry","garden",
-    "cloud","notebook","candle","blanket","window",
-    "spoon","river","mountain","pasta","library"
+    "flower","spoon","cloud","pillow","laundry",
+    "garden","notebook","candle","blanket","window",
+    "river","mountain","pasta","library","sunflower"
 ];
 
 // ============================================================
-// ATTRACT MODE → EXIT ON KEY OR CLICK
+// UNIFIED START: music + attract exit
 // ============================================================
-document.addEventListener("keydown", exitAttract, { once: true });
-document.addEventListener("click", exitAttract, { once: true });
-
-function exitAttract() {
+function startEverything() {
+    bgMusic.play().catch(() => {});
     attractScreen.classList.remove("active");
     menuScreen.classList.add("active");
+
+    document.removeEventListener("click", startEverything);
+    document.removeEventListener("keydown", startEverything);
 }
+
+document.addEventListener("click", startEverything, { once: true });
+document.addEventListener("keydown", startEverything, { once: true });
 
 // ============================================================
 // MENU BUTTONS
@@ -104,11 +110,10 @@ startGameBtn.onclick = () => {
 
 howToPlayBtn.onclick = () => {
     alert(
-        "Click ONLY video‑game related words.\n\n" +
-        "Correct (game) word: +1 score.\n" +
-        "Wrong (non‑game) word: -50% health.\n\n" +
-        "If health reaches 0, the session ends.\n" +
-        "Reach the score goal to clear the stage."
+        "Correct words = video‑game terms (player, enemy, boss, level, controller…)\n\n" +
+        "Wrong words = unrelated terms (flower, spoon, cloud…)\n\n" +
+        "Wrong click = -50% health.\n" +
+        "Score 5 correct words to clear the stage."
     );
 };
 
@@ -177,7 +182,6 @@ function updateHUD() {
 function createWords() {
     poemGrid.innerHTML = "";
 
-    // mix game words and non‑game words
     const mixed = [
         ...gameWords.sort(() => Math.random() - 0.5).slice(0, 5),
         ...nonGameWords.sort(() => Math.random() - 0.5).slice(0, 5)
