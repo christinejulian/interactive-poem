@@ -5,404 +5,15 @@
 <title>Arcade Poem Dungeon — Off the Grid</title>  
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />  
 <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">  
-<style>  
-html, body {  
-  margin: 0;  
-  padding: 0;  
-  height: 100%;  
-  background: #000;  
-  font-family: "Press Start 2P", monospace;  
-  overflow: hidden;  
-}  
-  
-/* CRT scanlines */  
-body::before {  
-  content: "";  
-  position: fixed;  
-  inset: 0;  
-  background: repeating-linear-gradient(  
-    to bottom,  
-    rgba(255,255,255,0.03) 0px,  
-    rgba(255,255,255,0.03) 2px,  
-    rgba(0,0,0,0.05) 3px  
-  );  
-  pointer-events: none;  
-  z-index: 1000;  
-}  
-  
-/* VHS glitch */  
-@keyframes glitch {  
-  0% { transform: translate(0,0); }  
-  20% { transform: translate(-2px, 1px); }  
-  40% { transform: translate(2px, -1px); }  
-  60% { transform: translate(-1px, 2px); }  
-  80% { transform: translate(1px, -2px); }  
-  100% { transform: translate(0,0); }  
-}  
-.vhs {  
-  animation: glitch 0.25s infinite;  
-}  
-  
-/* Glow overlay */  
-.arcade-glow {  
-  position: fixed;  
-  inset: 0;  
-  background:  
-    radial-gradient(circle at 50% 20%, rgba(0,255,153,0.25), transparent 60%),  
-    radial-gradient(circle at 10% 80%, rgba(255,0,153,0.25), transparent 60%),  
-    radial-gradient(circle at 90% 60%, rgba(0,153,255,0.25), transparent 60%);  
-  mix-blend-mode: screen;  
-  pointer-events: none;  
-  z-index: 900;  
-}  
-  
-/* Cabinet */  
-.cabinet {  
-  position: absolute;  
-  top: 50%;  
-  left: 50%;  
-  width: 88vw;  
-  height: 88vh;  
-  transform: translate(-50%, -50%);  
-  background: #111;  
-  border: 12px solid #0ff;  
-  border-radius: 18px;  
-  box-shadow:  
-    0 0 40px #0ff,  
-    0 0 80px #0ff inset,  
-    0 0 120px rgba(0,255,255,0.4) inset;  
-  overflow: hidden;  
-}  
-  
-/* Pixel dungeon background */  
-.dungeon-bg {  
-  position: absolute;  
-  inset: 0;  
-  background-image:  
-    linear-gradient(#050505 1px, transparent 1px),  
-    linear-gradient(90deg, #050505 1px, transparent 1px);  
-  background-size: 32px 32px;  
-  opacity: 0.4;  
-  pointer-events: none;  
-}  
-  
-/* Menu screen */  
-.menu-screen {  
-  width: 100%;  
-  height: 100%;  
-  padding-top: 4rem;  
-  text-align: center;  
-  color: #0ff;  
-  display: flex;  
-  flex-direction: column;  
-  gap: 2rem;  
-  font-size: 1.2rem;  
-  position: relative;  
-  z-index: 2;  
-}  
-.menu-title {  
-  font-size: 2rem;  
-  text-shadow: 0 0 12px #0ff, 0 0 24px #0ff;  
-  letter-spacing: 0.15em;  
-}  
-.menu-option {  
-  padding: 1rem;  
-  margin: 0 auto;  
-  width: 60%;  
-  border: 3px solid #0ff;  
-  border-radius: 12px;  
-  cursor: pointer;  
-  transition: background 0.3s, color 0.3s;  
-}  
-.menu-option:hover {  
-  background: #0ff;  
-  color: #000;  
-}  
-  
-/* Character select */  
-.character-select {  
-  display: none;  
-  width: 100%;  
-  height: 100%;  
-  padding-top: 3rem;  
-  text-align: center;  
-  color: #0ff;  
-  position: relative;  
-  z-index: 2;  
-}  
-.character-grid {  
-  display: flex;  
-  justify-content: center;  
-  gap: 3rem;  
-  margin-top: 2rem;  
-}  
-.character {  
-  width: 140px;  
-  height: 140px;  
-  border: 3px solid #0ff;  
-  border-radius: 12px;  
-  display: flex;  
-  flex-direction: column;  
-  align-items: center;  
-  justify-content: center;  
-  cursor: pointer;  
-  transition: transform 0.3s, background 0.3s;  
-}  
-.character:hover {  
-  background: #0ff;  
-  color: #000;  
-  transform: scale(1.1);  
-}  
-.sprite {  
-  width: 64px;  
-  height: 64px;  
-  image-rendering: pixelated;  
-  background-size: cover;  
-  margin-bottom: 0.5rem;  
-}  
-  
-/* Save slots */  
-.save-screen {  
-  display: none;  
-  width: 100%;  
-  height: 100%;  
-  padding-top: 3rem;  
-  text-align: center;  
-  color: #0ff;  
-  position: relative;  
-  z-index: 2;  
-}  
-.save-slot {  
-  padding: 1rem;  
-  margin: 1rem auto;  
-  width: 60%;  
-  border: 3px solid #0ff;  
-  border-radius: 12px;  
-  cursor: pointer;  
-}  
-.save-slot:hover {  
-  background: #0ff;  
-  color: #000;  
-}  
-  
-/* In-Game Navigation UI Controls */
-.game-controls {  
-  position: absolute;  
-  top: 1rem;  
-  right: 1rem;  
-  display: flex;  
-  gap: 0.5rem;  
-  z-index: 10;  
-}  
-.ctrl-btn {  
-  background: #000;  
-  color: #0ff;  
-  border: 2px solid #0ff;  
-  padding: 0.5rem 0.8rem;  
-  font-family: inherit;  
-  font-size: 0.7rem;  
-  border-radius: 6px;  
-  cursor: pointer;  
-  box-shadow: 0 0 8px #0ff;  
-  transition: background 0.2s, color 0.2s, transform 0.1s;  
-}  
-.ctrl-btn:hover {  
-  background: #0ff;  
-  color: #000;  
-}  
-.ctrl-btn:active {  
-  transform: scale(0.95);  
-}  
-
-/* HUD (Level & Score) */  
-.hud-display {  
-  position: absolute;  
-  top: 1rem;  
-  left: 1rem;  
-  color: #0ff;  
-  font-size: 0.8rem;  
-  text-shadow: 0 0 8px #0ff;  
-  z-index: 3;  
-  display: flex;
-  flex-direction: column;
-  gap: 0.3rem;
-}
-  
-/* Player sprite */  
-.player {  
-  position: absolute;  
-  bottom: 10%;  
-  left: 50%;  
-  transform: translateX(-50%);  
-  width: 64px;  
-  height: 64px;  
-  background: #0ff;  
-  border-radius: 4px;  
-  box-shadow: 0 0 12px #0ff;  
-  image-rendering: pixelated;  
-  z-index: 3;  
-}  
-@keyframes idle {  
-  0% { transform: translateX(-50%) translateY(0); }  
-  50% { transform: translateX(-50%) translateY(-4px); }  
-  100% { transform: translateX(-50%) translateY(0); }  
-}  
-.player {  
-  animation: idle 1s infinite;  
-}  
-  
-/* Poem grid */  
-.poem-grid {  
-  display: none;  
-  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));  
-  gap: 2rem;  
-  padding: 4rem 3rem 3rem 3rem;  
-  font-size: 1.2rem;  
-  color: #fff;  
-  text-align: center;  
-  transition: all 1s ease;  
-  position: relative;  
-  z-index: 2;  
-}  
-.poem-grid div {  
-  padding: 1rem;  
-  border: 2px solid #0ff;  
-  border-radius: 10px;  
-  background: rgba(0,0,0,0.6);  
-  box-shadow: 0 0 12px #0ff;  
-  transition: transform 0.6s ease, color 0.4s ease, text-shadow 0.4s ease, opacity 0.4s ease;  
-  cursor: pointer;  
-}  
-.beat {  
-  border-color: #ff0;  
-  box-shadow: 0 0 12px #ff0;  
-}  
-  
-/* Settings overlay */  
-.settings-overlay {  
-  position: fixed;  
-  inset: 0;  
-  background: rgba(0,0,0,0.8);  
-  color: #0ff;  
-  display: none;  
-  align-items: center;  
-  justify-content: center;  
-  z-index: 1100;  
-}  
-.settings-panel {  
-  border: 3px solid #0ff;  
-  padding: 2rem;  
-  border-radius: 12px;  
-  background: #111;  
-  width: 320px;  
-}  
-.settings-panel h2 {  
-  font-size: 1rem;  
-  margin-bottom: 1rem;  
-}  
-.settings-row {  
-  margin-bottom: 1rem;  
-  font-size: 0.8rem;  
-}  
-.settings-row label {  
-  display: block;  
-  margin-bottom: 0.3rem;  
-}  
-.settings-row input[type="range"] {  
-  width: 100%;  
-}  
-  
-/* Particles */  
-.particle {  
-  position: fixed;  
-  width: 6px;  
-  height: 6px;  
-  background: #0ff;  
-  border-radius: 50%;  
-  pointer-events: none;  
-  opacity: 0.8;  
-  animation: fly 1.2s linear forwards;  
-}  
-@keyframes fly {  
-  from { transform: translate(0,0); opacity: 1; }  
-  to { transform: translate(var(--dx), var(--dy)); opacity: 0; }  
-}  
-  
-/* Victory Screen */
-.victory-screen {  
-  position: absolute;  
-  inset: 0;  
-  display: none;  
-  flex-direction: column;  
-  align-items: center;  
-  justify-content: center;  
-  gap: 2rem;  
-  background: rgba(0,0,0,0.85);  
-  z-index: 5;  
-  color: #0f0;  
-  font-size: 2rem;  
-  text-shadow: 0 0 12px #0f0;  
-}  
-
-/* Grand Victory Screen (After Level 15) */
-.grand-victory-screen {  
-  position: absolute;  
-  inset: 0;  
-  display: none;  
-  flex-direction: column;  
-  align-items: center;  
-  justify-content: center;  
-  gap: 2rem;  
-  background: rgba(0,0,0,0.9);  
-  z-index: 6;  
-  color: #ff0;  
-  font-size: 1.8rem;  
-  text-shadow: 0 0 15px #ff0;  
-  text-align: center;
-  padding: 2rem;
-}  
-  
-/* Scrolling retro credits */  
-.credits-overlay {  
-  position: fixed;  
-  inset: 0;  
-  background: #000;  
-  display: none;  
-  overflow: hidden;  
-  z-index: 2000;  
-}  
-.credits-content {  
-  position: absolute;  
-  bottom: -100%;  
-  width: 100%;  
-  text-align: center;  
-  color: #0ff;  
-  font-size: 1.2rem;  
-  text-shadow: 0 0 12px #0ff;  
-  animation: scrollCredits 20s linear forwards;  
-}  
-.credit-line {  
-  margin: 1.2rem 0;  
-  letter-spacing: 0.15em;  
-}  
-@keyframes scrollCredits {  
-  from { bottom: -100%; }  
-  to { bottom: 110%; }  
-}  
-</style>  
+<link rel="stylesheet" href="styles.css">  
 </head>  
 <body>  
 <div class="arcade-glow"></div>  
 <div class="cabinet">  
   <div class="dungeon-bg"></div>    
 
-  <!-- UI Navigation Controls -->
-  <div class="game-controls">  
-    <button class="ctrl-btn" onclick="returnToMenu()">🏠 MENU</button>  
-  </div>  
-
-  <!-- HUD: Level & Score -->    
-  <div class="hud-display" id="hudDisplay">  
+  <!-- Scoreboard & Level HUD (Only shown during gameplay, hidden on menu/level select) -->  
+  <div class="hud-display" id="hudDisplay" style="display: none;">  
     <div id="levelIndicator">LEVEL 1 / 15</div>  
     <div id="scoreIndicator">SCORE: 0</div>  
   </div>    
@@ -410,90 +21,99 @@ body::before {
   <!-- Player sprite -->    
   <div class="player" id="player"></div>    
 
-  <!-- Menu -->    
-  <div class="menu-screen" id="menuScreen">  
+  <!-- Menu Screen (No Menu Button Here) -->    
+  <div class="screen" id="menuScreen" style="display: flex;">  
     <div class="menu-title vhs">ARCADE POEM DUNGEON</div>  
-    <div class="menu-option" onclick="openCharacterSelect()">▶ START GAME</div>  
-    <div class="menu-option" onclick="openSaveSlots()">💾 SAVE SLOTS</div>  
-    <div class="menu-option" onclick="showCredits()">★ CREDITS</div>  
-    <div class="menu-option" onclick="showInstructions()">❖ HOW TO PLAY</div>  
-    <div class="menu-option" onclick="openSettings()">⚙ SETTINGS</div>  
-  </div>    
-
-  <!-- Character select -->    
-  <div class="character-select" id="characterSelect">  
-    <div class="menu-title">SELECT YOUR HERO</div>  
-    <div class="character-grid">  
-      <div class="character" onclick="chooseCharacter('Warrior')">  
-        <div class="sprite" style="background-image: linear-gradient(#f00,#800);"></div>  
-        <div>⚔️ Warrior</div>  
-      </div>  
-      <div class="character" onclick="chooseCharacter('Mage')">  
-        <div class="sprite" style="background-image: linear-gradient(#0ff,#008);"></div>  
-        <div>✨ Mage</div>  
-      </div>  
-      <div class="character" onclick="chooseCharacter('Rogue')">  
-        <div class="sprite" style="background-image: linear-gradient(#ff0,#880);"></div>  
-        <div>🗡️ Rogue</div>  
-      </div>  
+    <div class="menu-buttons">  
+      <button onclick="openCharacterSelect()">▶ START GAME</button>  
+      <button onclick="openLevelSelect()">🗺️ LEVEL SELECT</button>  
+      <button onclick="openSaveSlots()">💾 SAVE SLOTS</button>  
+      <button onclick="showInstructions()">❖ HOW TO PLAY</button>  
+      <button onclick="showCredits()">★ CREDITS</button>  
     </div>  
   </div>    
 
-  <!-- Save slots -->    
-  <div class="save-screen" id="saveScreen">  
-    <div class="menu-title">SAVE SLOTS</div>  
-    <div class="save-slot" onclick="loadSlot(1)">Slot 1</div>  
-    <div class="save-slot" onclick="loadSlot(2)">Slot 2</div>  
-    <div class="save-slot" onclick="loadSlot(3)">Slot 3</div>  
+  <!-- Character Select -->    
+  <div class="screen" id="characterSelect">  
+    <div class="menu-title">SELECT YOUR HERO</div>  
+    <div class="character-grid">  
+      <button onclick="chooseCharacter('Warrior')">⚔️ Warrior</button>  
+      <button onclick="chooseCharacter('Mage')">✨ Mage</button>  
+      <button onclick="chooseCharacter('Rogue')">🗡️ Rogue</button>  
+    </div>  
+    <button class="ctrl-btn" style="margin-top: 2rem;" onclick="returnToMenu()">🏠 BACK</button>  
   </div>    
 
-  <!-- Poem grid (enemies) -->    
-  <div class="poem-grid" id="poemGrid"></div>    
-
-  <!-- Victory Screen (Per Level) -->
-  <div class="victory-screen" id="victoryScreen">  
-    <div id="victoryTitle">LEVEL COMPLETED!</div>  
-    <button class="ctrl-btn" style="font-size: 1rem; padding: 0.8rem 1.5rem;" onclick="nextLevel()">▶ NEXT LEVEL</button>  
+  <!-- Level Select (Levels 1-15, Locked until cleared) -->  
+  <div class="screen" id="levelSelectScreen">  
+    <div class="menu-title" style="font-size: 1.5rem; margin-bottom: 1rem;">SELECT LEVEL</div>  
+    <div class="level-grid" id="levelGrid">  
+      <!-- Dynamically populated via JS -->  
+    </div>  
+    <button class="ctrl-btn" style="margin-top: 1.5rem;" onclick="returnToMenu()">🏠 BACK</button>  
   </div>  
 
-  <!-- Grand Victory Screen (After Level 15) -->
-  <div class="grand-victory-screen" id="grandVictoryScreen">  
-    <div>CONGRATULATIONS!<br>YOU BEAT ALL 15 LEVELS!</div>  
-    <button class="ctrl-btn" style="font-size: 1rem; padding: 0.8rem 1.5rem;" onclick="restartFullGame()">🔄 PLAY AGAIN FROM LEVEL 1</button>  
+  <!-- Save slots -->    
+  <div class="screen" id="saveScreen">  
+    <div class="menu-title">SAVE SLOTS</div>  
+    <div class="save-grid">  
+      <button onclick="loadSlot(1)">Slot 1</button>  
+      <button onclick="loadSlot(2)">Slot 2</button>  
+      <button onclick="loadSlot(3)">Slot 3</button>  
+    </div>  
+    <button class="ctrl-btn" style="margin-top: 2rem;" onclick="returnToMenu()">🏠 BACK</button>  
+  </div>    
+
+  <!-- Poem word grid (score items) -->    
+  <div class="poem-grid" id="poemGrid"></div>    
+
+  <!-- Level Complete Screen -->  
+  <div class="screen" id="levelComplete">  
+    <h1>LEVEL COMPLETED!</h1>  
+    <button class="nextLevelBtn" onclick="nextLevel()">▶ NEXT LEVEL</button>  
+    <button onclick="returnToMenu()">🏠 MAIN MENU</button>  
+  </div>  
+
+  <!-- Grand Victory Screen (Level 15 Complete) -->  
+  <div class="screen" id="gameComplete">  
+    <h1 style="color: #0f0;">CONGRATULATIONS!<br>YOU BEAT ALL 15 LEVELS!</h1>  
+    <button onclick="restartFullGame()">🔄 PLAY AGAIN</button>  
+    <button onclick="returnToMenu()">🏠 MAIN MENU</button>  
   </div>
 </div>  
 
-<!-- Settings overlay -->  
-<div class="settings-overlay" id="settingsOverlay">  
-  <div class="settings-panel">  
-    <h2>Settings</h2>  
-    <div class="settings-row">  
-      <label for="crtRange">CRT Intensity</label>  
+<!-- Settings Overlay (Opened via ESC) -->  
+<div class="overlay" id="settingsOverlay">  
+  <div class="overlay-content">  
+    <h2>Settings & Menu</h2>  
+    <div style="margin-bottom: 1rem;">  
+      <label>CRT Intensity</label>  
       <input type="range" id="crtRange" min="0" max="1" step="0.1" value="1">  
     </div>  
-    <div class="settings-row">  
-      <label for="glitchRange">Glitch Level</label>  
+    <div style="margin-bottom: 1rem;">  
+      <label>Glitch Level</label>  
       <input type="range" id="glitchRange" min="0" max="1" step="0.1" value="1">  
     </div>  
-    <div class="settings-row">  
-      <label for="volumeRange">Soundtrack Volume</label>  
-      <input type="range" id="volumeRange" num="0" max="1" step="0.1" value="0.6">  
+    <div style="margin-bottom: 1rem;">  
+      <label>Soundtrack Volume</label>  
+      <input type="range" id="volumeRange" min="0" max="1" step="0.1" value="0.6">  
     </div>  
-    <button class="ctrl-btn" onclick="closeSettings()">Close</button>  
+    <div style="display: flex; gap: 1rem; justify-content: center; margin-top: 1.5rem;">  
+      <button class="ctrl-btn" onclick="closeSettings()">Close</button>  
+      <button class="ctrl-btn" style="border-color: #f00; color: #f00;" onclick="returnToMenuFromESC()">🏠 Main Menu</button>  
+    </div>  
   </div>  
 </div>  
 
 <!-- Retro Scrolling Credits -->  
-<div class="credits-overlay" id="creditsOverlay">  
-  <div class="credits-content">  
+<div class="overlay" id="creditsOverlay">  
+  <div class="overlay-content">  
     <div class="credit-line">ARCADE POEM DUNGEON</div>  
     <div class="credit-line">CREATED BY</div>  
-    <div class="credit-line">CHRISTINE & JULIAN</div>  
+    <div class="credit-line">Christine Julian</div>  
     <div class="credit-line">PIXEL DUNGEON BACKGROUND</div>  
     <div class="credit-line">SYNTH NARRATOR VOICE</div>  
     <div class="credit-line">8-BIT SOUNDTRACK</div>  
-    <div class="credit-line">GLITCH FX & CRT FILTER</div>  
-    <div class="credit-line">POEM ENEMY COMBAT</div>  
     <div class="credit-line">THANK YOU FOR PLAYING</div>  
   </div>  
 </div>  
@@ -511,45 +131,46 @@ body::before {
 
 <script>  
 let currentLevel = 1;
+let highestUnlockedLevel = parseInt(localStorage.getItem("highestUnlockedLevel")) || 1;
 const maxLevels = 15;
 let score = 0;
 
-// Expanded Word pools across 15 levels
-const levelWordSets = {
-  1: ["arcade", "neon", "hum", "pixel", "dreams"],
-  2: ["pulse", "through", "midnight", "party", "queues", "hearts"],
-  3: ["level", "up", "in", "co-op", "syntax", "glitch"],
-  4: ["dungeon", "cipher", "matrix", "shadow", "echo", "terminal"],
-  5: ["packet", "buffer", "overflow", "kernel", "daemon", "quantum"],
-  6: ["singularity", "mainframe", "nexus", "infinity", "core", "genesis"],
-  7: ["zenith", "vortex", "plasma", "spectrum", "circuit", "binary"],
-  8: ["firewall", "encrypted", "protocol", "syntax", "runtime", "compile"],
-  9: ["vector", "matrix", "payload", "script", "node", "cluster"],
-  10: ["hyperlink", "domain", "packet", "gateway", "firewall", "router"],
-  11: ["photon", "neutron", "quark", "fusion", "galaxy", "nebula"],
-  12: ["stellar", "orbit", "eclipse", "comet", "gravity", "pulsar"],
-  13: ["chronos", "entropy", "horizon", "paradox", "infinity", "cosmos"],
-  14: ["zenith", "apex", "meridian", "solstice", "eclipse", "umbra"],
-  15: ["omega", "alpha", "genesis", "eternal", "nirvana", "absolute"]
-};
+const levelTargets = {};
+for (let i = 1; i <= maxLevels; i++) {
+  levelTargets[i] = i * 10; 
+}
 
+const menuScreen = document.getElementById("menuScreen");  
+const characterSelect = document.getElementById("characterSelect");  
+const saveScreen = document.getElementById("saveScreen");  
+const levelSelectScreen = document.getElementById("levelSelectScreen");  
+const levelGrid = document.getElementById("levelGrid");  
 const poemGrid = document.getElementById("poemGrid");  
+const hudDisplay = document.getElementById("hudDisplay");  
+const levelIndicator = document.getElementById("levelIndicator");  
+const scoreIndicator = document.getElementById("scoreIndicator");  
+const levelComplete = document.getElementById("levelComplete");  
+const gameComplete = document.getElementById("gameComplete");  
+const settingsOverlay = document.getElementById("settingsOverlay");  
+const creditsOverlay = document.getElementById("creditsOverlay");  
+
 const bgm = document.getElementById("bgm");  
 const voice = document.getElementById("voice");  
 const hitSfx = document.getElementById("hitSfx");  
-const victoryScreen = document.getElementById("victoryScreen");
-const grandVictoryScreen = document.getElementById("grandVictoryScreen");
-const levelIndicator = document.getElementById("levelIndicator");
-const scoreIndicator = document.getElementById("scoreIndicator");
-  
-/* Menu navigation */  
+
+/* Navigation */  
 function openCharacterSelect() {  
-  document.getElementById("menuScreen").style.display = "none";  
-  document.getElementById("characterSelect").style.display = "block";  
+  menuScreen.style.display = "none";  
+  characterSelect.style.display = "flex";  
 }  
 function openSaveSlots() {  
-  document.getElementById("menuScreen").style.display = "none";  
-  document.getElementById("saveScreen").style.display = "block";  
+  menuScreen.style.display = "none";  
+  saveScreen.style.display = "flex";  
+}  
+function openLevelSelect() {  
+  menuScreen.style.display = "none";  
+  buildLevelSelectButtons();  
+  levelSelectScreen.style.display = "flex";  
 }  
 function chooseCharacter(name) {  
   localStorage.setItem("character", name);  
@@ -563,166 +184,176 @@ function loadSlot(slot) {
   score = 0;
   startGame();  
 }  
-  
-/* Credits: scrolling crawl */  
+
+function buildLevelSelectButtons() {
+  levelGrid.innerHTML = "";
+  for (let i = 1; i <= maxLevels; i++) {
+    const btn = document.createElement("button");
+    btn.classList.add("ctrl-btn");
+    btn.style.padding = "0.8rem";
+    btn.style.fontSize = "0.8rem";
+    
+    if (i <= highestUnlockedLevel) {
+      btn.textContent = `Level ${i}`;
+      btn.onclick = () => {
+        currentLevel = i;
+        score = 0;
+        levelSelectScreen.style.display = "none";
+        startGame();
+      };
+    } else {
+      btn.textContent = `🔒 Level ${i}`;
+      btn.style.borderColor = "#555";
+      btn.style.color = "#555";
+      btn.style.cursor = "not-allowed";
+    }
+    levelGrid.appendChild(btn);
+  }
+}
+
 function showCredits() {  
-  const overlay = document.getElementById("creditsOverlay");  
-  overlay.style.display = "block";  
+  creditsOverlay.style.display = "flex";  
   voice.play();  
   setTimeout(() => {  
-    overlay.style.display = "none";  
-  }, 20000);  
+    creditsOverlay.style.display = "none";  
+  }, 18000);  
 }  
-  
-/* Instructions */  
+
 function showInstructions() {  
-  alert("Poem words are enemies across 15 Levels.\nClick them to score points and defeat them.\nClear all words to advance.\nPress ESC anytime for settings or menu options.");  
+  alert("Click poem words to gain score.\nReach the target score to complete each level.\nLevels 2 through 15 unlock as you progress.\nPress ESC anytime to open settings or return to menu.");  
 }  
-  
-/* Settings */  
+
 function openSettings() {  
-  document.getElementById("settingsOverlay").style.display = "flex";  
+  settingsOverlay.style.display = "flex";  
 }  
 function closeSettings() {  
-  document.getElementById("settingsOverlay").style.display = "none";  
+  settingsOverlay.style.display = "none";  
 }  
+function returnToMenuFromESC() {
+  closeSettings();
+  returnToMenu();
+}
+
+/* Settings Inputs */  
 document.getElementById("crtRange").addEventListener("input", (e) => {  
-  const val = e.target.value;  
-  document.body.style.opacity = val;  
+  document.body.style.opacity = e.target.value;  
 });  
 document.getElementById("glitchRange").addEventListener("input", (e) => {  
   const val = e.target.value;  
   const title = document.querySelector(".menu-title");  
-  title.style.animationDuration = (0.25 + (1 - val) * 0.5) + "s";  
+  if (title) {  
+    title.style.animationDuration = (0.25 + (1 - val) * 0.5) + "s";  
+  }  
 });  
 document.getElementById("volumeRange").addEventListener("input", (e) => {  
   bgm.volume = e.target.value;  
 });  
 
-/* Build Level Grid Dynamically */
-function buildLevelGrid(levelNum) {
-  poemGrid.innerHTML = "";
-  const words = levelWordSets[levelNum] || levelWordSets[1];
-  
-  words.forEach((word, index) => {
-    const div = document.createElement("div");
-    div.classList.add("enemy");
-    if (index % 3 === 0) {
-      div.classList.add("beat");
-    }
-    div.textContent = word;
-    
-    div.addEventListener("click", () => {  
-      div.style.opacity = "0";  
-      div.style.transform = "scale(0.5)";  
-      div.style.pointerEvents = "none";  
-      score += 1;
-      updateHUD();
-      spawnParticles();  
-      hitSfx.play();  
-      checkAllEnemiesDefeated();  
-    });  
-
-    poemGrid.appendChild(div);
-  });
-}
-
-function updateHUD() {
-  levelIndicator.textContent = `LEVEL ${currentLevel} / ${maxLevels}`;
-  scoreIndicator.textContent = `SCORE: ${score}`;
-}
-
-/* Start game */  
+/* Gameplay */  
 function startGame() {  
-  document.getElementById("menuScreen").style.display = "none";
-  document.getElementById("characterSelect").style.display = "none";  
-  document.getElementById("saveScreen").style.display = "none";  
-  victoryScreen.style.display = "none";
-  grandVictoryScreen.style.display = "none";
+  menuScreen.style.display = "none";  
+  characterSelect.style.display = "none";  
+  saveScreen.style.display = "none";  
+  levelSelectScreen.style.display = "none";  
+  levelComplete.style.display = "none";  
+  gameComplete.style.display = "none";  
   
-  updateHUD();
-  buildLevelGrid(currentLevel);
-  poemGrid.style.display = "grid";  
-  
+  hudDisplay.style.display = "flex";  
   bgm.volume = 0.6;  
   bgm.play();  
   voice.play();  
+  loadLevel(currentLevel);  
+  updateHUD();  
 }  
 
-/* Proceed to Next Level or Win Game */
-function nextLevel() {
-  victoryScreen.style.display = "none";
-  currentLevel++;
-  if (currentLevel > maxLevels) {
-    poemGrid.style.display = "none";
-    grandVictoryScreen.style.display = "flex";
-    bgm.pause();
-    voice.play();
-  } else {
-    startGame();
+function loadLevel(level) {  
+  poemGrid.innerHTML = "";  
+  poemGrid.style.display = "grid";  
+  
+  for (let i = 0; i < 10; i++) {  
+    const word = document.createElement("div");  
+    word.classList.add("poemWord");  
+    word.textContent = `word ${i + 1}`;  
+    word.addEventListener("click", () => {  
+      score++;  
+      updateHUD();  
+      hitSfx.play();  
+      word.style.opacity = "0";  
+      word.style.transform = "scale(0.5)";  
+      word.style.pointerEvents = "none";  
+      
+      if (score >= levelTargets[currentLevel]) {  
+        completeLevel();  
+      }  
+    });  
+    poemGrid.appendChild(word);  
+  }  
+}  
+
+function updateHUD() {  
+  levelIndicator.textContent = `LEVEL ${currentLevel} / ${maxLevels}`;  
+  scoreIndicator.textContent = `SCORE: ${score}`;  
+}  
+
+function completeLevel() {  
+  poemGrid.style.display = "none";  
+  hudDisplay.style.display = "none";  
+  bgm.pause();  
+  
+  if (currentLevel > highestUnlockedLevel) {
+    highestUnlockedLevel = currentLevel;
+    localStorage.setItem("highestUnlockedLevel", highestUnlockedLevel);
   }
-}
 
-/* Restart Full Game from Level 1 */
-function restartFullGame() {
-  currentLevel = 1;
-  score = 0;
-  grandVictoryScreen.style.display = "none";
-  startGame();
-}
+  if (currentLevel < maxLevels) {  
+    levelComplete.style.display = "flex";  
+    levelComplete.querySelector("h1").textContent = `Level ${currentLevel} Complete!`;  
+  } else {  
+    gameComplete.style.display = "flex";  
+  }  
+}  
 
-/* Return to Main Menu */
+function nextLevel() {  
+  levelComplete.style.display = "none";  
+  currentLevel++;  
+  score = 0;  
+  hudDisplay.style.display = "flex";  
+  bgm.play();  
+  loadLevel(currentLevel);  
+  updateHUD();  
+}  
+
+function restartFullGame() {  
+  currentLevel = 1;  
+  score = 0;  
+  gameComplete.style.display = "none";  
+  hudDisplay.style.display = "flex";  
+  bgm.play();  
+  loadLevel(currentLevel);  
+  updateHUD();  
+}  
+
 function returnToMenu() {  
   poemGrid.style.display = "none";  
-  victoryScreen.style.display = "none";  
-  grandVictoryScreen.style.display = "none";  
-  document.getElementById("characterSelect").style.display = "none";  
-  document.getElementById("saveScreen").style.display = "none";  
-  document.getElementById("menuScreen").style.display = "flex";  
-  levelIndicator.textContent = "";
-  scoreIndicator.textContent = "";
+  hudDisplay.style.display = "none";  
+  levelComplete.style.display = "none";  
+  gameComplete.style.display = "none";  
+  characterSelect.style.display = "none";  
+  saveScreen.style.display = "none";  
+  levelSelectScreen.style.display = "none";  
+  creditsOverlay.style.display = "none";  
+  settingsOverlay.style.display = "none";  
+  
+  menuScreen.style.display = "flex";  
   bgm.pause();  
   bgm.currentTime = 0;  
-}
-  
-/* Check if all enemies defeated in current level */  
-function checkAllEnemiesDefeated() {  
-  const enemies = poemGrid.querySelectorAll(".enemy");
-  const remaining = Array.from(enemies).filter(e => e.style.pointerEvents !== "none");  
-  if (remaining.length === 0) {  
-    poemGrid.style.display = "none";  
-    if (currentLevel === maxLevels) {
-      grandVictoryScreen.style.display = "flex";
-    } else {
-      victoryScreen.style.display = "flex";  
-    }
-    bgm.pause();  
-    voice.play();  
-  }  
 }  
-  
-/* Particles */  
-function spawnParticles() {  
-  for (let i = 0; i < 20; i++) {  
-    const p = document.createElement("div");  
-    p.classList.add("particle");  
-    const dx = (Math.random() * 400 - 200) + "px";  
-    const dy = (Math.random() * 400 - 200) + "px";  
-    p.style.setProperty("--dx", dx);  
-    p.style.setProperty("--dy", dy);  
-    p.style.left = (window.innerWidth / 2) + "px";  
-    p.style.top = (window.innerHeight / 2) + "px";  
-    document.body.appendChild(p);  
-    setTimeout(() => p.remove(), 1200);  
-  }  
-}  
-  
-/* ESC: open settings or return to menu */  
+
+/* ESC key opens Settings (which includes Return to Menu) */  
 document.addEventListener("keydown", (e) => {  
   if (e.key === "Escape") {  
-    const credits = document.getElementById("creditsOverlay");  
-    if (credits.style.display === "block") {  
-      credits.style.display = "none";  
+    if (settingsOverlay.style.display === "flex") {  
+      closeSettings();  
     } else {  
       openSettings();  
     }  
