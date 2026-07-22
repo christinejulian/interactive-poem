@@ -3,13 +3,13 @@
 // ============================================================
 // GAME CONSTANTS
 // ============================================================
-const MAX_LEVELS = 15;
-const DAMAGE_AMOUNT = 10;
+const MAX_STAGES = 15;
+const DAMAGE_AMOUNT = 10; // 10% clarity loss
 const SCORE_GOAL = 10;
 
-let currentLevel = 1;
+let currentStage = 1;
 let score = 0;
-let health = 100;
+let clarity = 100;
 
 let highestUnlocked = Number(localStorage.getItem("highestUnlocked")) || 1;
 
@@ -39,7 +39,6 @@ const levelGrid = document.getElementById("levelGrid");
 const startGameBtn = document.getElementById("startGameBtn");
 const howToPlayBtn = document.getElementById("howToPlayBtn");
 const settingsBtn = document.getElementById("settingsBtn");
-const creditsBtn = document.getElementById("creditsBtn");
 
 const returnMenuBtn = document.getElementById("returnMenuBtn");
 const nextLevelBtn = document.getElementById("nextLevelBtn");
@@ -68,13 +67,13 @@ volumeSlider.oninput = () => {
 };
 
 // ============================================================
-// WORD BANK
+// WORD BANK (neutral, cognitive theme)
 // ============================================================
 const words = [
-    "arcade","pixel","dream","neon","controller",
-    "coin","hero","quest","poem","boss",
-    "level","victory","echo","light","future",
-    "hope","memory","code","game","play"
+    "focus","clarity","calm","present","aware",
+    "steady","mindful","center","breathe","observe",
+    "notice","attention","balance","still","clear",
+    "reflect","listen","sense","soft","gentle"
 ];
 
 // ============================================================
@@ -94,25 +93,21 @@ function exitAttract() {
 startGameBtn.onclick = () => {
     hideAll();
     levelSelect.classList.add("active");
-    buildLevelButtons();
+    buildStageButtons();
 };
 
 howToPlayBtn.onclick = () => {
     alert(
-        "Correct words = +1 score\n" +
-        "Wrong words = -10 health\n" +
-        "Health = 0 → GAME OVER\n\n" +
-        "Clear all 15 levels to reveal the final poem."
+        "Correct words increase focus.\n" +
+        "Wrong words overload your mind and reduce clarity by 10%.\n" +
+        "If clarity reaches 0%, the session ends.\n\n" +
+        "Complete all 15 stages to finish the training."
     );
 };
 
 settingsBtn.onclick = () => {
     hideAll();
     settingsScreen.classList.add("active");
-};
-
-creditsBtn.onclick = () => {
-    creditsOverlay.style.display = "flex";
 };
 
 returnMenuBtn.onclick = showMenu;
@@ -123,17 +118,17 @@ creditsMenuBtn.onclick = showMenu;
 settingsBackBtn.onclick = showMenu;
 
 // ============================================================
-// BUILD LEVEL SELECT GRID
+// BUILD STAGE SELECT GRID
 // ============================================================
-function buildLevelButtons() {
+function buildStageButtons() {
     levelGrid.innerHTML = "";
 
-    for (let i = 1; i <= MAX_LEVELS; i++) {
+    for (let i = 1; i <= MAX_STAGES; i++) {
         const b = document.createElement("button");
-        b.textContent = "LEVEL " + i;
+        b.textContent = "STAGE " + i;
 
         if (i <= highestUnlocked) {
-            b.onclick = () => startLevel(i);
+            b.onclick = () => startStage(i);
         } else {
             b.disabled = true;
             b.textContent = "LOCKED";
@@ -144,12 +139,12 @@ function buildLevelButtons() {
 }
 
 // ============================================================
-// START LEVEL
+// START STAGE
 // ============================================================
-function startLevel(level) {
-    currentLevel = level;
+function startStage(stage) {
+    currentStage = stage;
     score = 0;
-    health = 100;
+    clarity = 100;
 
     hideAll();
 
@@ -164,9 +159,9 @@ function startLevel(level) {
 // UPDATE HUD
 // ============================================================
 function updateHUD() {
-    levelIndicator.textContent = `LEVEL ${currentLevel} / ${MAX_LEVELS}`;
-    scoreIndicator.textContent = `SCORE: ${score}`;
-    healthIndicator.textContent = `HEALTH: ${health}`;
+    levelIndicator.textContent = `STAGE ${currentStage} / ${MAX_STAGES}`;
+    scoreIndicator.textContent = `FOCUS: ${score}`;
+    healthIndicator.textContent = `CLARITY: ${clarity}%`;
 }
 
 // ============================================================
@@ -175,9 +170,9 @@ function updateHUD() {
 function createWords() {
     poemGrid.innerHTML = "";
 
-    const levelWords = [...words].sort(() => Math.random() - 0.5).slice(0, 10);
+    const stageWords = [...words].sort(() => Math.random() - 0.5).slice(0, 10);
 
-    levelWords.forEach(word => {
+    stageWords.forEach(word => {
         const div = document.createElement("div");
         div.className = "poemWord";
         div.textContent = word;
@@ -191,11 +186,11 @@ function createWords() {
                 div.style.pointerEvents = "none";
             } else {
                 div.classList.add("wrong");
-                health -= DAMAGE_AMOUNT;
+                clarity -= DAMAGE_AMOUNT;
             }
 
             updateHUD();
-            checkLevel();
+            checkStage();
         };
 
         poemGrid.appendChild(div);
@@ -203,11 +198,11 @@ function createWords() {
 }
 
 // ============================================================
-// CHECK LEVEL STATUS
+// CHECK STAGE STATUS
 // ============================================================
-function checkLevel() {
+function checkStage() {
 
-    if (health <= 0) {
+    if (clarity <= 0) {
         hideAll();
         gameOver.classList.add("active");
         return;
@@ -215,24 +210,24 @@ function checkLevel() {
 
     if (score >= SCORE_GOAL) {
 
-        if (currentLevel > highestUnlocked) {
-            highestUnlocked = currentLevel;
+        if (currentStage > highestUnlocked) {
+            highestUnlocked = currentStage;
             localStorage.setItem("highestUnlocked", highestUnlocked);
         }
 
-        if (currentLevel === MAX_LEVELS) {
+        if (currentStage === MAX_STAGES) {
             creditsOverlay.style.display = "flex";
 
             setTimeout(() => {
                 creditsOverlay.style.display = "none";
                 hideAll();
                 gameComplete.classList.add("active");
-            }, 35000);
+            }, 15000);
 
         } else {
             hideAll();
             document.getElementById("levelCompleteTitle").textContent =
-                `LEVEL ${currentLevel} COMPLETE`;
+                `STAGE ${currentStage} COMPLETE`;
             levelComplete.classList.add("active");
         }
     }
@@ -241,9 +236,9 @@ function checkLevel() {
 // ============================================================
 // BUTTON ACTIONS
 // ============================================================
-nextLevelBtn.onclick = () => startLevel(currentLevel + 1);
-retryLevelBtn.onclick = () => startLevel(currentLevel);
-playAgainBtn.onclick = () => startLevel(1);
+nextLevelBtn.onclick = () => startStage(currentStage + 1);
+retryLevelBtn.onclick = () => startStage(currentStage);
+playAgainBtn.onclick = () => startStage(1);
 
 // ============================================================
 // SHOW MENU
