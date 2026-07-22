@@ -1,1 +1,95 @@
-body{background:#000;color:#0f0;font-family:monospace;text-align:center}button{margin:6px;padding:10px;background:#111;color:#0f0;border:1px solid #0f0}#words{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;max-width:700px;margin:auto}
+body {
+    background:#000;
+    color:#0f0;
+    font-family:monospace;
+    text-align:center;
+    margin:0;
+}
+
+/* Buttons */
+button {
+    margin:6px;
+    padding:10px;
+    background:#111;
+    color:#0f0;
+    border:1px solid #0f0;
+    cursor:pointer;
+}
+
+/* Cabinet frame */
+.cabinet {
+    width:90vw;
+    height:90vh;
+    margin:auto;
+    margin-top:3vh;
+    border:6px solid #0f0;
+    box-shadow:0 0 20px #0f0 inset;
+    position:relative;
+    overflow:hidden;
+}
+
+/* Neon grid background */
+.dungeon-bg {
+    position:absolute;
+    inset:0;
+    background-image:
+        linear-gradient(#020 1px, transparent 1px),
+        linear-gradient(90deg, #020 1px, transparent 1px);
+    background-size:32px 32px;
+    opacity:0.4;
+}
+
+/* Screens */
+.screen {
+    display:none;
+    position:absolute;
+    inset:0;
+    padding-top:40px;
+}
+
+.screen.active {
+    display:block;
+}
+
+/* HUD */
+#scoreboard {
+    position:absolute;
+    top:10px;
+    left:10px;
+    font-size:14px;
+    display:none;
+}
+
+/* Poem grid */
+#poemGrid {
+    display:none;
+    margin-top:60px;
+    display:grid;
+    grid-template-columns:repeat(auto-fit, minmax(120px,1fr));
+    gap:10px;
+    padding:20px;
+}
+
+.poemWord {
+    padding:10px;
+    border:1px solid #0f0;
+    background:#111;
+    cursor:pointer;
+}
+
+/* Overlay (credits) */
+.overlay {
+    display:none;
+    position:fixed;
+    inset:0;
+    background:rgba(0,0,0,0.9);
+    color:#0f0;
+    overflow-y:auto;
+    padding:20px;
+}
+
+.overlay-content {
+    max-width:600px;
+    margin:auto;
+    line-height:1.6;
+}
