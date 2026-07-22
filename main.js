@@ -54,7 +54,7 @@ const creditsMenuBtn = document.getElementById("creditsMenuBtn");
 const settingsBackBtn = document.getElementById("settingsBackBtn");
 
 // ============================================================
-// SETTINGS
+// SETTINGS + MUSIC
 // ============================================================
 const volumeSlider = document.getElementById("volumeSlider");
 const bgMusic = document.getElementById("bgMusic");
@@ -78,12 +78,15 @@ const words = [
 ];
 
 // ============================================================
-// ATTRACT MODE → PRESS ANY KEY TO ENTER MENU
+// ATTRACT MODE → EXIT ON KEY OR CLICK
 // ============================================================
-document.addEventListener("keydown", () => {
+document.addEventListener("keydown", exitAttract, { once: true });
+document.addEventListener("click", exitAttract, { once: true });
+
+function exitAttract() {
     attractScreen.classList.remove("active");
     menuScreen.classList.add("active");
-}, { once: true });
+}
 
 // ============================================================
 // MENU BUTTONS
