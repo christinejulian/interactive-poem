@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Arcade Poem Dungeon</title>
+<title>Neon Focus Arcade</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link rel="stylesheet" href="styles.css">
 </head>
@@ -16,73 +16,83 @@
 
         <!-- ATTRACT MODE -->
         <div id="attractScreen" class="screen active">
-            <div class="attract-title">ARCADE<br>POEM<br>DUNGEON</div>
-            <div class="attract-subtitle">A Neon‑Lit Word Quest</div>
-            <div class="attract-flash">PRESS ANY KEY OR CLICK TO START</div>
+            <div class="attract-title">NEON<br>FOCUS<br>ARCADE</div>
+            <div class="attract-subtitle">A Retro Cognitive Challenge</div>
+
+            <div class="attract-flash">
+                PRESS ANY KEY<br>
+                OR CLICK ANYWHERE<br>
+                TO START
+            </div>
 
             <div class="attract-lore">
-                <p>Deep beneath the neon city,</p>
-                <p>a forgotten arcade cabinet hums softly.</p>
-                <p>Its circuits glow with ancient poetry.</p>
-                <p>Its screen flickers with digital ghosts.</p>
-                <p>Those who dare to play must master the poem</p>
-                <p>to escape the dungeon of words.</p>
+                <p>This cabinet trains your attention.</p>
+                <p>Correct words sharpen your clarity.</p>
+                <p>Wrong words overload your mind.</p>
+                <p>Stay focused. Stay sharp.</p>
+            </div>
+
+            <div class="attract-bottom">
+                <p>NEON PIXEL SYSTEM // MODEL 86‑A</p>
+                <p>INSERT COIN — 1 CREDIT</p>
             </div>
         </div>
 
         <!-- HUD -->
         <div id="scoreboard">
-            <div id="levelIndicator">LEVEL 1 / 15</div>
-            <div id="scoreIndicator">SCORE: 0</div>
-            <div id="healthIndicator">HEALTH: 100</div>
+            <div id="levelIndicator">STAGE 1 / 15</div>
+            <div id="scoreIndicator">FOCUS: 0</div>
+            <div id="healthIndicator">CLARITY: 100%</div>
         </div>
 
         <!-- MAIN MENU -->
         <div id="menuScreen" class="screen">
-            <h1 class="menu-title">ARCADE POEM DUNGEON</h1>
+            <h1 class="menu-title">NEON FOCUS ARCADE</h1>
 
             <div class="menu-buttons">
-                <button id="startGameBtn">▶ START GAME</button>
-                <button id="howToPlayBtn">❖ HOW TO PLAY</button>
+                <button id="startGameBtn">▶ BEGIN TRAINING</button>
+                <button id="howToPlayBtn">❖ HOW IT WORKS</button>
                 <button id="settingsBtn">⚙ SETTINGS</button>
             </div>
 
             <div class="menu-lore">
-                <p>The neon dungeon awaits.</p>
-                <p>Every word is a weapon.</p>
-                <p>Every mistake drains your life.</p>
+                <p>This is a cognitive focus simulator.</p>
+                <p>Select meaningful words to strengthen clarity.</p>
+                <p>Avoid distractions — they drain 10% clarity.</p>
             </div>
         </div>
 
-        <!-- LEVEL SELECT -->
+        <!-- STAGE SELECT -->
         <div id="levelSelect" class="screen">
-            <h2 class="screen-title">SELECT LEVEL</h2>
+            <h2 class="screen-title">SELECT A STAGE</h2>
             <div id="levelGrid"></div>
             <button id="returnMenuBtn">🏠 MAIN MENU</button>
         </div>
 
-        <!-- GAMEPLAY GRID -->
+        <!-- WORD GRID -->
         <div id="poemGrid"></div>
 
-        <!-- LEVEL COMPLETE -->
+        <!-- STAGE COMPLETE -->
         <div id="levelComplete" class="screen">
-            <h1 id="levelCompleteTitle">LEVEL COMPLETE</h1>
-            <button id="nextLevelBtn">▶ NEXT LEVEL</button>
+            <h1 id="levelCompleteTitle">STAGE COMPLETE</h1>
+            <p>Your clarity remains strong.</p>
+            <button id="nextLevelBtn">▶ NEXT STAGE</button>
             <button id="mainMenuBtn1">🏠 MAIN MENU</button>
         </div>
 
-        <!-- GAME OVER -->
+        <!-- SESSION OVER -->
         <div id="gameOver" class="screen">
-            <h1 class="game-over-title">GAME OVER</h1>
-            <p>You ran out of health.</p>
-            <button id="retryLevelBtn">🔄 RETRY LEVEL</button>
+            <h1 class="game-over-title">CLARITY LOST</h1>
+            <p>Your mind overloaded.</p>
+            <button id="retryLevelBtn">🔄 TRY AGAIN</button>
             <button id="mainMenuBtn2">🏠 MAIN MENU</button>
         </div>
 
-        <!-- GAME COMPLETE -->
+        <!-- SESSION COMPLETE -->
         <div id="gameComplete" class="screen">
-            <h1 class="game-complete-title">ALL LEVELS CLEARED</h1>
-            <button id="playAgainBtn">🔄 PLAY AGAIN</button>
+            <h1 class="game-complete-title">TRAINING COMPLETE</h1>
+            <p>You maintained clarity through all stages.</p>
+            <button id="playAgainBtn">🔄 RESTART</button>
             <button id="mainMenuBtn3">🏠 MAIN MENU</button>
         </div>
 
@@ -101,25 +111,13 @@
     </div>
 </div>
 
-<!-- CREDITS OVERLAY (still needed for final poem) -->
+<!-- FINAL MESSAGE OVERLAY -->
 <div class="overlay" id="creditsOverlay">
     <div class="overlay-content">
-
-        <h2>★ ARCADE POEM DUNGEON ★</h2>
-
-        <p>You reached the final chamber.</p>
-        <p>The neon lights dim softly.</p>
-
-        <h3>FINAL POEM</h3>
-
-        <p>I entered searching for another high score.</p>
-        <p>Neon lights blinked, coins echoed, and every level asked me to continue.</p>
-        <p>Every enemy was only another word.</p>
-        <p>Every puzzle became another verse.</p>
-        <p>Victory is not measured by points alone, but by every story we choose to finish.</p>
-
+        <h2>TRAINING SUMMARY</h2>
+        <p>You completed all stages with strong clarity.</p>
+        <p>Remember: focus improves with practice.</p>
         <button id="creditsMenuBtn">🏠 MAIN MENU</button>
-
     </div>
 </div>
 
@@ -128,7 +126,6 @@
     <source src="Music.mp3" type="audio/mpeg">
 </audio>
 
-<!-- Load main.js LAST -->
 <script src="main.js" defer></script>
 
 </body>
