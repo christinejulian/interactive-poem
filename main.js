@@ -6,7 +6,7 @@
 // ============================================================
 const MAX_STAGES = 15;
 const DAMAGE_AMOUNT = 50; // wrong word = 50% health loss
-const SCORE_GOAL = 5;     // fewer correct words needed per stage
+const SCORE_GOAL = 5;
 
 let currentStage = 1;
 let score = 0;
@@ -231,6 +231,7 @@ function checkStage() {
         }
 
         if (currentStage === MAX_STAGES) {
+            // Show final poem overlay
             creditsOverlay.style.display = "flex";
 
             setTimeout(() => {
