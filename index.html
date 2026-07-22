@@ -2,26 +2,29 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Arcade Poem Dungeon — Neon CRT Edition</title>
+<title>Arcade Poem Dungeon</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <link rel="stylesheet" href="styles.css">
-</head>
 
+</head>
 <body>
 
 <div class="cabinet">
 
     <div class="dungeon-bg"></div>
 
+    <!-- HUD -->
     <div id="scoreboard">
         <div id="levelIndicator">LEVEL 1 / 15</div>
         <div id="scoreIndicator">SCORE: 0</div>
         <div id="healthIndicator">HEALTH: 100</div>
     </div>
 
+    <!-- MENU -->
     <div id="menuScreen" class="screen active">
-        <div class="menu-title">ARCADE POEM DUNGEON</div>
+        <h1 class="menu-title">ARCADE POEM DUNGEON</h1>
+
         <div class="menu-buttons">
             <button id="startGameBtn">▶ START GAME</button>
             <button id="howToPlayBtn">❖ HOW TO PLAY</button>
@@ -29,43 +32,40 @@
         </div>
     </div>
 
+    <!-- LEVEL SELECT -->
     <div id="levelSelect" class="screen">
         <h2>SELECT LEVEL</h2>
         <div id="levelGrid"></div>
-        <div class="menu-buttons">
-            <button id="returnMenuBtn">🏠 MAIN MENU</button>
-        </div>
+        <button id="returnMenuBtn">🏠 MAIN MENU</button>
     </div>
 
+    <!-- POEM GRID -->
     <div id="poemGrid"></div>
 
+    <!-- LEVEL COMPLETE -->
     <div id="levelComplete" class="screen">
-        <h1 id="levelCompleteTitle">LEVEL COMPLETED!</h1>
-        <div class="menu-buttons">
-            <button id="nextLevelBtn">▶ NEXT LEVEL</button>
-            <button id="mainMenuBtn1">🏠 MAIN MENU</button>
-        </div>
+        <h1 id="levelCompleteTitle">LEVEL COMPLETE</h1>
+        <button id="nextLevelBtn">▶ NEXT LEVEL</button>
+        <button id="mainMenuBtn1">🏠 MAIN MENU</button>
     </div>
 
+    <!-- GAME OVER -->
     <div id="gameOver" class="screen">
         <h1>GAME OVER</h1>
-        <p>You lost all your health.</p>
-        <div class="menu-buttons">
-            <button id="retryLevelBtn">🔄 RETRY LEVEL</button>
-            <button id="mainMenuBtn2">🏠 MAIN MENU</button>
-        </div>
+        <button id="retryLevelBtn">🔄 RETRY LEVEL</button>
+        <button id="mainMenuBtn2">🏠 MAIN MENU</button>
     </div>
 
+    <!-- GAME COMPLETE -->
     <div id="gameComplete" class="screen">
-        <h1>ALL 15 LEVELS CLEARED</h1>
-        <div class="menu-buttons">
-            <button id="playAgainBtn">🔄 PLAY AGAIN</button>
-            <button id="mainMenuBtn3">🏠 MAIN MENU</button>
-        </div>
+        <h1>ALL LEVELS CLEARED</h1>
+        <button id="playAgainBtn">🔄 PLAY AGAIN</button>
+        <button id="mainMenuBtn3">🏠 MAIN MENU</button>
     </div>
 
 </div>
 
+<!-- CREDITS OVERLAY -->
 <div class="overlay" id="creditsOverlay">
     <div class="overlay-content">
 
@@ -156,7 +156,7 @@
         <h2>THE END</h2>
 
         <br>
-        <button id="creditsMenuBtn" class="overlay-btn">🏠 MAIN MENU</button>
+        <button id="creditsMenuBtn">🏠 MAIN MENU</button>
 
     </div>
 </div>
