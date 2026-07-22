@@ -4,6 +4,8 @@
 // GAME CONSTANTS
 // ===============================
 const MAX_LEVELS = 15;
+const DAMAGE_AMOUNT = 10;   // wrong word damage
+const SCORE_GOAL = 10;      // words needed to complete level
 
 let currentLevel = 1;
 let score = 0;
@@ -22,6 +24,7 @@ const levelComplete = document.getElementById("levelComplete");
 const gameOver = document.getElementById("gameOver");
 const gameComplete = document.getElementById("gameComplete");
 const creditsOverlay = document.getElementById("creditsOverlay");
+const settingsScreen = document.getElementById("settingsScreen");
 
 // ===============================
 // HUD ELEMENTS
@@ -36,6 +39,7 @@ const healthIndicator = document.getElementById("healthIndicator");
 const startGameBtn = document.getElementById("startGameBtn");
 const howToPlayBtn = document.getElementById("howToPlayBtn");
 const creditsBtn = document.getElementById("creditsBtn");
+const settingsBtn = document.getElementById("settingsBtn");
 
 const returnMenuBtn = document.getElementById("returnMenuBtn");
 const nextLevelBtn = document.getElementById("nextLevelBtn");
@@ -48,8 +52,25 @@ const mainMenuBtn2 = document.getElementById("mainMenuBtn2");
 const mainMenuBtn3 = document.getElementById("mainMenuBtn3");
 
 const creditsMenuBtn = document.getElementById("creditsMenuBtn");
+const settingsBackBtn = document.getElementById("settingsBackBtn");
 
 const levelGrid = document.getElementById("levelGrid");
+
+// ===============================
+// SETTINGS ELEMENTS
+// ===============================
+const volumeSlider = document.getElementById("volumeSlider");
+const bgMusic = document.getElementById("bgMusic");
+
+// Load saved volume
+volumeSlider.value = localStorage.getItem("volume") || 0.4;
+bgMusic.volume = volumeSlider.value;
+
+// Update volume
+volumeSlider.oninput = () => {
+    bgMusic.volume = volumeSlider.value;
+    localStorage.setItem("volume", volumeSlider.value);
+};
 
 // ===============================
 // WORD BANK
@@ -72,14 +93,15 @@ startGameBtn.onclick = () => {
 
 howToPlayBtn.onclick = () => {
     alert(
-        "Click every poem word.\n\n" +
-        "Each word gives 1 point.\n" +
-        "Finish every level.\n" +
+        "Correct words = +1 score\n" +
+        "Wrong words = -10 health\n" +
+        "Health reaches 0 = GAME OVER\n\n" +
         "Clear all 15 levels to reveal the final poem."
     );
 };
 
 creditsBtn.onclick = showCredits;
+settingsBtn.onclick = showSettings;
 
 returnMenuBtn.onclick = showMenu;
 mainMenuBtn1.onclick = showMenu;
@@ -87,6 +109,7 @@ mainMenuBtn2.onclick = showMenu;
 mainMenuBtn3.onclick = showMenu;
 
 creditsMenuBtn.onclick = showMenu;
+settingsBackBtn.onclick = showMenu;
 
 // ===============================
 // BUILD LEVEL SELECT GRID
@@ -150,9 +173,18 @@ function createWords() {
         div.textContent = word;
 
         div.onclick = () => {
-            score++;
-            div.style.opacity = 0.25;
-            div.style.pointerEvents = "none";
+            const isCorrect = Math.random() > 0.3; // 70% chance correct
+
+            if (isCorrect) {
+                score++;
+                div.style.opacity = 0.25;
+                div.style.pointerEvents = "none";
+            } else {
+                health -= DAMAGE_AMOUNT;
+                div.style.background = "#300";
+                div.style.borderColor = "#f00";
+            }
+
             updateHUD();
             checkLevel();
         };
@@ -165,7 +197,14 @@ function createWords() {
 // CHECK LEVEL COMPLETION
 // ===============================
 function checkLevel() {
-    if (score >= 10) {
+
+    if (health <= 0) {
+        hideAll();
+        gameOver.classList.add("active");
+        return;
+    }
+
+    if (score >= SCORE_GOAL) {
 
         if (currentLevel > highestUnlocked) {
             highestUnlocked = currentLevel;
@@ -212,11 +251,20 @@ function showCredits() {
 }
 
 // ===============================
+// SHOW SETTINGS
+// ===============================
+function showSettings() {
+    hideAll();
+    settingsScreen.classList.add("active");
+}
+
+// ===============================
 // SHOW MENU
 // ===============================
 function showMenu() {
     hideAll();
     creditsOverlay.style.display = "none";
+    settingsScreen.classList.remove("active");
     menuScreen.classList.add("active");
 }
 
@@ -230,6 +278,7 @@ function hideAll() {
     levelComplete.classList.remove("active");
     gameOver.classList.remove("active");
     gameComplete.classList.remove("active");
+    settingsScreen.classList.remove("active");
 }
 
 // ===============================
