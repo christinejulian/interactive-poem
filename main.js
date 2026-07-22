@@ -1,9 +1,8 @@
 // main.js
 
-// ===============================
+// ============================================================
 // GAME CONSTANTS
-// ===============================
-
+// ============================================================
 const MAX_LEVELS = 15;
 const DAMAGE_AMOUNT = 10;
 const SCORE_GOAL = 10;
@@ -14,28 +13,37 @@ let health = 100;
 
 let highestUnlocked = Number(localStorage.getItem("highestUnlocked")) || 1;
 
+// ============================================================
+// ELEMENTS
+// ============================================================
+const attractScreen = document.getElementById("attractScreen");
 const menuScreen = document.getElementById("menuScreen");
 const levelSelect = document.getElementById("levelSelect");
 const poemGrid = document.getElementById("poemGrid");
 const levelComplete = document.getElementById("levelComplete");
 const gameOver = document.getElementById("gameOver");
 const gameComplete = document.getElementById("gameComplete");
-const creditsOverlay = document.getElementById("creditsOverlay");
 const settingsScreen = document.getElementById("settingsScreen");
+const creditsOverlay = document.getElementById("creditsOverlay");
 
+const scoreboard = document.getElementById("scoreboard");
 const levelIndicator = document.getElementById("levelIndicator");
 const scoreIndicator = document.getElementById("scoreIndicator");
 const healthIndicator = document.getElementById("healthIndicator");
 
+const levelGrid = document.getElementById("levelGrid");
+
+// ============================================================
+// BUTTONS
+// ============================================================
 const startGameBtn = document.getElementById("startGameBtn");
 const howToPlayBtn = document.getElementById("howToPlayBtn");
-const creditsBtn = document.getElementById("creditsBtn");
 const settingsBtn = document.getElementById("settingsBtn");
+const creditsBtn = document.getElementById("creditsBtn");
 
 const returnMenuBtn = document.getElementById("returnMenuBtn");
 const nextLevelBtn = document.getElementById("nextLevelBtn");
 const retryLevelBtn = document.getElementById("retryLevelBtn");
-
 const playAgainBtn = document.getElementById("playAgainBtn");
 
 const mainMenuBtn1 = document.getElementById("mainMenuBtn1");
@@ -45,8 +53,9 @@ const mainMenuBtn3 = document.getElementById("mainMenuBtn3");
 const creditsMenuBtn = document.getElementById("creditsMenuBtn");
 const settingsBackBtn = document.getElementById("settingsBackBtn");
 
-const levelGrid = document.getElementById("levelGrid");
-
+// ============================================================
+// SETTINGS
+// ============================================================
 const volumeSlider = document.getElementById("volumeSlider");
 const bgMusic = document.getElementById("bgMusic");
 
@@ -58,6 +67,9 @@ volumeSlider.oninput = () => {
     localStorage.setItem("volume", volumeSlider.value);
 };
 
+// ============================================================
+// WORD BANK
+// ============================================================
 const words = [
     "arcade","pixel","dream","neon","controller",
     "coin","hero","quest","poem","boss",
@@ -65,6 +77,17 @@ const words = [
     "hope","memory","code","game","play"
 ];
 
+// ============================================================
+// ATTRACT MODE → PRESS ANY KEY TO ENTER MENU
+// ============================================================
+document.addEventListener("keydown", () => {
+    attractScreen.classList.remove("active");
+    menuScreen.classList.add("active");
+}, { once: true });
+
+// ============================================================
+// MENU BUTTONS
+// ============================================================
 startGameBtn.onclick = () => {
     hideAll();
     levelSelect.classList.add("active");
@@ -72,35 +95,54 @@ startGameBtn.onclick = () => {
 };
 
 howToPlayBtn.onclick = () => {
-    alert("Correct words = +1 score\nWrong words = -10 health\nHealth = 0 → GAME OVER");
+    alert(
+        "Correct words = +1 score\n" +
+        "Wrong words = -10 health\n" +
+        "Health = 0 → GAME OVER\n\n" +
+        "Clear all 15 levels to reveal the final poem."
+    );
 };
 
-creditsBtn.onclick = showCredits;
-settingsBtn.onclick = showSettings;
+settingsBtn.onclick = () => {
+    hideAll();
+    settingsScreen.classList.add("active");
+};
+
+creditsBtn.onclick = () => {
+    creditsOverlay.style.display = "flex";
+};
 
 returnMenuBtn.onclick = showMenu;
 mainMenuBtn1.onclick = showMenu;
 mainMenuBtn2.onclick = showMenu;
 mainMenuBtn3.onclick = showMenu;
-
 creditsMenuBtn.onclick = showMenu;
 settingsBackBtn.onclick = showMenu;
 
+// ============================================================
+// BUILD LEVEL SELECT GRID
+// ============================================================
 function buildLevelButtons() {
     levelGrid.innerHTML = "";
+
     for (let i = 1; i <= MAX_LEVELS; i++) {
         const b = document.createElement("button");
         b.textContent = "LEVEL " + i;
+
         if (i <= highestUnlocked) {
             b.onclick = () => startLevel(i);
         } else {
             b.disabled = true;
             b.textContent = "LOCKED";
         }
+
         levelGrid.appendChild(b);
     }
 }
 
+// ============================================================
+// START LEVEL
+// ============================================================
 function startLevel(level) {
     currentLevel = level;
     score = 0;
@@ -108,19 +150,25 @@ function startLevel(level) {
 
     hideAll();
 
-    scoreboard.style.display = "block"; // FIXED
+    scoreboard.style.display = "block";
     poemGrid.style.display = "grid";
 
     updateHUD();
     createWords();
 }
 
+// ============================================================
+// UPDATE HUD
+// ============================================================
 function updateHUD() {
     levelIndicator.textContent = `LEVEL ${currentLevel} / ${MAX_LEVELS}`;
     scoreIndicator.textContent = `SCORE: ${score}`;
     healthIndicator.textContent = `HEALTH: ${health}`;
 }
 
+// ============================================================
+// CREATE WORD GRID
+// ============================================================
 function createWords() {
     poemGrid.innerHTML = "";
 
@@ -151,7 +199,11 @@ function createWords() {
     });
 }
 
+// ============================================================
+// CHECK LEVEL STATUS
+// ============================================================
 function checkLevel() {
+
     if (health <= 0) {
         hideAll();
         gameOver.classList.add("active");
@@ -159,18 +211,21 @@ function checkLevel() {
     }
 
     if (score >= SCORE_GOAL) {
+
         if (currentLevel > highestUnlocked) {
             highestUnlocked = currentLevel;
             localStorage.setItem("highestUnlocked", highestUnlocked);
         }
 
         if (currentLevel === MAX_LEVELS) {
-            showCredits();
+            creditsOverlay.style.display = "flex";
+
             setTimeout(() => {
                 creditsOverlay.style.display = "none";
                 hideAll();
                 gameComplete.classList.add("active");
             }, 35000);
+
         } else {
             hideAll();
             document.getElementById("levelCompleteTitle").textContent =
@@ -180,28 +235,28 @@ function checkLevel() {
     }
 }
 
+// ============================================================
+// BUTTON ACTIONS
+// ============================================================
 nextLevelBtn.onclick = () => startLevel(currentLevel + 1);
 retryLevelBtn.onclick = () => startLevel(currentLevel);
 playAgainBtn.onclick = () => startLevel(1);
 
-function showCredits() {
-    creditsOverlay.style.display = "flex";
-}
-
-function showSettings() {
-    hideAll();
-    settingsScreen.classList.add("active");
-}
-
+// ============================================================
+// SHOW MENU
+// ============================================================
 function showMenu() {
     hideAll();
-    scoreboard.style.display = "none"; // FIXED
+    scoreboard.style.display = "none";
     creditsOverlay.style.display = "none";
-    settingsScreen.classList.remove("active");
     menuScreen.classList.add("active");
 }
 
+// ============================================================
+// HIDE ALL SCREENS
+// ============================================================
 function hideAll() {
+    attractScreen.classList.remove("active");
     menuScreen.classList.remove("active");
     levelSelect.classList.remove("active");
     poemGrid.style.display = "none";
@@ -209,11 +264,18 @@ function hideAll() {
     gameOver.classList.remove("active");
     gameComplete.classList.remove("active");
     settingsScreen.classList.remove("active");
-    scoreboard.style.display = "none"; // FIXED
+    scoreboard.style.display = "none";
 }
 
+// ============================================================
+// ESC KEY RETURNS TO MENU
+// ============================================================
 document.addEventListener("keydown", (e) => {
     if (e.key === "Escape") showMenu();
 });
 
-showMenu();
+// ============================================================
+// START IN ATTRACT MODE
+// ============================================================
+hideAll();
+attractScreen.classList.add("active");
