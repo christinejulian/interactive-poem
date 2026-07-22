@@ -2,197 +2,181 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Arcade Poem Dungeon — Off the Grid</title>
+<title>Arcade Poem Dungeon — Retro 80s Arcade</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<!-- Retro Pixel Font -->
-<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
-
-<!-- External CSS -->
-<link rel="stylesheet" href="styles.css">
 </head>
-<body>
+<body style="margin:0; background:#000; color:#0f0; font-family: monospace;">
 
-<!-- Ambient Glow Overlay -->
-<div class="arcade-glow"></div>
+<!-- Retro 80s Arcade Marquee -->
+<div style="text-align:center; padding:20px; border-bottom:2px solid #0f0; box-shadow:0 0 20px #0f0;">
+  <h1 style="margin:0; font-size:24px; text-shadow:0 0 10px #0f0;">
+    ARCADE POEM DUNGEON
+  </h1>
+  <p style="margin:5px 0; font-size:12px; color:#0a0;">
+    OFF THE GRID — RETRO 80s ARCADE EDITION
+  </p>
+</div>
 
-<!-- Static Noise Overlay -->
-<div class="static-overlay"></div>
+<!-- Main Cabinet Area -->
+<div style="margin:20px auto; max-width:800px; border:4px solid #0f0; border-radius:12px; padding:20px; box-shadow:0 0 30px #0f0;">
 
-<!-- Boot-Up Terminal Intro -->
-<div id="bootIntro" class="screen">
-  <div class="boot-lines">
-    <p>BOOTING ARCADE SYSTEM...</p>
-    <p>LOADING POEM DUNGEON MODULE...</p>
-    <p>INITIALIZING GLITCH CORE...</p>
-    <p>ESTABLISHING NEON LINK...</p>
-    <p>DECRYPTING LEVEL MATRIX...</p>
-    <p class="boot-complete">SYSTEM ONLINE — PRESS START</p>
+  <!-- Screen Frame -->
+  <div style="border:2px solid #0f0; padding:16px; background:#020; box-shadow:inset 0 0 20px #000;">
+    
+    <!-- Fake CRT Scanlines -->
+    <div style="background-image:linear-gradient(rgba(0,255,0,0.08) 1px, transparent 1px); background-size:100% 3px; padding:16px;">
+
+      <!-- Main Menu (Static) -->
+      <div style="text-align:center; margin-bottom:24px;">
+        <h2 style="margin:0 0 10px; font-size:18px; text-shadow:0 0 8px #0f0;">
+          INSERT COIN
+        </h2>
+        <p style="margin:4px 0; font-size:11px;">PRESS START TO BEGIN</p>
+        <p style="margin:4px 0; font-size:11px;">SELECT LEVEL • READ POEM • SURVIVE THE DUNGEON</p>
+      </div>
+
+      <!-- Static Level Select Mockup -->
+      <div style="margin:0 auto 24px; max-width:500px; text-align:center;">
+        <h3 style="margin:0 0 10px; font-size:14px;">LEVEL GRID (1–15)</h3>
+        <div style="display:inline-block; text-align:left; font-size:11px; line-height:1.6;">
+          <p>LEVEL 1 — UNLOCKED</p>
+          <p>LEVEL 2 — LOCKED</p>
+          <p>LEVEL 3 — LOCKED</p>
+          <p>LEVEL 4 — LOCKED</p>
+          <p>LEVEL 5 — LOCKED</p>
+          <p>LEVEL 6 — LOCKED</p>
+          <p>LEVEL 7 — LOCKED</p>
+          <p>LEVEL 8 — LOCKED</p>
+          <p>LEVEL 9 — LOCKED</p>
+          <p>LEVEL 10 — LOCKED</p>
+          <p>LEVEL 11 — LOCKED</p>
+          <p>LEVEL 12 — LOCKED</p>
+          <p>LEVEL 13 — LOCKED</p>
+          <p>LEVEL 14 — LOCKED</p>
+          <p>LEVEL 15 — LOCKED</p>
+        </div>
+      </div>
+
+      <!-- Static HUD Mockup -->
+      <div style="display:flex; justify-content:space-between; font-size:11px; margin-bottom:24px;">
+        <div>LEVEL: 1 / 15</div>
+        <div>SCORE: 0000</div>
+        <div>HEALTH: ████████</div>
+      </div>
+
+      <!-- Poem Word Grid Mockup -->
+      <div style="display:grid; grid-template-columns:repeat(3, 1fr); gap:8px; font-size:11px;">
+        <div style="border:1px solid #0f0; padding:6px; text-align:center;">WORD 1</div>
+        <div style="border:1px solid #0f0; padding:6px; text-align:center;">WORD 2</div>
+        <div style="border:1px solid #0f0; padding:6px; text-align:center;">WORD 3</div>
+        <div style="border:1px solid #0f0; padding:6px; text-align:center;">WORD 4</div>
+        <div style="border:1px solid #0f0; padding:6px; text-align:center;">WORD 5</div>
+        <div style="border:1px solid #0f0; padding:6px; text-align:center;">WORD 6</div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Control Panel -->
+  <div style="margin-top:20px; text-align:center; font-size:11px;">
+    <p>START • SELECT • OPTIONS</p>
+    <p>THIS IS A STATIC RETRO MOCKUP — NO SCRIPTS, PURE HTML</p>
   </div>
 </div>
 
-<!-- Main Game Cabinet -->
-<div class="cabinet">
+<!-- Credits Overlay (Your Full Text) -->
+<div style="margin:40px auto; max-width:700px; border-top:2px solid #0f0; padding-top:20px; text-align:center; font-size:11px; line-height:1.8;">
 
-  <!-- Dungeon Grid Background -->
-  <div class="dungeon-bg"></div>
+  <div>
 
-  <!-- HUD -->
-  <div id="scoreboard">
-    <div id="levelIndicator">LEVEL 1 / 15</div>
-    <div id="scoreIndicator">SCORE: 0</div>
-  </div>
+    <h2 style="margin-bottom:10px; text-shadow:0 0 8px #0f0;">★ ARCADE POEM DUNGEON ★</h2>
 
-  <!-- Main Menu -->
-  <div id="menuScreen" class="screen">
-    <div class="menu-title glitch">ARCADE POEM DUNGEON</div>
-    <div class="menu-subtitle">OFF THE GRID — TERMINAL EDITION</div>
+    <p>Congratulations, Player.</p>
 
-    <div class="menu-attract">
-      <p>INSERT COIN</p>
-      <p>PRESS START</p>
-      <p>BEGIN TRANSMISSION</p>
-    </div>
-
-    <div class="menu-buttons">
-      <button id="startGameBtn">▶ START GAME</button>
-      <button id="howToPlayBtn">❖ HOW TO PLAY</button>
-      <button id="creditsBtn">★ CREDITS</button>
-    </div>
-  </div>
-
-  <!-- Level Select -->
-  <div id="levelSelect" class="screen">
-    <div class="level-select-title glitch">SELECT LEVEL</div>
-    <div class="level-grid" id="levelGrid"></div>
-
-    <div class="menu-buttons">
-      <button id="returnMenuBtn">🏠 MAIN MENU</button>
-    </div>
-  </div>
-
-  <!-- Poem Word Grid -->
-  <div id="poemGrid" class="poem-grid"></div>
-
-  <!-- Level Complete -->
-  <div id="levelComplete" class="screen">
-    <h1 id="levelCompleteTitle">LEVEL COMPLETED!</h1>
-    <p class="level-lore">
-      The neon words collapse.<br>
-      The terminal hums quietly.<br>
-      The next chamber awaits.
-    </p>
-    <div class="menu-buttons">
-      <button id="nextLevelBtn">▶ NEXT LEVEL</button>
-      <button id="mainMenuBtn1">🏠 MAIN MENU</button>
-    </div>
-  </div>
-
-  <!-- Game Over -->
-  <div id="gameOver" class="screen">
-    <h1 class="glitch">GAME OVER</h1>
-    <p class="death-text">
-      The terminal overloads.<br>
-      The neon grid fractures.<br>
-      Your signal fades.
-    </p>
-    <div class="menu-buttons">
-      <button id="retryLevelBtn">🔄 RETRY LEVEL</button>
-      <button id="mainMenuBtn2">🏠 MAIN MENU</button>
-    </div>
-  </div>
-
-  <!-- Game Complete -->
-  <div id="gameComplete" class="screen">
-    <h1 class="glitch">ALL 15 LEVELS CLEARED</h1>
-    <p class="victory-text">
-      The dungeon dissolves.<br>
-      The neon horizon opens.<br>
-      Your story becomes legend.
-    </p>
-    <div class="menu-buttons">
-      <button id="playAgainBtn">🔄 PLAY AGAIN</button>
-      <button id="mainMenuBtn3">🏠 MAIN MENU</button>
-    </div>
-  </div>
-
-</div>
-
-<!-- Settings Overlay -->
-<div class="overlay" id="settingsOverlay">
-  <div class="overlay-content">
-    <h2>SYSTEM SETTINGS</h2>
-
-    <label>CRT Intensity</label>
-    <input type="range" id="crtRange" min="0.2" max="1" step="0.1" value="1">
-
-    <label>Glitch Level</label>
-    <input type="range" id="glitchRange" min="0" max="1" step="0.1" value="1">
-
-    <label>Soundtrack Volume</label>
-    <input type="range" id="volumeRange" min="0" max="1" step="0.1" value="0.6">
-
-    <div class="settings-buttons">
-      <button class="level-btn" id="resumeBtn">RESUME</button>
-      <button class="level-btn" id="escMenuBtn" style="border-color:#f00;color:#f00;">MAIN MENU</button>
-    </div>
-  </div>
-</div>
-
-<!-- Credits Overlay -->
-<div class="overlay" id="creditsOverlay">
-  <div class="overlay-content credits-scroll">
-
-    <h2 class="glitch">★ ARCADE POEM DUNGEON ★</h2>
-    <p>Terminal Overload Edition</p>
     <br>
 
-    <h3>FINAL POEM</h3>
-    <p>The neon grid flickers.</p>
-    <p>The terminal breathes.</p>
-    <p>The dungeon listens.</p>
+    <p>You reached the final room.</p>
+    <p>The glowing pixels fade.</p>
+    <p>The dungeon grows quiet.</p>
+
     <br>
 
-    <p>You walked through static corridors.</p>
-    <p>You decoded fractured verses.</p>
-    <p>You survived the glitch storms.</p>
+    <h3 style="margin-bottom:8px;">FINAL POEM</h3>
+
+    <p>I entered searching</p>
+    <p>for another high score.</p>
+
     <br>
 
-    <p>Every word was a spark.</p>
-    <p>Every level a memory.</p>
-    <p>Every victory a pulse.</p>
+    <p>Neon lights blinked,</p>
+    <p>coins echoed,</p>
+    <p>and every level</p>
+    <p>asked me to continue.</p>
+
     <br>
 
-    <p>Now the system sleeps.</p>
-    <p>But your signal remains.</p>
+    <p>Every enemy</p>
+    <p>was only another word.</p>
+
+    <p>Every puzzle</p>
+    <p>became another verse.</p>
+
     <br>
 
-    <h3>CREATED BY</h3>
+    <p>I learned</p>
+    <p>that victory</p>
+    <p>is not measured</p>
+    <p>by points alone,</p>
+
+    <p>but by every story</p>
+    <p>we choose to finish.</p>
+
+    <br>
+
+    <p>The arcade sleeps.</p>
+
+    <p>The screen flickers.</p>
+
+    <p>The controller rests.</p>
+
+    <br>
+
+    <p>Yet somewhere</p>
+
+    <p>a single pixel</p>
+
+    <p>still glows.</p>
+
+    <br>
+
+    <p>Waiting…</p>
+
+    <p>for another player.</p>
+
+    <br><br>
+
+    <h3 style="margin-bottom:8px;">THANK YOU FOR PLAYING</h3>
+
+    <p>Created by</p>
     <p>Christine Julian</p>
+
     <br>
 
-    <h3>THANK YOU FOR PLAYING</h3>
-    <p>★ GAME COMPLETE ★</p>
+    <p>Interactive Poem</p>
+    <p>Arcade Poem Dungeon</p>
 
-    <div style="margin-top:2rem;">
-      <button class="level-btn" id="creditsMenuBtn">🏠 MAIN MENU</button>
-    </div>
+    <br>
+
+    <p>GAME COMPLETE</p>
+
+    <p>★★★★★</p>
+
+    <br><br><br>
+
+    <h2 style="margin-bottom:0;">THE END</h2>
 
   </div>
 </div>
-
-<!-- Audio -->
-<audio id="bgm" loop>
-  <source src="https://files.catbox.moe/8bitloop.mp3" type="audio/mpeg">
-</audio>
-
-<audio id="hitSfx">
-  <source src="https://files.catbox.moe/hitbeep.mp3" type="audio/mpeg">
-</audio>
-
-<audio id="damageSfx">
-  <source src="https://files.catbox.moe/hitbeep.mp3" type="audio/mpeg">
-</audio>
 
 </body>
 </html>
