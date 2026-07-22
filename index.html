@@ -214,24 +214,16 @@ body::before {
   transform: scale(0.95);  
 }  
 
-/* Health bar */  
-.health-bar {  
+/* Level Indicator HUD */  
+.level-indicator {  
   position: absolute;  
   top: 1rem;  
   left: 1rem;  
-  width: 200px;  
-  height: 24px;  
-  border: 3px solid #f00;  
-  border-radius: 8px;  
-  background: #300;  
-  overflow: hidden;  
+  color: #0ff;  
+  font-size: 0.9rem;  
+  text-shadow: 0 0 8px #0ff;  
   z-index: 3;  
-}  
-.health-fill {  
-  height: 100%;  
-  width: 100%;  
-  background: linear-gradient(90deg, #0f0, #ff0, #f00);  
-}  
+}
   
 /* Player sprite */  
 .player {  
@@ -333,8 +325,8 @@ body::before {
   to { transform: translate(var(--dx), var(--dy)); opacity: 0; }  
 }  
   
-/* Game over / Victory overlay with replay CTA */  
-.game-over, .victory-screen {  
+/* Victory Screen */
+.victory-screen {  
   position: absolute;  
   inset: 0;  
   display: none;  
@@ -344,16 +336,27 @@ body::before {
   gap: 2rem;  
   background: rgba(0,0,0,0.85);  
   z-index: 5;  
-}  
-.game-over {  
-  color: #f00;  
-  font-size: 2rem;  
-  text-shadow: 0 0 12px #f00;  
-}
-.victory-screen {  
   color: #0f0;  
   font-size: 2rem;  
   text-shadow: 0 0 12px #0f0;  
+}  
+
+/* Grand Victory Screen (After Level 5) */
+.grand-victory-screen {  
+  position: absolute;  
+  inset: 0;  
+  display: none;  
+  flex-direction: column;  
+  align-items: center;  
+  justify-content: center;  
+  gap: 2rem;  
+  background: rgba(0,0,0,0.9);  
+  z-index: 6;  
+  color: #ff0;  
+  font-size: 1.8rem;  
+  text-shadow: 0 0 15px #ff0;  
+  text-align: center;
+  padding: 2rem;
 }  
   
 /* Scrolling retro credits */  
@@ -392,14 +395,11 @@ body::before {
 
   <!-- UI Navigation Controls -->
   <div class="game-controls">  
-    <button class="ctrl-btn" onclick="replayGame()">🔄 REPLAY</button>  
     <button class="ctrl-btn" onclick="returnToMenu()">🏠 MENU</button>  
   </div>  
 
-  <!-- Health bar -->    
-  <div class="health-bar" id="healthBar">  
-    <div class="health-fill" id="healthFill"></div>  
-  </div>    
+  <!-- Level Indicator -->    
+  <div class="level-indicator" id="levelIndicator">LEVEL 1 / 5</div>    
 
   <!-- Player sprite -->    
   <div class="player" id="player"></div>    
@@ -442,36 +442,18 @@ body::before {
   </div>    
 
   <!-- Poem grid (enemies) -->    
-  <div class="poem-grid" id="poemGrid">  
-    <div class="beat enemy">arcade</div>  
-    <div class="enemy">neon</div>  
-    <div class="enemy">hum</div>  
-    <div class="enemy">pixel</div>  
-    <div class="enemy">dreams</div>  
-    <div class="beat enemy">boss</div>  
-    <div class="enemy">fights</div>  
-    <div class="enemy">pulse</div>  
-    <div class="enemy">through</div>  
-    <div class="enemy">midnight</div>  
-    <div class="enemy">party</div>  
-    <div class="enemy">queues</div>  
-    <div class="beat enemy">hearts</div>  
-    <div class="enemy">level</div>  
-    <div class="enemy">up</div>  
-    <div class="enemy">in</div>  
-    <div class="enemy">co-op</div>
-  </div>    
+  <div class="poem-grid" id="poemGrid"></div>    
 
-  <!-- Game over -->    
-  <div class="game-over" id="gameOver">  
-    <div>GAME OVER</div>  
-    <button class="ctrl-btn" style="font-size: 1rem; padding: 0.8rem 1.5rem;" onclick="replayGame()">🔄 TRY AGAIN</button>  
+  <!-- Victory Screen (Per Level) -->
+  <div class="victory-screen" id="victoryScreen">  
+    <div id="victoryTitle">LEVEL COMPLETED!</div>  
+    <button class="ctrl-btn" style="font-size: 1rem; padding: 0.8rem 1.5rem;" onclick="nextLevel()">▶ NEXT LEVEL</button>  
   </div>  
 
-  <!-- Victory Screen -->
-  <div class="victory-screen" id="victoryScreen">  
-    <div>LEVEL COMPLETED!</div>  
-    <button class="ctrl-btn" style="font-size: 1rem; padding: 0.8rem 1.5rem;" onclick="replayGame()">🔄 PLAY AGAIN</button>  
+  <!-- Grand Victory Screen (After Level 5 Complete) -->
+  <div class="grand-victory-screen" id="grandVictoryScreen">  
+    <div>CONGRATULATIONS!<br>YOU BEAT ALL 5 LEVELS!</div>  
+    <button class="ctrl-btn" style="font-size: 1rem; padding: 0.8rem 1.5rem;" onclick="restartFullGame()">🔄 PLAY AGAIN FROM LEVEL 1</button>  
   </div>
 </div>  
 
@@ -522,15 +504,25 @@ body::before {
 </audio>  
 
 <script>  
-let health = 100;  
-const healthFill = document.getElementById("healthFill");  
+let currentLevel = 1;
+const maxLevels = 5;
+
+// Word pools for each of the 5 levels
+const levelWordSets = {
+  1: ["arcade", "neon", "hum", "pixel", "dreams", "fights"],
+  2: ["pulse", "through", "midnight", "party", "queues", "hearts", "level"],
+  3: ["up", "in", "co-op", "syntax", "glitch", "dungeon", "cipher", "matrix"],
+  4: ["shadow", "echo", "terminal", "packet", "buffer", "overflow", "kernel", "daemon"],
+  5: ["quantum", "singularity", "mainframe", "nexus", "infinity", "core", "genesis", "zenith", "omega"]
+};
+
 const poemGrid = document.getElementById("poemGrid");  
-const enemies = document.querySelectorAll(".enemy");  
 const bgm = document.getElementById("bgm");  
 const voice = document.getElementById("voice");  
 const hitSfx = document.getElementById("hitSfx");  
-const gameOver = document.getElementById("gameOver");  
 const victoryScreen = document.getElementById("victoryScreen");
+const grandVictoryScreen = document.getElementById("grandVictoryScreen");
+const levelIndicator = document.getElementById("levelIndicator");
   
 /* Menu navigation */  
 function openCharacterSelect() {  
@@ -543,10 +535,12 @@ function openSaveSlots() {
 }  
 function chooseCharacter(name) {  
   localStorage.setItem("character", name);  
+  currentLevel = 1;
   startGame();  
 }  
 function loadSlot(slot) {  
   alert("Loaded Slot " + slot);  
+  currentLevel = 1;
   startGame();  
 }  
   
@@ -562,7 +556,7 @@ function showCredits() {
   
 /* Instructions */  
 function showInstructions() {  
-  alert("Poem words are enemies.\nClick them to defeat.\nDefeat all word enemies to win!\nPress ESC for settings.");  
+  alert("Poem words are enemies across 5 Levels.\nClick them all to clear each level.\nComplete Level 5 to win the entire game!\nPress ESC for settings.");  
 }  
   
 /* Settings */  
@@ -585,79 +579,94 @@ document.getElementById("volumeRange").addEventListener("input", (e) => {
   bgm.volume = e.target.value;  
 });  
 
-/* Reset Enemy States */
-function resetEnemies() {
-  enemies.forEach((enemy) => {
-    enemy.style.opacity = "1";
-    enemy.style.transform = "scale(1)";
-    enemy.style.pointerEvents = "auto";
+/* Build Level Grid Dynamically */
+function buildLevelGrid(levelNum) {
+  poemGrid.innerHTML = "";
+  const words = levelWordSets[levelNum] || levelWordSets[1];
+  
+  words.forEach((word, index) => {
+    const div = document.createElement("div");
+    div.classList.add("enemy");
+    if (index % 3 === 0) {
+      div.classList.add("beat");
+    }
+    div.textContent = word;
+    
+    div.addEventListener("click", () => {  
+      div.style.opacity = "0";  
+      div.style.transform = "scale(0.5)";  
+      div.style.pointerEvents = "none";  
+      spawnParticles();  
+      hitSfx.play();  
+      checkAllEnemiesDefeated();  
+    });  
+
+    poemGrid.appendChild(div);
   });
 }
 
-/* Replay Game */
-function replayGame() {  
-  resetEnemies();  
-  gameOver.style.display = "none";  
-  victoryScreen.style.display = "none";  
-  startGame();  
-}
-
-/* Return to Main Menu */
-function returnToMenu() {  
-  resetEnemies();  
-  poemGrid.style.display = "none";  
-  gameOver.style.display = "none";  
-  victoryScreen.style.display = "none";  
-  document.getElementById("characterSelect").style.display = "none";  
-  document.getElementById("saveScreen").style.display = "none";  
-  document.getElementById("menuScreen").style.display = "flex";  
-  bgm.pause();  
-  bgm.currentTime = 0;  
-}
-  
 /* Start game */  
 function startGame() {  
   document.getElementById("menuScreen").style.display = "none";
   document.getElementById("characterSelect").style.display = "none";  
   document.getElementById("saveScreen").style.display = "none";  
+  victoryScreen.style.display = "none";
+  grandVictoryScreen.style.display = "none";
+  
+  levelIndicator.textContent = `LEVEL ${currentLevel} / ${maxLevels}`;
+  buildLevelGrid(currentLevel);
   poemGrid.style.display = "grid";  
-  health = 100;  
-  updateHealth();  
+  
   bgm.volume = 0.6;  
   bgm.play();  
   voice.play();  
 }  
-  
-/* Health */  
-function updateHealth() {  
-  healthFill.style.width = health + "%";  
-  if (health <= 0) {  
-    triggerGameOver();  
-  }  
-}  
-function triggerGameOver() {  
-  gameOver.style.display = "flex";  
+
+/* Proceed to Next Level or Win Game */
+function nextLevel() {
+  victoryScreen.style.display = "none";
+  currentLevel++;
+  if (currentLevel > maxLevels) {
+    poemGrid.style.display = "none";
+    grandVictoryScreen.style.display = "flex";
+    bgm.pause();
+    voice.play();
+  } else {
+    startGame();
+  }
+}
+
+/* Restart Full Game from Level 1 */
+function restartFullGame() {
+  currentLevel = 1;
+  grandVictoryScreen.style.display = "none";
+  startGame();
+}
+
+/* Return to Main Menu */
+function returnToMenu() {  
+  poemGrid.style.display = "none";  
+  victoryScreen.style.display = "none";  
+  grandVictoryScreen.style.display = "none";  
+  document.getElementById("characterSelect").style.display = "none";  
+  document.getElementById("saveScreen").style.display = "none";  
+  document.getElementById("menuScreen").style.display = "flex";  
+  levelIndicator.textContent = "";
   bgm.pause();  
-}  
+  bgm.currentTime = 0;  
+}
   
-/* Enemy behavior: poem combat mode */  
-enemies.forEach((enemy) => {  
-  enemy.addEventListener("click", () => {  
-    enemy.style.opacity = "0";  
-    enemy.style.transform = "scale(0.5)";  
-    enemy.style.pointerEvents = "none";  
-    spawnParticles();  
-    hitSfx.play();  
-    checkAllEnemiesDefeated();  
-  });  
-});  
-  
-/* Check if all enemies defeated */  
+/* Check if all enemies defeated in current level */  
 function checkAllEnemiesDefeated() {  
+  const enemies = poemGrid.querySelectorAll(".enemy");
   const remaining = Array.from(enemies).filter(e => e.style.pointerEvents !== "none");  
   if (remaining.length === 0) {  
     poemGrid.style.display = "none";  
-    victoryScreen.style.display = "flex";  
+    if (currentLevel === maxLevels) {
+      grandVictoryScreen.style.display = "flex";
+    } else {
+      victoryScreen.style.display = "flex";  
+    }
     bgm.pause();  
     voice.play();  
   }  
