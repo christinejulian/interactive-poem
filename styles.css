@@ -1,3 +1,6 @@
+/* ============================================================
+   GLOBAL RESET + ARCADE LOOK
+   ============================================================ */
 html, body {
     margin: 0;
     padding: 0;
@@ -6,8 +9,12 @@ html, body {
     background: #000;
     color: #0f0;
     font-family: monospace;
+    letter-spacing: 1px;
 }
 
+/* ============================================================
+   FULLSCREEN GAME CONTAINER
+   ============================================================ */
 #gameContainer {
     width: 100vw;
     height: 100vh;
@@ -16,15 +23,25 @@ html, body {
     align-items: center;
 }
 
+/* ============================================================
+   CRT ARCADE CABINET FRAME
+   ============================================================ */
 .crtFrame {
     width: 90vw;
     height: 90vh;
     border: 8px solid #0f0;
-    box-shadow: 0 0 25px #0f0 inset, 0 0 40px #0f0;
+    box-shadow:
+        0 0 25px #0f0 inset,
+        0 0 40px #0f0,
+        0 0 80px #0f0 inset;
     position: relative;
     overflow: hidden;
+    background: #000;
 }
 
+/* ============================================================
+   NEON DUNGEON BACKGROUND GRID
+   ============================================================ */
 .dungeon-bg {
     position: absolute;
     inset: 0;
@@ -33,18 +50,12 @@ html, body {
         linear-gradient(90deg, #020 1px, transparent 1px);
     background-size: 32px 32px;
     opacity: 0.35;
+    pointer-events: none;
 }
 
-/* FIX: scoreboard hidden by default */
-#scoreboard {
-    position: absolute;
-    top: 10px;
-    left: 10px;
-    font-size: 14px;
-    display: none;
-    pointer-events: none; /* FIX: scoreboard no longer blocks clicks */
-}
-
+/* ============================================================
+   SCREENS (GAME STATES)
+   ============================================================ */
 .screen {
     display: none;
     position: absolute;
@@ -57,6 +68,71 @@ html, body {
     display: block;
 }
 
+/* ============================================================
+   ATTRACT MODE
+   ============================================================ */
+#attractScreen {
+    cursor: pointer;
+}
+
+.attract-title {
+    font-size: 4rem;
+    margin-top: 2rem;
+    line-height: 1.1;
+    text-shadow: 0 0 12px #0f0, 0 0 24px #0f0;
+}
+
+.attract-subtitle {
+    font-size: 1.5rem;
+    margin-top: 1rem;
+    opacity: 0.8;
+}
+
+.attract-flash {
+    margin-top: 3rem;
+    font-size: 1.2rem;
+    animation: flash 1s infinite;
+}
+
+@keyframes flash {
+    0% { opacity: 1; }
+    50% { opacity: 0.2; }
+    100% { opacity: 1; }
+}
+
+.attract-lore {
+    margin-top: 3rem;
+    opacity: 0.7;
+}
+
+.attract-bottom {
+    position: absolute;
+    bottom: 20px;
+    width: 100%;
+    opacity: 0.5;
+}
+
+/* ============================================================
+   MENU SCREEN
+   ============================================================ */
+.menu-title {
+    font-size: 2.5rem;
+    margin-top: 2rem;
+    text-shadow: 0 0 12px #0f0;
+}
+
+.menu-buttons {
+    margin-top: 2rem;
+}
+
+.menu-lore {
+    margin-top: 2rem;
+    opacity: 0.7;
+}
+
+/* ============================================================
+   BUTTONS
+   ============================================================ */
 button {
     margin: 10px auto;
     padding: 12px 20px;
@@ -64,7 +140,10 @@ button {
     color: #0f0;
     border: 2px solid #0f0;
     cursor: pointer;
+    font-size: 1rem;
+    display: block;
     width: 240px;
+    transition: 0.2s;
 }
 
 button:hover {
@@ -72,6 +151,35 @@ button:hover {
     color: #000;
 }
 
+button:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+}
+
+/* ============================================================
+   HUD (Hidden until gameplay)
+   ============================================================ */
+#scoreboard {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    font-size: 14px;
+    display: none; /* FIXED */
+    pointer-events: none; /* FIXED */
+    text-shadow: 0 0 8px #0f0;
+}
+
+/* ============================================================
+   LEVEL SELECT GRID
+   ============================================================ */
+#levelGrid button {
+    width: 200px;
+    margin: 8px auto;
+}
+
+/* ============================================================
+   POEM GRID (Gameplay)
+   ============================================================ */
 #poemGrid {
     display: none;
     margin-top: 60px;
@@ -86,6 +194,7 @@ button:hover {
     background: #111;
     border: 2px solid #0f0;
     cursor: pointer;
+    transition: 0.2s;
 }
 
 /* Wrong word damage */
@@ -94,11 +203,41 @@ button:hover {
     border-color: #f00 !important;
 }
 
-#settingsScreen input[type=range] {
+/* ============================================================
+   LEVEL COMPLETE / GAME OVER / GAME COMPLETE
+   ============================================================ */
+.level-complete-text,
+.game-over-text,
+.game-complete-text {
+    margin-top: 2rem;
+    opacity: 0.8;
+}
+
+/* ============================================================
+   SETTINGS SCREEN
+   ============================================================ */
+#settingsScreen h2 {
+    font-size: 2rem;
+    text-shadow: 0 0 12px #0f0;
+}
+
+.settings-group {
+    margin-top: 2rem;
+}
+
+.settings-label {
+    font-size: 20px;
+}
+
+#volumeSlider {
     width: 300px;
+    margin-top: 20px;
     accent-color: #0f0;
 }
 
+/* ============================================================
+   CREDITS OVERLAY
+   ============================================================ */
 .overlay {
     position: fixed;
     inset: 0;
@@ -108,4 +247,28 @@ button:hover {
     overflow-y: auto;
     padding: 20px;
     text-align: center;
+}
+
+.overlay-content {
+    max-width: 600px;
+    margin: auto;
+    line-height: 1.6;
+    font-size: 1rem;
+}
+
+/* ============================================================
+   CRT SCANLINES
+   ============================================================ */
+body::after {
+    content: "";
+    position: fixed;
+    inset: 0;
+    background: repeating-linear-gradient(
+        to bottom,
+        rgba(0,255,0,0.05) 0px,
+        rgba(0,255,0,0.05) 2px,
+        rgba(0,0,0,0.1) 3px
+    );
+    pointer-events: none;
+    z-index: 999;
 }
