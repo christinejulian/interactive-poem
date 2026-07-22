@@ -283,20 +283,6 @@ body::before {
   box-shadow: 0 0 12px #ff0;  
 }  
   
-/* Boss */  
-.boss {  
-  position: absolute;  
-  top: 10%;  
-  left: 50%;  
-  transform: translateX(-50%);  
-  font-size: 2rem;  
-  color: #f00;  
-  text-shadow: 0 0 12px #f00;  
-  display: none;  
-  z-index: 3;  
-  cursor: pointer;
-}  
-  
 /* Settings overlay */  
 .settings-overlay {  
   position: fixed;  
@@ -418,9 +404,6 @@ body::before {
   <!-- Player sprite -->    
   <div class="player" id="player"></div>    
 
-  <!-- Boss -->    
-  <div class="boss" id="boss" onclick="defeatBoss()">👾 BOSS: GLITCHED VERSE</div>    
-
   <!-- Menu -->    
   <div class="menu-screen" id="menuScreen">  
     <div class="menu-title vhs">ARCADE POEM DUNGEON</div>  
@@ -523,7 +506,6 @@ body::before {
     <div class="credit-line">8-BIT SOUNDTRACK</div>  
     <div class="credit-line">GLITCH FX & CRT FILTER</div>  
     <div class="credit-line">POEM ENEMY COMBAT</div>  
-    <div class="credit-line">BOSS: GLITCHED VERSE</div>  
     <div class="credit-line">THANK YOU FOR PLAYING</div>  
   </div>  
 </div>  
@@ -542,7 +524,6 @@ body::before {
 <script>  
 let health = 100;  
 const healthFill = document.getElementById("healthFill");  
-const boss = document.getElementById("boss");  
 const poemGrid = document.getElementById("poemGrid");  
 const enemies = document.querySelectorAll(".enemy");  
 const bgm = document.getElementById("bgm");  
@@ -581,7 +562,7 @@ function showCredits() {
   
 /* Instructions */  
 function showInstructions() {  
-  alert("Poem words are enemies.\nClick them to defeat.\nBoss appears after all words fall.\nClick the boss to defeat it!\nHealth drops when boss attacks.\nPress ESC for settings.");  
+  alert("Poem words are enemies.\nClick them to defeat.\nDefeat all word enemies to win!\nPress ESC for settings.");  
 }  
   
 /* Settings */  
@@ -624,7 +605,6 @@ function replayGame() {
 /* Return to Main Menu */
 function returnToMenu() {  
   resetEnemies();  
-  boss.style.display = "none";  
   poemGrid.style.display = "none";  
   gameOver.style.display = "none";  
   victoryScreen.style.display = "none";  
@@ -641,7 +621,6 @@ function startGame() {
   document.getElementById("characterSelect").style.display = "none";  
   document.getElementById("saveScreen").style.display = "none";  
   poemGrid.style.display = "grid";  
-  boss.style.display = "none";  
   health = 100;  
   updateHealth();  
   bgm.volume = 0.6;  
@@ -660,15 +639,6 @@ function triggerGameOver() {
   gameOver.style.display = "flex";  
   bgm.pause();  
 }  
-
-/* Defeat Boss to finish level */
-function defeatBoss() {
-  boss.style.display = "none";
-  victoryScreen.style.display = "flex";
-  bgm.pause();
-  spawnParticles();
-  hitSfx.play();
-}
   
 /* Enemy behavior: poem combat mode */  
 enemies.forEach((enemy) => {  
@@ -686,20 +656,12 @@ enemies.forEach((enemy) => {
 function checkAllEnemiesDefeated() {  
   const remaining = Array.from(enemies).filter(e => e.style.pointerEvents !== "none");  
   if (remaining.length === 0) {  
-    poemGrid.style.display = "none";
-    boss.style.display = "block";  
+    poemGrid.style.display = "none";  
+    victoryScreen.style.display = "flex";  
+    bgm.pause();  
     voice.play();  
   }  
 }  
-  
-/* Boss attacks: periodic damage */  
-setInterval(() => {  
-  if (poemGrid.style.display === "grid" && boss.style.display === "block" && health > 0) {  
-    health -= 10;  
-    updateHealth();  
-    spawnParticles();  
-  }  
-}, 3000);  
   
 /* Particles */  
 function spawnParticles() {  
