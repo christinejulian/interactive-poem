@@ -1,38 +1,40 @@
 /* ==========================================================================
-   GAME STATE & DOM ELEMENT SELECTION
+   GAME STATE
    ========================================================================== */
 let currentLevel = 1;
-const maxLevel = 5;
+const maxLevel = 15;
+let score = 0;
 
-// UI Elements
-const poemGrid = document.getElementById("poemGrid");
-const gameOver = document.getElementById("gameOver");
-const levelComplete = document.getElementById("levelComplete");
+/* Level score targets */
+const levelTargets = {};
+for (let i = 1; i <= maxLevel; i++) {
+  levelTargets[i] = i * 10; // Level 1 = 10 points, Level 15 = 150 points
+}
 
+/* ==========================================================================
+   DOM ELEMENTS
+   ========================================================================== */
 const menuScreen = document.getElementById("menuScreen");
 const characterSelect = document.getElementById("characterSelect");
 const saveScreen = document.getElementById("saveScreen");
 const settingsOverlay = document.getElementById("settingsOverlay");
 const creditsOverlay = document.getElementById("creditsOverlay");
 
-// Audio
+const poemGrid = document.getElementById("poemGrid");
+
+const scoreboard = document.getElementById("scoreboard");
+const scoreValue = document.getElementById("scoreValue");
+const levelValue = document.getElementById("levelValue");
+
+const levelComplete = document.getElementById("levelComplete");
+const gameComplete = document.getElementById("gameComplete");
+
 const bgm = document.getElementById("bgm");
 const voice = document.getElementById("voice");
 const hitSfx = document.getElementById("hitSfx");
 
 /* ==========================================================================
-   LEVEL WORD LISTS (5 LEVELS)
-   ========================================================================== */
-const levelWords = {
-  1: ["whisper", "shadow", "memory", "echo", "silence", "dream"],
-  2: ["fracture", "hollow", "pulse", "static", "ember", "solace"],
-  3: ["tremor", "ashen", "cipher", "lumen", "rift", "shatter"],
-  4: ["seraph", "gloom", "marrow", "veil", "tether", "spiral"],
-  5: ["origin", "relic", "mythos", "astral", "infinite", "eternal"]
-};
-
-/* ==========================================================================
-   MENU & NAVIGATION
+   MENU FUNCTIONS
    ========================================================================== */
 function openCharacterSelect() {
   menuScreen.style.display = "none";
@@ -57,13 +59,17 @@ function loadSlot(slot) {
 function showCredits() {
   creditsOverlay.style.display = "block";
   voice.play();
+  creditsOverlay.querySelector(".overlay-content").innerHTML = `
+    <h2>Credits</h2>
+    <p>Created by Christine Julian</p>
+  `;
   setTimeout(() => {
     creditsOverlay.style.display = "none";
   }, 18000);
 }
 
 function showInstructions() {
-  alert("Click poem words to defeat them.\nClear all words to complete the level.\nThere are 5 levels.\nPress ESC for settings.");
+  alert("Click poem words to gain score.\nReach the target score to complete each level.\nThere are 15 levels.\nPress ESC for settings and return to menu.");
 }
 
 function openSettings() {
@@ -93,96 +99,98 @@ document.getElementById("volumeRange").addEventListener("input", (e) => {
 });
 
 /* ==========================================================================
-   LEVEL & GAMEPLAY LOGIC
+   GAMEPLAY
    ========================================================================== */
 function startGame() {
   currentLevel = 1;
+  score = 0;
+
   menuScreen.style.display = "none";
   characterSelect.style.display = "none";
   saveScreen.style.display = "none";
   levelComplete.style.display = "none";
-  gameOver.style.display = "none";
+  gameComplete.style.display = "none";
 
-  loadLevel(currentLevel);
+  scoreboard.style.display = "flex";
 
   bgm.volume = 0.6;
   bgm.play();
   voice.play();
+
+  loadLevel(currentLevel);
+  updateScoreboard();
 }
 
 function loadLevel(level) {
-  poemGrid.innerHTML = ""; // Clear previous level
+  poemGrid.innerHTML = "";
   poemGrid.style.display = "grid";
 
-  const words = levelWords[level];
+  // Generate 10 words per level
+  for (let i = 0; i < 10; i++) {
+    const word = document.createElement("div");
+    word.classList.add("poemWord");
+    word.textContent = `word ${i + 1}`;
 
-  words.forEach(word => {
-    const div = document.createElement("div");
-    div.classList.add("enemy");
-    div.textContent = word;
-
-    div.addEventListener("click", () => {
-      div.style.opacity = "0";
-      div.style.transform = "scale(0.5)";
-      div.style.pointerEvents = "none";
-      spawnParticles();
+    word.addEventListener("click", () => {
+      score++;
+      updateScoreboard();
       hitSfx.play();
-      checkLevelCompletion();
+      word.style.opacity = "0";
+      word.style.transform = "scale(0.5)";
+      word.style.pointerEvents = "none";
+
+      if (score >= levelTargets[currentLevel]) {
+        completeLevel();
+      }
     });
 
-    poemGrid.appendChild(div);
-  });
+    poemGrid.appendChild(word);
+  }
 }
 
-function checkLevelCompletion() {
-  const remaining = Array.from(poemGrid.children).filter(e => e.style.pointerEvents !== "none");
-
-  if (remaining.length === 0) {
-    completeLevel();
-  }
+function updateScoreboard() {
+  scoreValue.textContent = score;
+  levelValue.textContent = currentLevel;
 }
 
 function completeLevel() {
   poemGrid.style.display = "none";
   bgm.pause();
-  levelComplete.style.display = "flex";
 
-  // Update level complete text
-  levelComplete.querySelector("h1").textContent = `Level ${currentLevel} Complete!`;
+  if (currentLevel < maxLevel) {
+    levelComplete.style.display = "flex";
+    levelComplete.querySelector("h1").textContent = `Level ${currentLevel} Complete!`;
 
-  // Update button behavior
-  const replayBtn = levelComplete.querySelector("button:nth-child(3)");
-  const menuBtn = levelComplete.querySelector("button:nth-child(4)");
-
-  replayBtn.textContent = currentLevel < maxLevel ? "Next Level" : "Replay Game";
-
-  replayBtn.onclick = () => {
-    if (currentLevel < maxLevel) {
+    const nextBtn = levelComplete.querySelector(".nextLevelBtn");
+    nextBtn.onclick = () => {
       currentLevel++;
+      score = 0;
       levelComplete.style.display = "none";
+      scoreboard.style.display = "flex";
       bgm.play();
       loadLevel(currentLevel);
-    } else {
-      replayGame();
-    }
-  };
+      updateScoreboard();
+    };
 
-  menuBtn.onclick = returnToMenu;
+  } else {
+    gameComplete.style.display = "flex";
+  }
 }
 
 function replayGame() {
   currentLevel = 1;
-  levelComplete.style.display = "none";
+  score = 0;
+  gameComplete.style.display = "none";
+  scoreboard.style.display = "flex";
   bgm.play();
   loadLevel(currentLevel);
+  updateScoreboard();
 }
 
 function returnToMenu() {
   poemGrid.style.display = "none";
   levelComplete.style.display = "none";
-  gameOver.style.display = "none";
-  characterSelect.style.display = "none";
-  saveScreen.style.display = "none";
+  gameComplete.style.display = "none";
 
   menuScreen.style.display = "flex";
 
@@ -191,32 +199,10 @@ function returnToMenu() {
 }
 
 /* ==========================================================================
-   PARTICLES & EFFECTS
-   ========================================================================== */
-function spawnParticles() {
-  for (let i = 0; i < 20; i++) {
-    const p = document.createElement("div");
-    p.classList.add("particle");
-    const dx = (Math.random() * 400 - 200) + "px";
-    const dy = (Math.random() * 400 - 200) + "px";
-    p.style.setProperty("--dx", dx);
-    p.style.setProperty("--dy", dy);
-    p.style.left = (window.innerWidth / 2) + "px";
-    p.style.top = (window.innerHeight / 2) + "px";
-    document.body.appendChild(p);
-    setTimeout(() => p.remove(), 1200);
-  }
-}
-
-/* ==========================================================================
    KEYBOARD SHORTCUTS
    ========================================================================== */
 document.addEventListener("keydown", (e) => {
   if (e.key === "Escape") {
-    if (creditsOverlay.style.display === "block") {
-      creditsOverlay.style.display = "none";
-    } else {
-      openSettings();
-    }
+    openSettings();
   }
 });
