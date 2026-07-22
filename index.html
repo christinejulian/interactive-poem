@@ -5,9 +5,6 @@
 <title>Arcade Poem Dungeon — Neon CRT Edition</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<!-- ============================
-     EMBEDDED RETRO CRT CSS
-     ============================ -->
 <style>
     body {
         margin: 0;
@@ -17,7 +14,6 @@
         overflow: hidden;
     }
 
-    /* CRT Scanlines */
     body::before {
         content: "";
         position: fixed;
@@ -32,7 +28,6 @@
         z-index: 999;
     }
 
-    /* Cabinet Frame */
     .cabinet {
         position: absolute;
         top: 50%;
@@ -47,7 +42,6 @@
         overflow: hidden;
     }
 
-    /* Dungeon Grid */
     .dungeon-bg {
         position: absolute;
         inset: 0;
@@ -59,7 +53,6 @@
         pointer-events: none;
     }
 
-    /* Screens */
     .screen {
         display: none;
         position: absolute;
@@ -68,7 +61,6 @@
         text-align: center;
     }
 
-    /* Menu */
     .menu-title {
         font-size: 1.8rem;
         margin-top: 3rem;
@@ -86,7 +78,6 @@
         cursor: pointer;
     }
 
-    /* HUD */
     #scoreboard {
         position: absolute;
         top: 1rem;
@@ -95,7 +86,6 @@
         display: none;
     }
 
-    /* Poem Grid */
     #poemGrid {
         display: none;
         position: absolute;
@@ -120,7 +110,6 @@
         color: #000;
     }
 
-    /* Overlay */
     .overlay {
         position: fixed;
         inset: 0;
@@ -146,21 +135,16 @@
 
 <body>
 
-<!-- ============================
-     CABINET
-     ============================ -->
 <div class="cabinet">
 
     <div class="dungeon-bg"></div>
 
-    <!-- HUD -->
     <div id="scoreboard">
         <div id="levelIndicator">LEVEL 1 / 15</div>
         <div id="scoreIndicator">SCORE: 0</div>
         <div id="healthIndicator">HEALTH: 100</div>
     </div>
 
-    <!-- MENU -->
     <div id="menuScreen" class="screen" style="display:flex; flex-direction:column; align-items:center;">
         <div class="menu-title">ARCADE POEM DUNGEON</div>
         <div class="menu-buttons">
@@ -170,7 +154,6 @@
         </div>
     </div>
 
-    <!-- LEVEL SELECT -->
     <div id="levelSelect" class="screen">
         <h2>SELECT LEVEL</h2>
         <div id="levelGrid"></div>
@@ -179,10 +162,8 @@
         </div>
     </div>
 
-    <!-- POEM GRID -->
     <div id="poemGrid"></div>
 
-    <!-- LEVEL COMPLETE -->
     <div id="levelComplete" class="screen">
         <h1 id="levelCompleteTitle">LEVEL COMPLETED!</h1>
         <div class="menu-buttons">
@@ -191,7 +172,6 @@
         </div>
     </div>
 
-    <!-- GAME OVER -->
     <div id="gameOver" class="screen">
         <h1>GAME OVER</h1>
         <p>You lost all your health.</p>
@@ -201,7 +181,6 @@
         </div>
     </div>
 
-    <!-- GAME COMPLETE -->
     <div id="gameComplete" class="screen">
         <h1>ALL 15 LEVELS CLEARED</h1>
         <div class="menu-buttons">
@@ -212,9 +191,6 @@
 
 </div>
 
-<!-- ============================
-     FULL CREDITS OVERLAY
-     ============================ -->
 <div class="overlay" id="creditsOverlay">
     <div class="overlay-content">
 
@@ -313,11 +289,9 @@
 </div>
 
 <!-- ============================
-     EMBEDDED INTERACTIVE JS
+     JAVASCRIPT AT THE VERY BOTTOM
      ============================ -->
 <script>
-// main.js (embedded)
-
 let currentLevel = 1;
 let unlockedLevels = 1;
 let score = 0;
@@ -340,7 +314,6 @@ const gameOver = document.getElementById("gameOver");
 const gameComplete = document.getElementById("gameComplete");
 const creditsOverlay = document.getElementById("creditsOverlay");
 
-/* MENU BUTTONS */
 document.getElementById("startGameBtn").onclick = () => openLevelSelect();
 document.getElementById("howToPlayBtn").onclick = () => alert("Click words to gain score.\nAvoid losing health.\nReach the target score.\nLevels unlock sequentially.");
 document.getElementById("creditsBtn").onclick = () => creditsOverlay.style.display = "block";
@@ -348,7 +321,6 @@ document.getElementById("creditsMenuBtn").onclick = () => { creditsOverlay.style
 
 document.getElementById("returnMenuBtn").onclick = () => returnToMenu();
 
-/* LEVEL SELECT */
 function openLevelSelect() {
     menuScreen.style.display = "none";
     levelSelect.style.display = "block";
@@ -372,7 +344,6 @@ function renderLevelButtons() {
     }
 }
 
-/* START LEVEL */
 function startLevel(level) {
     currentLevel = level;
     score = 0;
@@ -390,7 +361,6 @@ function startLevel(level) {
     loadPoemWords();
 }
 
-/* LOAD WORDS */
 function loadPoemWords() {
     poemGrid.innerHTML = "";
     for (let i = 0; i < 12; i++) {
@@ -407,7 +377,6 @@ function loadPoemWords() {
         poemGrid.appendChild(word);
     }
 
-    /* Random health loss */
     const interval = setInterval(() => {
         if (poemGrid.style.display !== "grid") { clearInterval(interval); return; }
         if (Math.random() < 0.15) {
@@ -421,14 +390,12 @@ function loadPoemWords() {
     }, 1500);
 }
 
-/* HUD */
 function updateHUD() {
     levelIndicator.textContent = `LEVEL ${currentLevel} / ${maxLevel}`;
     scoreIndicator.textContent = `SCORE: ${score}`;
     healthIndicator.textContent = `HEALTH: ${health}`;
 }
 
-/* LEVEL COMPLETE */
 document.getElementById("nextLevelBtn").onclick = () => startLevel(currentLevel + 1);
 
 function completeLevel() {
@@ -439,7 +406,6 @@ function completeLevel() {
     document.getElementById("levelCompleteTitle").textContent = `LEVEL ${currentLevel} COMPLETE!`;
 }
 
-/* GAME OVER */
 document.getElementById("retryLevelBtn").onclick = () => startLevel(currentLevel);
 
 function triggerGameOver() {
@@ -448,13 +414,11 @@ function triggerGameOver() {
     gameOver.style.display = "block";
 }
 
-/* GAME COMPLETE */
 document.getElementById("playAgainBtn").onclick = () => {
     unlockedLevels = 1;
     startLevel(1);
 };
 
-/* RETURN TO MENU */
 function returnToMenu() {
     menuScreen.style.display = "flex";
     levelSelect.style.display = "none";
